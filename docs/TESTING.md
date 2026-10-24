@@ -83,6 +83,15 @@ NOT run: printing on a real printer, scanning a printed label with a real scanne
 
 NOT run: the import screen in a browser with a login (needs the owner), a 2000-row file, a very large or hostile `.xlsx` (zip bomb) file.
 
+## P3 locations checks (2026-10-25)
+| Check | Result |
+|---|---|
+| DB tests `supabase/tests/006_locations.sql` | 17/17 PASS (see FEATURE-004 section 0) |
+| `npm test` | 23/23 PASS (3 new for location rules) |
+| lint, typecheck, build | exit 0; new routes `/locations`, `/locations/new`, `/locations/[id]` |
+
+NOT run: the screens in a browser with a login; the switcher with a user who has two places; the cookie being ignored when it holds a place the user is not assigned to (logic reviewed, not exercised).
+
 ## Not tested yet (gaps)
 - Real login with a real user, the admin page with real data, and the Save button. No user exists yet; first admin must be created in the Supabase dashboard.
 - No automated browser/end-to-end tests.

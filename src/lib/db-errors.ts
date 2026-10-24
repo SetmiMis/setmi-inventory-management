@@ -8,6 +8,7 @@ export function friendlyDbError(e: DbError): string {
     if (msg.includes("items_internal_code_uq")) return "This Internal Item Code already exists.";
     if (msg.includes("items_import_code_uq")) return "This Import Item Code already exists.";
     if (msg.includes("item_barcodes_barcode_uq")) return "This barcode already belongs to an item.";
+    if (msg.includes("locations_code_uq")) return "This location code already exists.";
     if (msg.includes("categories_name_uq")) return "A category with this name already exists.";
     return "A record with the same value already exists.";
   }

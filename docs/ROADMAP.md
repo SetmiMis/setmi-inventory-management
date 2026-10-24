@@ -16,6 +16,18 @@ A multi-user inventory + billing system for SETMI INDIA with several **warehouse
 7. **Archive, never delete** items and locations.
 8. Quantity type `numeric(12,3)` and `items.unit` (default `PCS`), because cables may be sold by meter. AI decision, easy to restrict later.
 
+## What we took from Odoo's Inventory documentation (read 2026-10-25, owner's request)
+Pages read through a fetch tool, in my own words. Coverage is partial: several pages were only tables of contents and long pages were cut near the end (adjustment details, backorders, reordering triggers were NOT readable). Where a point below says "general knowledge", it did not come from the page.
+- **Warehouse record** = full name + short code (Odoo: up to 5 characters, shown on documents) + address. We already have `code`; P3 adds a length limit.
+- **Locations can nest** (shelf inside zone inside warehouse) and Odoo has **virtual places**: vendor, customer, transit, inventory loss. Idea we adopt: every stock movement has a "from" and a "to"; a receipt comes from "outside (supplier)", a sale goes to "outside (customer)", a loss or count correction goes to/from "loss". Our ledger (P4) will store movement type + from/to location, where an empty end means "outside".
+- **Transit**: goods moving between sites are in a holding state until received. Our transfers (P6) will have status draft -> sent -> received, and stock "in transit" is shown per transfer.
+- **Inventory adjustment** = physical count vs on-hand quantity, the difference is applied, products with negative stock still show up (P4: count screen, reason required, difference becomes an ADJUSTMENT movement).
+- **Receipts and deliveries**: a receipt is checked against the purchase order and "validated" to become Done; a delivery mirrors it. One-step (receive straight into stock) is the simple default; two or three steps are for large operations. We start with one-step (P5, P7).
+- **Reordering rules**: minimum (and maximum) stock per item per location; below minimum, refill. We take the minimum/maximum per item per location for the low-stock report (P8); automatic purchase orders are out of scope.
+- **Barcodes**: Odoo accepts any text as a barcode; EAN-13 for retail normally needs a GS1 company prefix (this matches our choice of the internal "2" range); variants should carry their own barcodes; **locations can have barcodes** too (print and scan to say "I am putting this on shelf A"). Location barcodes are a later option for P4-P6.
+- **Units and packaging** matter for cables (metres, reels, boxes). Open question for the owner (see below); not in P4.
+- Not adopted (too big for a trading shop for now): lots/serial numbers, expiry dates, putaway rules, storage categories, routes, batch/wave picking, carrier integrations, landed costs.
+
 ## Phases
 
 | Phase | Content | Needs from owner |

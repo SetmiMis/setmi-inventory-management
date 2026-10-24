@@ -1,7 +1,9 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { can, requireUser } from "@/lib/auth";
+import { getCurrentLocation, getMyLocations } from "@/lib/location";
 import { logout } from "./actions";
+import { LocationSwitcher } from "./location-switcher";
 
 // Every page in this group needs a signed-in user. Reading the session is a request-time
 // read, so with Cache Components it must sit inside <Suspense>.
@@ -15,6 +17,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
 async function Shell({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
+  const myLocations = await getMyLocations(user);
+  const current = await getCurrentLocation(user);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-4">
@@ -28,12 +32,22 @@ async function Shell({ children }: { children: React.ReactNode }) {
               Items
             </Link>
           )}
+          {(can(user, "locations.manage") || myLocations.length > 0) && (
+            <Link href="/locations" className="text-blue-700 underline">
+              Locations
+            </Link>
+          )}
           {user.isActive && user.isAdmin && (
             <Link href="/admin/users" className="text-blue-700 underline">
               Users
             </Link>
           )}
         </nav>
+        {myLocations.length > 1 && current ? (
+          <LocationSwitcher locations={myLocations} currentId={current.id} />
+        ) : current ? (
+          <span className="text-sm text-neutral-500">Working in {current.name} ({current.code})</span>
+        ) : null}
         <form action={logout} className="flex items-center gap-3 text-sm">
           <span className="text-neutral-500">{user.email}</span>
           <button type="submit" className="rounded border border-neutral-400 px-3 py-1">

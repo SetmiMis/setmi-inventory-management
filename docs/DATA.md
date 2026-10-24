@@ -41,6 +41,9 @@ Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search 
 - `_generate_item_barcode(uuid)` (internal, no rights for users) and `generate_item_barcode` now uses it (same behaviour).
 - `import_items(p_rows jsonb, p_dry_run, p_skip_invalid, p_generate_barcodes)`: security definer, needs `items.import`; max 2000 rows; uses temporary tables inside one transaction; returns counts, errors (row, column, message) and new categories. New categories need `categories.manage`. Tests `supabase/tests/005_import_items.sql`: 16/16 pass.
 
+## Migration 6: `20261025000006_location_guards.sql` (applied 2026-10-25)
+- Checks: `locations_code_len` (<= 20), `locations_name_len` (<= 100), `locations_address_len` (<= 500). Trigger `locations_guard`: `updated_by` = caller, `created_by`/`created_at` cannot change. Tests `supabase/tests/006_locations.sql`: 17/17 pass.
+
 ## Known gaps in this design
 - (fixed by migration 3) archive-only users could edit other columns.
 - `item_barcodes` and `categories` inserts are not blocked for archive-only users beyond RLS permission checks (barcodes need items.edit or items.create).

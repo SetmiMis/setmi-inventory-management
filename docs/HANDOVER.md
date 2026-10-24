@@ -2,6 +2,32 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-25: Odoo docs read; P3 locations built (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- Odoo Inventory docs read (partially: several pages were only tables of contents, long pages cut near the end). What was taken, and what was not, is in `docs/ROADMAP.md` ("What we took from Odoo").
+- P3 built per `docs/features/FEATURE-004-LOCATIONS.md` section 0: screens, working-location switcher, migration 6 (applied), DB tests 17/17, unit tests 23/23, lint/typecheck/build pass.
+- Commit `5ecf6ae` (P2c, local). Everything of P3 is uncommitted.
+
+### Owner to do
+1. Items > Locations > New location: create the real warehouses and shops (codes like WH-MAIN, SHOP-01). Tell the AI the names if you want them reviewed.
+2. Users page: assign each user to their place(s). A shop user then sees only that shop.
+3. Still untried in the browser: uploads, barcode print/scan, Excel import, locations.
+
+### Next
+P4: stock ledger and balances per item per location, manual stock count/adjustment with a reason, stock view. Design follows the Odoo lessons (movements have from/to, "outside" for suppliers and customers).
+Open questions for P4: opening stock (how will today's stock be loaded: Excel count per location?), units (metres/reels?), minimum stock levels per item per location.
+
+---
+
+## 2026-10-25: P3 plan written (Claude Sonnet 5.5)
+
+- P2c committed locally as `5ecf6ae` (not pushed). Working tree was clean after that commit.
+- Plan for warehouses and shops: `docs/features/FEATURE-004-LOCATIONS.md`. Only a document; no code or database change. Waiting for the owner's "haan" and the five answers in its section 7 (names/codes of warehouses and shops, shop details, multi-location users, racks, who creates locations).
+- Still untried by the owner in the browser: uploads (P2b), barcode print and scan, Excel import (P2c).
+
+---
+
 ## 2026-10-24: P2c Excel import (Claude Sonnet 5.5)
 
 ### Done (verified by command output)
