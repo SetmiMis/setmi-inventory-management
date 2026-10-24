@@ -130,6 +130,14 @@ Format: context, options, choice, reason, date, model.
 - **Revisit if:** the owner wants purchase orders, gap-free numbers per financial year, landed costs, or returns to suppliers.
 - **Date / model:** 2026-10-25, Claude Sonnet 5.5
 
+## D-024: Transfers through a hidden "in transit" place (P6)
+- **Context:** goods must not vanish between two places and must not count as available at either end while on the way. The owner's reply to the six questions was empty again, so the plan's defaults were used.
+- **Choice:** one system place `IN-TRANSIT`; send = source -> transit; receive = transit -> destination; shortage = transit -> outside (own movement type); recall = transit -> source. Documents DRAFT -> SENT -> RECEIVED/CANCELLED, immutable once sent. Place names are copied onto the document.
+- **Alternatives:** a separate "in transit quantity" table per transfer (a second source of truth, new "never negative" logic); moving stock to the destination at send time (the shop would sell goods it does not have yet); a transit place per transfer (hundreds of useless places).
+- **Trade-offs:** the system place is a special case in a few places (lists, counts, permissions); transit totals are visible only to admins until the P8 reports; a shortage is booked as a loss, not held open.
+- **Open (owner):** GST/e-way bill rules for transfers between your places; whether shortages should stay open instead.
+- **Date / model:** 2026-10-25, Claude Sonnet 5.5
+
 ## D-012: `Import_item_code` is optional
 - **Owner decision:** some items need it, some do not. It is optional, unique when filled, and not tied to LOCAL/IMPORT by a database rule.
 - **Date:** 2026-10-24

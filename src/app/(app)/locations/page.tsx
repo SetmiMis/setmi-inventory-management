@@ -16,7 +16,7 @@ export default async function LocationsPage({ searchParams }: { searchParams: Pr
   const status = ["active", "archived", "all"].includes(first(sp.status) ?? "") ? first(sp.status)! : "active";
 
   const supabase = await createClient();
-  let query = supabase.from("locations").select("id, code, name, type, address, is_active").order("type").order("name");
+  let query = supabase.from("locations").select("id, code, name, type, address, is_active").neq("type", "TRANSIT").order("type").order("name");
   if (type) query = query.eq("type", type);
   if (status !== "all") query = query.eq("is_active", status === "active");
   const { data, error } = await query;

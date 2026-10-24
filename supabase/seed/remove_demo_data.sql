@@ -1,8 +1,9 @@
 -- REMOVE DEMO DATA, DEVELOPMENT ONLY. Run in the Supabase SQL editor as the project owner.
 -- Deletes only things whose code / name starts with DEMO. Real items, locations and stock are not touched.
--- The stock history is normally impossible to delete (append-only trigger). This script switches that
--- trigger off for the length of the transaction, deletes ONLY the movements of DEMO items, and switches it on again.
--- NEVER run this on a database that holds real stock history for DEMO-named things.
+-- Stock history, goods receipts and transfers are normally impossible to delete (append-only / locked
+-- triggers). This script switches those triggers off for the length of the transaction, deletes ONLY rows
+-- that belong to DEMO items or DEMO locations, and switches them on again before it commits.
+-- NEVER run this on a database that holds real history for DEMO-named things.
 begin;
 
 alter table public.stock_movements disable trigger stock_movements_no_change;
@@ -11,6 +12,24 @@ delete from public.stock_movements
     or from_location_id in (select id from public.locations where code like 'DEMO-%')
     or to_location_id   in (select id from public.locations where code like 'DEMO-%');
 alter table public.stock_movements enable trigger stock_movements_no_change;
+
+-- goods receipts that belong to a DEMO place (lines and prices go with them)
+alter table public.goods_receipts disable trigger goods_receipts_no_change;
+alter table public.goods_receipt_lines disable trigger goods_receipt_lines_guard;
+alter table public.goods_receipt_costs disable trigger goods_receipt_costs_guard;
+delete from public.goods_receipts where location_id in (select id from public.locations where code like 'DEMO-%');
+alter table public.goods_receipt_costs enable trigger goods_receipt_costs_guard;
+alter table public.goods_receipt_lines enable trigger goods_receipt_lines_guard;
+alter table public.goods_receipts enable trigger goods_receipts_no_change;
+
+-- transfers that start or end at a DEMO place
+alter table public.stock_transfers disable trigger stock_transfers_flow_trg;
+alter table public.stock_transfer_lines disable trigger stock_transfer_lines_flow_trg;
+delete from public.stock_transfers
+ where from_location_id in (select id from public.locations where code like 'DEMO-%')
+    or to_location_id   in (select id from public.locations where code like 'DEMO-%');
+alter table public.stock_transfer_lines enable trigger stock_transfer_lines_flow_trg;
+alter table public.stock_transfers enable trigger stock_transfers_flow_trg;
 
 delete from public.stock_balances
  where item_id in (select id from public.items where internal_item_code like 'DEMO-%')
@@ -23,5 +42,6 @@ delete from public.item_barcodes where item_id in (select id from public.items w
 delete from public.items where internal_item_code like 'DEMO-%';
 delete from public.locations where code like 'DEMO-%';
 delete from public.categories where name like 'DEMO %';
+delete from public.suppliers where name like 'DEMO %';
 
 commit;

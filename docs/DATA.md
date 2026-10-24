@@ -61,6 +61,13 @@ Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search 
 - Writes only through `save_goods_receipt` (needs `receipts.create`, place access, validates every line, replaces lines of the draft), `post_goods_receipt` (needs `receipts.post`, locks the receipt, inserts RECEIPT movements with reference = number, sets POSTED, audit), `cancel_goods_receipt` (draft only).
 - Tests: `supabase/tests/009_receiving.sql`.
 
+## Migrations 11 and 12 (applied 2026-10-25): transfers
+- Enum values: `location_type` + `TRANSIT`; `stock_movement_type` + `TRANSFER_SHORTAGE` (separate migration because a new enum value cannot be used in the transaction that adds it).
+- System place: one row in `locations` with type TRANSIT, code `IN-TRANSIT` (unique partial index). Trigger `locations_protect_transit` stops users creating or changing it; trigger `user_locations_no_transit` stops assigning it; trigger `stock_movements_transit_guard` lets only TRANSFER and TRANSFER_SHORTAGE touch it and makes a shortage leave it. View `stock_overview` excludes it.
+- `stock_transfers` (TRF-000001 from a sequence, from/to place ids and copied code/name, status, notes, shortage flag and note, who/when for create/send/receive) and `stock_transfer_lines` (item, quantity_sent, quantity_received). Flow trigger: finished transfers are frozen, a sent one can only be received or recalled, no deletes; lines are frozen once sent except filling in quantity_received.
+- Read: any transfers permission plus access to the from OR to place. Writes only through the functions listed in FEATURE-007 section 0.
+- Tests: `supabase/tests/010_transfers.sql` (38 lines).
+
 ## Known gaps in this design
 - (fixed by migration 3) archive-only users could edit other columns.
 - `item_barcodes` and `categories` inserts are not blocked for archive-only users beyond RLS permission checks (barcodes need items.edit or items.create).

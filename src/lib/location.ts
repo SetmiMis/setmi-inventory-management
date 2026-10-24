@@ -19,6 +19,7 @@ export const getMyLocations = cache(async (user: CurrentUser): Promise<MyLocatio
       .from("locations")
       .select("id, code, name, type")
       .eq("is_active", true)
+      .neq("type", "TRANSIT") // the hidden "in transit" system place is never a working place
       .order("name");
     return (data ?? []) as MyLocation[];
   }

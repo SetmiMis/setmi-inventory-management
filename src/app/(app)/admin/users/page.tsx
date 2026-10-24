@@ -12,7 +12,7 @@ export default async function UsersPage() {
     supabase.from("profiles").select("id, email, full_name, is_active, is_admin").order("email"),
     supabase.from("permissions").select("key, module, description").order("module").order("key"),
     supabase.from("user_permissions").select("user_id, permission_key"),
-    supabase.from("locations").select("id, code, name, type").eq("is_active", true).order("name"),
+    supabase.from("locations").select("id, code, name, type").eq("is_active", true).neq("type", "TRANSIT").order("name"),
     supabase.from("user_locations").select("user_id, location_id"),
   ]);
 

@@ -17,4 +17,5 @@ export const MOVEMENT_LABELS: Record<string, string> = {
   RECEIPT: "Received",
   SALE: "Sold",
   TRANSFER: "Transfer",
+  TRANSFER_SHORTAGE: "Lost in transit",
 };

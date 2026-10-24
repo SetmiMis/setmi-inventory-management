@@ -64,7 +64,11 @@ export default async function MovementsPage({ searchParams }: { searchParams: Pr
             <tbody>
               {rows.map((m) => {
                 const incoming = m.to_location_id === loc.id;
-                const other = incoming ? (m.from_loc?.code ?? "Outside") : (m.to_loc?.code ?? "Outside / loss");
+                // The hidden in-transit place is invisible to most users (it reads as empty), so a
+                // transfer movement with an unseen end means "on the way".
+                const onTheWay = m.movement_type === "TRANSFER" || m.from_loc?.code === "IN-TRANSIT" || m.to_loc?.code === "IN-TRANSIT";
+                const otherCode = incoming ? m.from_loc?.code : m.to_loc?.code;
+                const other = otherCode && otherCode !== "IN-TRANSIT" ? otherCode : onTheWay ? "On the way" : incoming ? "Outside" : "Outside / loss";
                 return (
                   <tr key={m.id} className="border-b border-neutral-200">
                     <td className="py-2 pr-3 whitespace-nowrap">{when(m.created_at)}</td>

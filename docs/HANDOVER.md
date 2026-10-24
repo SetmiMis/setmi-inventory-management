@@ -2,7 +2,36 @@
 
 Newest entry on top. Read this first, update it last.
 
-## 2026-10-25 (newest): scan-count pushed; P5 receiving built (Claude Sonnet 5.5)
+## 2026-10-25 (very latest): P6 transfers built (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- P5 was pushed earlier as `83f8d1c`.
+- P6 per `docs/features/FEATURE-007-TRANSFERS.md` section 0: migrations 11 and 12 applied; DB tests 38/38; unit tests 28/28; lint/typecheck/build pass; advisor has no new kind of warning; `remove_demo_data.sql` now also removes demo receipts and transfers (rolled-back test passed).
+- The owner's reply to the P6 questions was empty ("1)"), so the plan's DEFAULTS were used (D-024).
+- **Uncommitted and not pushed:** all of P6.
+
+### Owner to try (browser)
+1. Admin Users page: give a warehouse user `transfers.create` + `transfers.send` + `stock.view` and the DEMO warehouse; give a shop user `transfers.receive` + `transfers.view` + `items.view` + `stock.view` and a DEMO shop. (As admin you can do all steps yourself: switch place in the header.)
+2. Transfers > New transfer (from the DEMO warehouse): scan or search items, or press "Fill from the other place's minimum levels" (some DEMO shop items are below minimum on purpose). Save and send. Switch to the shop, open the transfer, receive with "check by scanning", try a shortage. Look at Stock and History on both places.
+3. Still untried in the browser: uploads, barcode print/scan, Excel import, locations, stock, scan-count, receipts.
+
+### Open
+- **GST / e-way bill** for stock moved between your places (ask the accountant). Until then only a plain dispatch note exists.
+- Shortage booked as a loss with a note, or kept open?
+- Older DB tests assume an empty database (see TESTING.md).
+
+### Next
+P7 billing at the shop (scan barcode, bill uses Selling_Item_Name, SALE movements; needs the invoice/GST rules from the accountant) or P8 reports (stock by place incl. in-transit, low stock, history export).
+
+---
+
+## 2026-10-25 (earlier): P5 pushed; P6 transfers planned (Claude Sonnet 5.5)
+
+- P5 committed as `83f8d1c` and **pushed**: `git ls-remote origin` = local HEAD. Pre-push checks clean again (repo 404 without login, no secrets in any commit, no env file). Known-good for `docs/ROLLBACK.md` is now `83f8d1c` with the database at migration 010.
+- P6 plan only: `docs/features/FEATURE-007-TRANSFERS.md` (DRAFT -> SENT -> RECEIVED, hidden "IN TRANSIT" system place, shortage booked visibly, scan to check on arrival, suggest from minimum levels). No code or database change. Waiting for the owner's "haan" and the six questions in section 7, especially the GST / e-way bill question for transfers between places (accountant).
+- Uncommitted: that plan doc and this note.
+
+## 2026-10-25 (earlier): scan-count pushed; P5 receiving built (Claude Sonnet 5.5)
 
 ### Done (verified by command output)
 - Scan-to-count committed as `065e20f` and **pushed** (`git ls-remote` = local HEAD). Known-good for `docs/ROLLBACK.md` is now `065e20f` (database at migration 009).

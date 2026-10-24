@@ -123,6 +123,21 @@ NOT run: the screen in a browser, a real USB scanner, the beep (browsers may blo
 
 NOT run: the receipt editor in a browser, a real scanner on it, A4 print, label print for a receipt, a user with `receipts.create` but without `items.view` (lookups fail), two people posting at the same moment (covered by a row lock; not stress-tested).
 
+## P6 transfer checks (2026-10-25)
+| Check | Result |
+|---|---|
+| DB tests `supabase/tests/010_transfers.sql` | 38 lines, all PASS: draft saved with a TRF number and both place names copied; destinations list never shows the system place; draft does not touch stock; from = to refused; fractions refused for pieces; cannot prepare a transfer from a place you do not work in; send needs `transfers.send`; sending takes stock out of the source and into transit; send twice refused and stock unchanged; not enough stock names the short items; a sent transfer cannot be edited; receive needs `transfers.receive` and the receiving place; more than sent refused; shortage needs a note; every line must be answered; receive with shortage: shop gets what arrived, transit returns to 0, one shortage movement, flag set; receive twice refused and stock unchanged; recall puts goods back and cancels; a received transfer cannot be recalled; a shop user cannot see transfers between two other places; viewer sees transfers touching their place with lines; no direct insert; suggestion fills to the maximum capped by the source's stock and is empty for users without the right; the system place cannot be edited, duplicated or assigned and is hidden from the stock list; only transfers may use it; lines of finished transfers locked, no delete; audit rows; anonymous sees nothing |
+| `remove_demo_data.sql` with receipts and transfers (rolled-back test) | removed receipts, lines, transfers, movements, balances, demo items and places; all 6 guard triggers back ON; a real place was kept |
+| `npm test` | 28/28 PASS |
+| lint, typecheck, build | exit 0; new routes `/transfers`, `/transfers/new`, `/transfers/[id]`, `/transfers/[id]/print` |
+| Supabase security advisor | no new kind of warning (the accepted "signed-in users can execute SECURITY DEFINER" notes, now 20, each checks permission inside; no anonymous ones); plus the dashboard setting "leaked password protection disabled" |
+| First run of the test | had a NULL result because the script read the system place's balance as a normal user (only admins may). Fixed in the script; not a database fault |
+
+NOT run: the transfer screens in a browser, the receive screen with a real scanner, A4 dispatch note print, two people sending/receiving at the same moment (row lock; not stress-tested).
+
+## Note about the older DB tests
+Tests 006-009 (and 003/004 in places) assume an EMPTY database: they count rows. With the demo data and the hidden in-transit place present, some of those counts differ and the tests would report FAIL. Run them on an empty copy (a Supabase branch) or read the failing line before trusting it.
+
 ## Not tested yet (gaps)
 - Real login with a real user, the admin page with real data, and the Save button. No user exists yet; first admin must be created in the Supabase dashboard.
 - No automated browser/end-to-end tests.

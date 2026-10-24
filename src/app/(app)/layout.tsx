@@ -37,6 +37,11 @@ async function Shell({ children }: { children: React.ReactNode }) {
               Receipts
             </Link>
           )}
+          {(can(user, "transfers.view") || can(user, "transfers.create") || can(user, "transfers.send") || can(user, "transfers.receive")) && (
+            <Link href="/transfers" className="text-blue-700 underline">
+              Transfers
+            </Link>
+          )}
           {(can(user, "suppliers.view") || can(user, "suppliers.manage")) && (
             <Link href="/suppliers" className="text-blue-700 underline">
               Suppliers
