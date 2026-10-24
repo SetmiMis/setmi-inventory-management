@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { can, requireUser } from "@/lib/auth";
 import { logout } from "./actions";
 
 // Every page in this group needs a signed-in user. Reading the session is a request-time
@@ -23,6 +23,11 @@ async function Shell({ children }: { children: React.ReactNode }) {
           <Link href="/" className="font-semibold">
             SETMI INDIA IMS
           </Link>
+          {can(user, "items.view") && (
+            <Link href="/items" className="text-blue-700 underline">
+              Items
+            </Link>
+          )}
           {user.isActive && user.isAdmin && (
             <Link href="/admin/users" className="text-blue-700 underline">
               Users

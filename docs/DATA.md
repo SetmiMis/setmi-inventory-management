@@ -29,8 +29,13 @@ Storage bucket `item-files`: private, 10 MB cap, JPEG/PNG/WebP/PDF only. Read ne
 Trigger `items_guard`: changing `selling_item_name` needs `items.edit_selling_name`; changing `is_active` needs `items.archive`.
 Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search on names and code.
 
+## Migration 3: `20261024000003_item_guards.sql` (applied 2026-10-24)
+- `created_by` defaults to `auth.uid()` on items, item_barcodes, locations.
+- `items_guard_update` now: forces `updated_by` to the caller, keeps `created_by`/`created_at` unchangeable, and blocks a user who has only `items.archive` from editing any field except `is_active`. Tests: `supabase/tests/002_item_guards.sql`, 7/7 pass.
+
 ## Known gaps in this design
-- A user with only `items.archive` can pass the RLS update check and could edit other columns. Fix when the item UI is built (separate archive function) or tighten the trigger.
+- (fixed by migration 3) archive-only users could edit other columns.
+- `item_barcodes` and `categories` inserts are not blocked for archive-only users beyond RLS permission checks (barcodes need items.edit or items.create).
 - Signups on Supabase Auth must be disabled in the dashboard. Defence in depth: new profiles are inactive.
 - Admin creation of the first admin is a manual SQL step.
 

@@ -2,6 +2,30 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-24: P2a Item Master screens (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- Migration 3 applied (guards, created_by); 7/7 DB tests pass.
+- Screens: item list (search by code/name/barcode, filters, 25 per page), new item, item page (edit, barcodes, archive/restore), categories page, nav link. Flow in `docs/FLOW.md`.
+- lint, typecheck, build pass.
+- Owner reported the login works.
+
+### NOT done / NOT verified
+- Item screens never clicked through with a real user. Please try: add a category, add an item (watch Selling Name copy Item Name), add/remove a barcode, search, archive/restore.
+- Item images and datasheet upload (spec: 4 images JPG/PNG/WebP up to 5 MB, 1 PDF up to 10 MB; bucket `item-files` exists) -> P2b.
+- Excel import -> P2c (need a sample file and the Excel library choice).
+- The admin account holds every permission, so the permission-limited views (read-only item page, hidden buttons) are untested; try them later with a second user.
+- Create item is two DB calls, not one transaction (documented limit).
+- Rows are untyped in code (Supabase types not generated into the repo).
+
+### Uncommitted
+Migration 3, tests, all P2a code and docs.
+
+### Next
+P2b: image and datasheet upload with server-side type/size checks.
+
+---
+
 ## 2026-10-24: P1 app code, login + guard + admin users (Claude Sonnet 5.5)
 
 ### Done (verified by command output)
@@ -19,11 +43,13 @@ Newest entry on top. Read this first, update it last.
 1. Authentication settings: turn OFF "Allow new users to sign up".
 2. Authentication > Users > Add user (email + password, auto-confirm). Tell the AI the EMAIL only; it will mark that user admin + active by SQL.
 
-### Uncommitted
-All P1 code and doc changes.
+### Update (same day): first admin created
+- Owner confirmed signups were turned off and created the first user in the Supabase dashboard. The only user (`mis@setmiindia.org`) was set `is_admin = true`, `is_active = true` by SQL (verified by the query result).
+- P1 committed locally as `0247be3`. Not pushed.
+- Real browser login still to be done by the owner (the AI never enters passwords).
 
 ### Next
-After first admin exists: test login + admin page for real, then P2: categories and Item Master screens.
+Owner logs in on `npm run dev` and checks `/` and `/admin/users`. Then P2: categories and Item Master screens.
 
 ---
 

@@ -43,6 +43,15 @@ Run in the Supabase SQL editor or with `execute_sql`. It creates temporary users
 
 Note: a stale `.next` folder after deleting a page can break `typecheck`; delete `.next` and rerun.
 
+## P2a Item Master checks (2026-10-24)
+| Check | Result |
+|---|---|
+| DB tests `supabase/tests/002_item_guards.sql` | 7/7 PASS (created_by/updated_by forced, archive-only cannot edit, archive and restore work) |
+| `npm run lint` / `typecheck` / `build` | all exit 0. New routes: `/items`, `/items/new`, `/items/[id]`, `/items/categories` |
+| Search filter syntax sent to PostgREST (anonymous request) | HTTP 200, `[]` (syntax accepted; RLS shows nothing without login) |
+
+NOT run: the item screens in a browser with a real user (no add/edit/archive/barcode/search click-through yet), the 25-per-page paging with real data, categories page.
+
 ## Not tested yet (gaps)
 - Real login with a real user, the admin page with real data, and the Save button. No user exists yet; first admin must be created in the Supabase dashboard.
 - No automated browser/end-to-end tests.

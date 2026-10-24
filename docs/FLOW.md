@@ -35,5 +35,19 @@ Header form -> server action `logout` in `(app)/actions.ts` -> `signOut` -> redi
    -> each RPC re-checks `is_admin()` in the database and writes an audit_log row
 -> revalidatePath, result message shown next to the Save button.
 
+## Item Master (P2a, implemented 2026-10-24; images/datasheet and Excel import NOT yet)
+All under `src/app/(app)/items/`. Every page/action starts with `requirePermission(...)`.
+
+| Route / action | Permission | What happens |
+|---|---|---|
+| `/items` (page.tsx) | items.view | URL params parsed and sanitised (`sanitizeSearch`, uuid check, whitelist for status/source, page clamp). Barcode matches fetched first, then one `items` query with `or(ilike...)`, filters, count, `range` (25 per page) |
+| `/items/new` -> `createItem` | items.create | zod (`lib/validation/item.ts`) -> insert item (selling name falls back to item name) -> insert barcodes -> redirect to `/items/[id]`. If barcodes fail: redirect with `?warn=barcodes` |
+| `/items/[id]` -> `updateItem` | items.edit | zod -> update `where id and updated_at = expected` (stops lost updates; 0 rows = "changed by someone else"). `selling_item_name` is sent only if user has items.edit_selling_name |
+| `ArchiveControl` -> `setItemActive` | items.archive | sets `is_active` |
+| `BarcodeManager` -> `addBarcode` / `removeBarcode` | items.edit | insert / delete one barcode |
+| `/items/categories` -> `saveCategory` | categories.manage | create or rename / switch off a category |
+
+Database errors go through `lib/db-errors.ts` so users see plain messages (duplicate code, no permission), never raw database text. Database triggers still enforce the same rules if the app code ever has a bug.
+
 ## Errors
 Validation failure or database error is returned to the form as `{ok:false, message}` and shown in red. Not-signed-in and not-admin cases redirect.
