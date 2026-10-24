@@ -31,5 +31,49 @@ Format: context, options, choice, reason, date, model.
 - **Date:** 2026-10-24
 
 ## D-006: System is multi-user
-- **Status:** owner-stated. Several company users will use it, so login, roles and RLS are required. Roles are not yet defined.
+- **Status:** owner-stated. Several company users will use it, so login, authorization and RLS are required. Users are not decided yet.
+- **Date:** 2026-10-24
+
+## D-007: Admin-configurable permissions instead of fixed roles
+- **Owner decision:** an admin panel where the admin switches permissions on/off per user, per menu/action.
+- **Options:** (a) fixed roles (Admin/Editor/Viewer), (b) per-user permission toggles. (a) was the AI's first proposal; owner chose (b).
+- **Why (b):** user list and duties are not known yet, and new modules will need new permissions.
+- **Trade-offs:** more tables and more careful testing; a bug in permission checks affects every module. Mitigation: deny by default, enforce on server and in RLS, log permission changes, test unauthorized access explicitly.
+- **Revisit if:** permission list becomes too large to manage; then group permissions into roles that are only shortcuts for toggles.
+- **Date / model:** 2026-10-24, Claude Sonnet 5.5
+
+## D-008: `Selling_Item_Name` is required and prefilled
+- **Owner decision ("haa"):** required; on create it is prefilled from `Item_Name` so a bill never has an empty name.
+- **Date:** 2026-10-24
+
+## D-009: Archive only, no real delete
+- **Owner decision ("haa").** Items are archived, not deleted, so future stock and billing history keep a valid reference.
+- **Date:** 2026-10-24
+
+## D-010: Two data-entry paths
+- **Owner decision:** manual entry and Excel import both supported. Import design is a separate task.
+- **Date:** 2026-10-24
+
+## D-011: Barcode purpose
+- **Owner statement:** barcode is scanned at selling time to pick the item for a bill, and used for inventory management.
+- **Owner decision:** works like standard barcode billing: one barcode value belongs to exactly one item, so it is globally unique.
+- **Proposed, not yet confirmed:** barcodes stored in their own table so an item can have several. Costs one extra table now, avoids a migration later.
+- **Date:** 2026-10-24
+
+## D-013: Whole-project plan, AI decides details (owner instruction 2026-10-24)
+- Owner asked for a full plan including warehouses and shops, and said to decide sensibly and change after it is built. Plan: `docs/ROADMAP.md`.
+- AI decisions inside it: one `locations` table (WAREHOUSE/SHOP); append-only stock ledger; stock changes only via Postgres functions; user-to-location scope; bills snapshot names; `numeric(12,3)` quantities with `unit`.
+- Still requires explicit owner approval: push, deploy, DNS, paid resources.
+- **Date / model:** 2026-10-24, Claude Sonnet 5.5
+
+## D-014: Admin-only user management, `is_admin` flag
+- Permission toggles are changed only by `admin_*` SQL functions that require `is_admin()`. No client write policy exists on profiles, user_permissions, user_locations. This avoids a user with a "manage users" toggle promoting themselves.
+- **Date / model:** 2026-10-24, Claude Sonnet 5.5
+
+## D-015: Category as a managed table
+- Owner undecided (list vs free text). A `categories` table gives a list that admins can extend, so it behaves like free text with no typo duplicates. `items.category_id` is nullable. Change later if owner prefers.
+- **Date / model:** 2026-10-24, Claude Sonnet 5.5
+
+## D-012: `Import_item_code` is optional
+- **Owner decision:** some items need it, some do not. It is optional, unique when filled, and not tied to LOCAL/IMPORT by a database rule.
 - **Date:** 2026-10-24
