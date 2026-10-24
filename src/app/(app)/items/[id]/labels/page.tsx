@@ -120,7 +120,8 @@ export default async function LabelsPage({
         </form>
         <p className="text-xs text-neutral-500">
           In the print window choose your label printer, set margins to &quot;None&quot; and scale to 100%.
-          Print one label first and scan it before printing a full roll.
+          Print one label first and scan it before printing a full roll. Scan the PRINTED label, not the
+          screen: simple scanners often cannot read a barcode shown on a monitor.
         </p>
       </div>
 

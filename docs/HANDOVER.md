@@ -2,6 +2,23 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-25 (latest): Odoo Barcode docs read; scan-to-count built (Claude Sonnet 5.5)
+
+- Owner asked to read Odoo's Barcode docs (Setup, Daily operations), check against our system and develop. Read (partially, see FEATURE-003 section 0b); findings written there and in ROADMAP.
+- Built `/stock/scan`: count by scanning, per FEATURE-003 section 0c. lint/typecheck/build pass, unit tests 25/25. No new migration, no new dependency.
+- Not verified: with a real scanner or in a browser.
+- Uncommitted and not pushed: scan-count code (actions.ts refactor + new screen + label tip), docs, and the P5 plan doc from before.
+- P5 (receiving) plan is still waiting for the owner's "haan" and its seven questions.
+
+## 2026-10-25 (earlier): P4 pushed; P5 planned (Claude Sonnet 5.5)
+
+- P4 committed as `2fab60a` and **pushed**. `git ls-remote origin refs/heads/main` = `2fab60a` = local HEAD. Pre-push checks again clean (repo 404 without login, no secrets in any commit, no env file staged). Known-good commit for `docs/ROLLBACK.md` is now `2fab60a` (database at migration 009).
+- P5 plan only: `docs/features/FEATURE-006-RECEIVING.md` (suppliers, goods receipts DRAFT -> POSTED, scan to add lines, labels for received quantities, cost behind its own permission). No code or database change. Waiting for the owner's "haan" and the seven questions in section 7.
+- Uncommitted: that plan doc and this note.
+- Still untried by the owner in a browser: uploads, barcode print/scan, Excel import, locations, stock (with the DEMO data).
+
+---
+
 ## 2026-10-25: pushed to GitHub; P4 stock built (Claude Sonnet 5.5)
 
 ### Done (verified by command output)

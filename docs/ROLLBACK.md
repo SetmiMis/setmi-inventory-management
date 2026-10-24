@@ -3,8 +3,8 @@
 ## Current known-good points
 | What | Value | Notes |
 |---|---|---|
-| Last commit pushed to GitHub (`origin/main`) | `e2eb995` (P3: locations) | Verified with `git ls-remote origin` on 2026-10-25. P4 work is local until pushed |
-| Database state matching it | migrations 001 to 006 | P4 added 007, 008, 009 (applied to the dev Supabase project) |
+| Last commit pushed to GitHub (`origin/main`) | `2fab60a` (P4: stock) | Verified with `git ls-remote origin` on 2026-10-25. Previous known-good: `e2eb995` (P3) |
+| Database state matching it | migrations 001 to 009 | 007-009 are the stock migrations (applied to the dev Supabase project) |
 
 ## Undo an application change
 1. `git log --oneline` and pick the commit before the bad one.

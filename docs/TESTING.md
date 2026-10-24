@@ -104,6 +104,14 @@ NOT run: the screens in a browser with a login; the switcher with a user who has
 
 NOT run: the stock screens in a browser with a login, the count sheet with a user who has two places, a 500-row count, concurrent counts by two users.
 
+## Scan-count screen checks (2026-10-25)
+| Check | Result |
+|---|---|
+| lint, typecheck, `npm test` (25/25), build | exit 0; new route `/stock/scan` |
+| Server-side lookup and save | reuse the already tested pieces: exact barcode match, `apply_stock_count` (DB tests 007 cover permission, decimals, all-or-nothing) |
+
+NOT run: the screen in a browser, a real USB scanner, the beep (browsers may block sound until the page was clicked), a user with `stock.adjust` but without `items.view` (lookup answers "You cannot see this item"), two scans closer than 100 ms. There is no automated test for the client component (no browser test tool installed yet).
+
 ## Not tested yet (gaps)
 - Real login with a real user, the admin page with real data, and the Save button. No user exists yet; first admin must be created in the Supabase dashboard.
 - No automated browser/end-to-end tests.

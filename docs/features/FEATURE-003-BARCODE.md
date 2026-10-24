@@ -11,6 +11,33 @@ Owner request: when an item is created the system should give it a barcode, the 
 - Bar height is computed from the label size so bars stay at least about 0.26 mm wide (EAN-13 readable range).
 - Known gaps: SVG placement inside the page was not scanned from a real print; only the same module string was decoded. Sequence numbers 1 and 2 were used up by DB tests, so the first real barcode is ...003 (harmless). Only EAN-13 barcodes can be printed; a manufacturer barcode in another format (EAN-8, Code 128) shows no Print link.
 
+## 0b. Odoo Barcode docs, read 2026-10-25 (partial: pages were cut near the end; unknown-barcode handling, lots, packing and the full command list were NOT readable)
+What Odoo says, in my words, and how we compare:
+| Odoo | Us |
+|---|---|
+| A scanner behaves like a keyboard: it types the code and presses Enter | Same. The item search box and the new scan-count screen work this way |
+| Each scan of a product adds one unit; you can also type a quantity or use +1 / -1 | `/stock/scan` (new, below) does exactly this |
+| About 100 ms gap between scans so an accidental double read is ignored | Implemented in the scan-count screen (`MIN_GAP_MS`) |
+| Scanner and computer keyboard layout must match; scanner in USB keyboard (HID) mode; Enter suffix on; test scan on every device | Checklist below |
+| 1D barcodes are often unreadable when shown on a screen: print them | Tip added on the label page |
+| Locations, operation types and commands (e.g. Validate) can have barcodes | Not built (later idea: location barcodes) |
+| Package/packaging barcodes add a whole pack in one scan | Not built (later idea: a "pieces per scan" value on a barcode) |
+| Barcode lookup database for UPC/EAN/ISBN | Not planned |
+| GS1 nomenclature (barcodes carrying lot, expiry, weight) | Not needed: no lots or expiry |
+
+### Scanner setup checklist for the owner
+1. Use a **USB (keyboard / HID) scanner**, or a Bluetooth one paired to a tablet.
+2. Set the scanner so it adds **Enter (carriage return)** after every scan (manual: "suffix CR").
+3. Make the scanner's keyboard layout match the computer's (English US normally).
+4. Click in the Items search box and scan a printed label. The item should open. If nothing is typed, or letters look wrong, fix 1-3.
+5. Print labels on a printer (don't scan from a monitor).
+
+## 0c. Count by scanning (new 2026-10-25)
+- Screen `/stock/scan` (needs `stock.adjust`). Scan an item: it is added to the list with count 1; every next scan adds one. Metre and kilogram items are added with an empty quantity (you cannot scan every metre): type the number. Buttons -1 / +1, edit by typing, remove a line.
+- The scan is looked up by the server (`lookupBarcode`): exact match on `item_barcodes.barcode`; an unknown barcode shows a red message and a low beep and creates nothing; an archived item is refused. The lookup also needs `items.view` (otherwise the item is invisible to that user).
+- Saving (`saveScanCount`) sends the counted numbers to the same database function as the count sheet (`apply_stock_count`): the numbers REPLACE the stock for the scanned items in the user's current place, a reason is required, all-or-nothing, items not scanned are untouched.
+- Not tested: a real scanner on this screen, a very fast scanner (two scans closer than 100 ms are dropped on purpose), phone camera scanning (not built).
+
 ## 1. What the owner wants
 1. Create item -> system generates a barcode for it.
 2. Print barcode labels (stickers).

@@ -26,6 +26,7 @@ Pages read through a fetch tool, in my own words. Coverage is partial: several p
 - **Reordering rules**: minimum (and maximum) stock per item per location; below minimum, refill. We take the minimum/maximum per item per location for the low-stock report (P8); automatic purchase orders are out of scope.
 - **Barcodes**: Odoo accepts any text as a barcode; EAN-13 for retail normally needs a GS1 company prefix (this matches our choice of the internal "2" range); variants should carry their own barcodes; **locations can have barcodes** too (print and scan to say "I am putting this on shelf A"). Location barcodes are a later option for P4-P6.
 - **Units and packaging** matter for cables (metres, reels, boxes). Open question for the owner (see below); not in P4.
+- **Barcode app lessons (read 2026-10-25, partial):** scanners type like a keyboard and end with Enter; each scan of a product adds one; 100 ms guard against double scans; match keyboard layouts; print 1D barcodes, do not scan them off a screen; locations and "command" barcodes exist; package barcodes add a whole pack. Adopted: scan-to-count (`/stock/scan`), scan guard and feedback, setup checklist. Later ideas: location barcodes, "pieces per scan" barcodes, phone-camera scanning. Details in `docs/features/FEATURE-003-BARCODE.md`.
 - Not adopted (too big for a trading shop for now): lots/serial numbers, expiry dates, putaway rules, storage categories, routes, batch/wave picking, carrier integrations, landed costs.
 
 ## Phases

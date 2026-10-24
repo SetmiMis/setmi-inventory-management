@@ -62,6 +62,7 @@ export default async function StockPage({ searchParams }: { searchParams: Promis
         </div>
         <div className="flex gap-2">
           <Link href="/stock/movements" className={secondaryButton}>History</Link>
+          {can(user, "stock.adjust") && <Link href="/stock/scan" className={secondaryButton}>Count by scanning</Link>}
           {can(user, "stock.adjust") && <Link href="/stock/count" className={primaryButton}>Count stock</Link>}
         </div>
       </div>
