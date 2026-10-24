@@ -37,6 +37,10 @@ Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search 
 - Sequence `item_barcode_seq` (no rights for app users). Function `ean13_check_digit(text)`. Function `generate_item_barcode(uuid)` (security definer, needs `items.edit`, advisory lock per item so a double click cannot create two, returns existing generated barcode, writes audit row). Column `item_barcodes.is_generated`.
 - Generated format: `2` + 11 digits + check digit. Tests: `supabase/tests/004_barcode_generation.sql`, 13/13 pass.
 
+## Migration 5: `20261024000005_import_items.sql` (applied 2026-10-24)
+- `_generate_item_barcode(uuid)` (internal, no rights for users) and `generate_item_barcode` now uses it (same behaviour).
+- `import_items(p_rows jsonb, p_dry_run, p_skip_invalid, p_generate_barcodes)`: security definer, needs `items.import`; max 2000 rows; uses temporary tables inside one transaction; returns counts, errors (row, column, message) and new categories. New categories need `categories.manage`. Tests `supabase/tests/005_import_items.sql`: 16/16 pass.
+
 ## Known gaps in this design
 - (fixed by migration 3) archive-only users could edit other columns.
 - `item_barcodes` and `categories` inserts are not blocked for archive-only users beyond RLS permission checks (barcodes need items.edit or items.create).

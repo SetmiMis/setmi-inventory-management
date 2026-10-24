@@ -73,6 +73,16 @@ NOT run: a real browser upload (needs a login), the 4-image limit in the UI, rep
 
 NOT run: printing on a real printer, scanning a printed label with a real scanner, the generate button and label page in a browser (login needed). Please print ONE label first and scan it.
 
+## P2c Excel import checks (2026-10-24)
+| Check | Result |
+|---|---|
+| DB tests `supabase/tests/005_import_items.sql` | 16/16 PASS: dry run finds the exact bad rows (existing code, duplicate in file, bad source, barcode taken, blank name, import code taken); dry run writes nothing; errors without "skip" create nothing; skip mode creates only good rows; selling name falls back to item name; existing category reused, new one created once; barcodes linked; SETMI barcodes generated on request; no `items.import` refused; no `categories.manage` cannot create categories; more than 2000 rows, empty list and non-list refused; anonymous refused; audit row written |
+| `npm test` | 20/20 PASS (8 new for the sheet parser, using the owner's real layout and rows) |
+| Real `.xlsx` through the library + parser (throw-away folder) | as described in FEATURE-002 section 0: all as expected |
+| lint, typecheck, build, `npm audit` | exit 0, 0 vulnerabilities |
+
+NOT run: the import screen in a browser with a login (needs the owner), a 2000-row file, a very large or hostile `.xlsx` (zip bomb) file.
+
 ## Not tested yet (gaps)
 - Real login with a real user, the admin page with real data, and the Save button. No user exists yet; first admin must be created in the Supabase dashboard.
 - No automated browser/end-to-end tests.

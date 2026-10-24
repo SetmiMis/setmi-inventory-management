@@ -28,4 +28,6 @@ From `package.json` (all added by the official `create-next-app` scaffold on 202
 
 `npm install` after adding: 0 vulnerabilities.
 
+Added 2026-10-24 (P2c, owner approved): **read-excel-file ^9.3.12** (MIT) to read the owner's `.xlsx` for the item import. Chosen after `npm audit` of three candidates (xlsx: 1 high with no fix; exceljs: 2 moderate; this one: 0). Read only, server side only. `npm audit` for the project after adding: 0 vulnerabilities. Review again before each release.
+
 Not installed yet: Excel library for import (choose carefully; some spreadsheet parsers have had security issues), test runner.

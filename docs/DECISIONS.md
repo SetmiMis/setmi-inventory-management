@@ -103,6 +103,13 @@ Format: context, options, choice, reason, date, model.
 - The owner's real codes are "SETMI-" + full item name, up to about 85 characters (found in the real sheet). The earlier limit of 64 would have rejected them.
 - **Date / model:** 2026-10-24, Claude Sonnet 5.5
 
+## D-020: Excel import design
+- **Owner approved** the library `read-excel-file` and the two-step flow (preview, then confirm).
+- **Choices:** the database function is the final judge (the app only parses); one transaction, default all-or-nothing with an option to skip bad rows; create-only (never overwrites an existing item); duplicates are checked against the database AND inside the file; headers matched loosely; rows with no Item_Name are skipped as empty (the owner's sheet has placeholder rows); image and datasheet columns ignored; SETMI barcodes can be generated for all new items.
+- **Alternatives:** parse in the database only (cannot read xlsx), insert row by row from the app (partial imports on failure), update-existing mode (rejected for now: one wrong Excel could silently rewrite items).
+- **Trade-offs:** the browser sends parsed rows back for the commit, so the server validates them again; limits 3 MB / 2000 rows; zip unpacked in memory.
+- **Date / model:** 2026-10-24, Claude Sonnet 5.5
+
 ## D-012: `Import_item_code` is optional
 - **Owner decision:** some items need it, some do not. It is optional, unique when filled, and not tied to LOCAL/IMPORT by a database rule.
 - **Date:** 2026-10-24

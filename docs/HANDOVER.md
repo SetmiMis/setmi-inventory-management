@@ -2,6 +2,32 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-24: P2c Excel import (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- Commit `1ef206d`: barcode feature (local only).
+- Import built per `docs/features/FEATURE-002-EXCEL-IMPORT.md` section 0 and D-020. Migration 5 applied, DB tests 16/16, unit tests 20/20, real `.xlsx` parsed OK, lint/typecheck/build pass, `npm audit` 0.
+- `read-excel-file` installed (owner approved). `next.config.ts` server-action body limit 4 MB.
+
+### Owner to try (needs login)
+1. Google Sheet: File > Download > Microsoft Excel (.xlsx).
+2. Items > Import Excel > choose the file > "Check file". Expected: about 36 rows ready, rows from 37 on skipped as empty, nine categories listed as new.
+3. Look at the problems list (if any), keep "Generate SETMI barcode" ticked, press Import. Then open Items.
+Also still untried by the owner: uploads (P2b), barcode print and scan (barcode feature).
+
+### Things the owner may want to decide next
+- Sheet row 10 (TW-17-INDIAN marked IMPORT) may be wrong.
+- Printer type and label size (label presets are generic).
+- Image and datasheet columns are not imported.
+
+### Uncommitted
+Import code, migration 5, tests, docs, `next.config.ts`, `package.json`.
+
+### Next
+After the owner's browser test: fix what they find. Then P3: locations (warehouses and shops) screens.
+
+---
+
 ## 2026-10-24: barcode generation, labels, scan jump (Claude Sonnet 5.5)
 
 ### Done (verified by command output)

@@ -84,6 +84,9 @@ export default async function ItemsPage({ searchParams }: { searchParams: Promis
           {can(user, "categories.manage") && (
             <Link href="/items/categories" className={secondaryButton}>Categories</Link>
           )}
+          {can(user, "items.import") && (
+            <Link href="/items/import" className={secondaryButton}>Import Excel</Link>
+          )}
           {can(user, "items.create") && (
             <Link href="/items/new" className={primaryButton}>New item</Link>
           )}
