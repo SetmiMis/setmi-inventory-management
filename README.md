@@ -26,9 +26,10 @@ npm run dev          # dev server on http://localhost:3000
 npm run lint         # ESLint
 npm run typecheck    # next typegen && tsc --noEmit
 npm run build        # production build
+npm test             # unit tests for validation rules (Node built-in runner)
 ```
 
-There is no automated test suite yet. `lint`, `typecheck` and `build` are the current checks.
+Database tests are SQL scripts in `supabase/tests/` (see `docs/TESTING.md`). On Windows PowerShell, if `npm` is blocked by the execution policy, use `npm.cmd`.
 
 ## Environment variables
 

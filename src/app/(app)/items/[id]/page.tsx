@@ -5,6 +5,8 @@ import { can, requirePermission } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ItemForm } from "../item-form";
 import { ArchiveControl, BarcodeManager } from "../item-extras";
+import { BUCKET } from "@/lib/validation/files";
+import { FileManager } from "./file-manager";
 
 export default async function ItemPage({
   params,
@@ -28,6 +30,18 @@ export default async function ItemPage({
     supabase.from("categories").select("id, name, is_active").order("name"),
   ]);
   if (!item) notFound();
+
+  // Private bucket: show files through signed links that expire after one hour.
+  const filePaths: string[] = [...(item.image_paths ?? []), ...(item.datasheet_path ? [item.datasheet_path] : [])];
+  const urlByPath = new Map<string, string | null>();
+  if (filePaths.length > 0) {
+    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrls(filePaths, 3600);
+    for (const s of signed ?? []) if (s.path) urlByPath.set(s.path, s.signedUrl ?? null);
+  }
+  const images = (item.image_paths ?? []).map((p: string) => ({ path: p, url: urlByPath.get(p) ?? null }));
+  const datasheet = item.datasheet_path
+    ? { path: item.datasheet_path as string, url: urlByPath.get(item.datasheet_path) ?? null }
+    : null;
 
   // Active categories, plus this item's current one even if it was switched off.
   const categoryOptions = (categories ?? [])
@@ -84,6 +98,8 @@ export default async function ItemPage({
       )}
 
       <BarcodeManager itemId={item.id} barcodes={item.item_barcodes ?? []} canEdit={canEdit} />
+
+      <FileManager itemId={item.id} images={images} datasheet={datasheet} canEdit={canEdit} />
 
       {can(user, "items.archive") && <ArchiveControl itemId={item.id} isActive={item.is_active} />}
     </main>

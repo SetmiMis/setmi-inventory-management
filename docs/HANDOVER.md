@@ -2,6 +2,25 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-24: P2b images and datasheet upload (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- Commit `968d9fd`: P2a (local only).
+- Upload flow per `docs/FLOW.md` / D-017: ticket -> direct upload -> server confirms real bytes. Up to 4 images (JPG/PNG/WebP, 5 MB) and 1 PDF datasheet (10 MB), shown on the item page via signed links, removable.
+- `npm test` added (7/7 pass); storage policy DB tests (all pass); lint, typecheck, build pass.
+
+### NOT verified
+- Uploading a real file in the browser, 4-image limit in the UI, replace/remove, signed links. Please try on an item page: upload 1-2 JPGs, a PDF, try a renamed .txt file (should be rejected), remove one.
+- Orphan files if an upload is never confirmed (documented limit).
+
+### Uncommitted
+P2b code, tests, docs, `tsconfig.json` and `package.json` (test script) changes.
+
+### Next
+P2c: Excel import. Needs a sample of the owner's Excel file and approval of one Excel library (the common `xlsx` package from npm has had security problems; the AI will propose a safer option first).
+
+---
+
 ## 2026-10-24: P2a Item Master screens (Claude Sonnet 5.5)
 
 ### Done (verified by command output)

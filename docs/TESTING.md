@@ -52,6 +52,17 @@ Note: a stale `.next` folder after deleting a page can break `typecheck`; delete
 
 NOT run: the item screens in a browser with a real user (no add/edit/archive/barcode/search click-through yet), the 25-per-page paging with real data, categories page.
 
+## P2b file upload checks (2026-10-24)
+| Check | Result |
+|---|---|
+| `npm test` (`tests/files.test.ts`, node built-in runner, no extra packages) | 7/7 PASS: real file signatures, disguised files (svg, html, exe, wav-as-webp) rejected, size limits, strict storage path parsing (path tricks refused), barcode and search sanitising, item validation |
+| DB tests `supabase/tests/003_storage_policies.sql` | all PASS: bucket private, 10 MB, no svg/html type; editor can upload and update; viewer can read but not upload or update; no-permission user and anonymous see nothing |
+| lint, typecheck, build | exit 0 |
+
+Note: Supabase blocks direct SQL DELETE on storage tables, so delete permission is checked through the UPDATE policy (same condition, `items.edit`). Deleting through the Storage API as a viewer was not exercised.
+
+NOT run: a real browser upload (needs a login), the 4-image limit in the UI, replacing a datasheet, removing files, the signed view links.
+
 ## Not tested yet (gaps)
 - Real login with a real user, the admin page with real data, and the Save button. No user exists yet; first admin must be created in the Supabase dashboard.
 - No automated browser/end-to-end tests.

@@ -81,6 +81,16 @@ Format: context, options, choice, reason, date, model.
 - **No self-signup page** (signups disabled in Supabase): admins create users in the Supabase dashboard for now. An in-app "create user" would need the service-role key on the server; postponed on purpose.
 - **Date / model:** 2026-10-24, Claude Sonnet 5.5
 
+## D-017: Direct-to-storage uploads with server confirmation
+- **Problem:** images up to 5 MB and datasheets up to 10 MB; Vercel limits request bodies to about 4.5 MB, so sending files through server actions would fail in production.
+- **Options:** (a) file through a server action (simple, breaks above 4.5 MB on Vercel; also needs a raised Next body limit); (b) browser uploads straight to Storage with a signed ticket, then the server confirms; (c) public bucket with client-side permission checks (rejected: breaks "server decides").
+- **Choice:** (b). The server issues the ticket after checking permission/type/size, then re-reads the stored file, checks size and real content bytes, and only then links it to the item.
+- **Why bytes, not type:** declared type and file name come from the uploader and can lie; the signature bytes of a real JPEG/PNG/WebP/PDF cannot be faked by renaming.
+- **Trade-offs:** one extra round trip; orphan files if confirmation never happens (cleanup later); files are private and shown through 1-hour signed links.
+- **SVG is not allowed** (can carry scripts).
+- **Also:** `allowImportingTsExtensions` added to tsconfig and an `npm test` script (Node's built-in test runner, no new package) so pure rule files can be unit-tested.
+- **Date / model:** 2026-10-24, Claude Sonnet 5.5
+
 ## D-012: `Import_item_code` is optional
 - **Owner decision:** some items need it, some do not. It is optional, unique when filled, and not tied to LOCAL/IMPORT by a database rule.
 - **Date:** 2026-10-24
