@@ -4,7 +4,8 @@ import { z } from "zod";
 import { requirePermission } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { isValidEan13 } from "@/lib/barcode/ean13";
-import { Ean13Barcode } from "@/components/ean13-barcode";
+import { LABEL_PRESETS, findPreset, labelPrintCss } from "@/lib/barcode/label-presets";
+import { BarcodeLabel } from "@/components/barcode-label";
 import { inputClass, secondaryButton } from "@/lib/ui";
 import { PrintButton } from "./print-button";
 
@@ -14,19 +15,6 @@ const clampInt = (raw: string | undefined, min: number, max: number, fallback: n
   const n = parseInt(raw ?? "", 10);
   return Number.isFinite(n) ? Math.min(Math.max(n, min), max) : fallback;
 };
-
-// Label sizes are the printer's decision, so they are choices, not fixed. Default: a common
-// 50 x 25 mm thermal label. "sheet" mode lays labels out on an A4 page for a normal printer.
-const PRESETS = [
-  { key: "50x25", label: "Thermal 50 x 25 mm", w: 50, h: 25, mode: "thermal" },
-  { key: "38x25", label: "Thermal 38 x 25 mm", w: 38, h: 25, mode: "thermal" },
-  { key: "60x40", label: "Thermal 60 x 40 mm", w: 60, h: 40, mode: "thermal" },
-  { key: "a4-65", label: "A4 sheet, 65 labels (38 x 21 mm)", w: 38, h: 21, mode: "sheet" },
-  { key: "a4-24", label: "A4 sheet, 24 labels (70 x 37 mm)", w: 70, h: 37, mode: "sheet" },
-] as const;
-
-const PAD_MM = 1.5; // blank border inside each label
-const NAME_MM = 5.5; // height reserved for the item name
 
 export default async function LabelsPage({
   params,
@@ -54,7 +42,7 @@ export default async function LabelsPage({
     .sort((a, b) => Number(b.is_generated) - Number(a.is_generated));
   const chosen = drawable.find((b) => b.barcode === first(sp.barcode)) ?? drawable[0];
 
-  const preset = PRESETS.find((p) => p.key === first(sp.size)) ?? PRESETS[0];
+  const preset = findPreset(first(sp.size));
   const copies = clampInt(first(sp.copies), 1, 200, 1);
 
   if (!chosen) {
@@ -70,22 +58,9 @@ export default async function LabelsPage({
     );
   }
 
-  // Bar height is chosen so the picture fills the free space of THIS label size. That keeps each
-  // bar wide enough for scanners (EAN-13 should print at 80% or more of its nominal size, i.e. at
-  // least 0.26 mm per module) instead of squeezing the bars to fit the height.
-  const innerW = preset.w - PAD_MM * 2;
-  const innerH = preset.h - PAD_MM * 2 - NAME_MM;
-  const barHeight = Math.min(60, Math.max(22, Math.round((innerH * 113) / innerW) - 12));
-
-  // Numbers only (validated above), so safe to place in CSS.
-  const css =
-    preset.mode === "thermal"
-      ? `@media print { @page { size: ${preset.w}mm ${preset.h}mm; margin: 0; } .label { break-after: page; } }`
-      : `@media print { @page { size: A4; margin: 8mm; } }`;
-
   return (
     <main className="space-y-4">
-      <style>{css}</style>
+      <style>{labelPrintCss(preset)}</style>
 
       <div className="space-y-3 print:hidden">
         <p className="text-sm">
@@ -96,7 +71,7 @@ export default async function LabelsPage({
           <label className="text-sm">
             Label size
             <select name="size" defaultValue={preset.key} className={inputClass}>
-              {PRESETS.map((p) => (
+              {LABEL_PRESETS.map((p) => (
                 <option key={p.key} value={p.key}>{p.label}</option>
               ))}
             </select>
@@ -127,18 +102,7 @@ export default async function LabelsPage({
 
       <div className={preset.mode === "sheet" ? "flex flex-wrap" : "flex flex-wrap gap-2 print:gap-0"}>
         {Array.from({ length: copies }, (_, i) => (
-          <div
-            key={i}
-            className="label overflow-hidden bg-white text-black"
-            style={{ width: `${preset.w}mm`, height: `${preset.h}mm`, boxSizing: "border-box", padding: `${PAD_MM}mm`, border: "0.1mm dashed #bbb" }}
-          >
-            <div style={{ fontSize: "6.5pt", lineHeight: 1.1, height: `${NAME_MM}mm`, overflow: "hidden", fontWeight: 600 }}>
-              {item.selling_item_name}
-            </div>
-            <div style={{ height: `${innerH}mm` }}>
-              <Ean13Barcode code={chosen.barcode} barHeight={barHeight} fill />
-            </div>
-          </div>
+          <BarcodeLabel key={i} name={item.selling_item_name} code={chosen.barcode} preset={preset} />
         ))}
       </div>
     </main>

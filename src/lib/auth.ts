@@ -62,6 +62,14 @@ export async function requirePermission(key: string): Promise<CurrentUser> {
   return user;
 }
 
+// For pages that several kinds of staff may open (for example receipts: view, prepare or post).
+export async function requireAnyPermission(...keys: string[]): Promise<CurrentUser> {
+  const user = await requireUser();
+  const allowed = user.isActive && (user.isAdmin || keys.some((k) => user.permissions.includes(k)));
+  if (!allowed) redirect("/");
+  return user;
+}
+
 export function can(user: CurrentUser, key: string): boolean {
   return user.isActive && (user.isAdmin || user.permissions.includes(key));
 }

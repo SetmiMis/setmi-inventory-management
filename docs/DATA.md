@@ -54,6 +54,13 @@ Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search 
 - Reads: `stock.view` plus access to the place (RLS). Admins see all.
 - Tests: `supabase/tests/007_stock.sql` 28/28, `008_stock_overview.sql` 4/4.
 
+## Migration 10: `20261025000010_receiving.sql` (applied 2026-10-25): suppliers and goods receipts
+- `suppliers` (name unique ignoring case, type LOCAL/IMPORT, contact, phone, email, address, country, GSTIN 15 upper-case letters/digits, notes, is_active). Read: `suppliers.view`, `receipts.view`, `receipts.create` or `receipts.post`. Write: `suppliers.manage`.
+- `goods_receipts` (receipt_no `GRN-000001` from a sequence, supplier, location, date, supplier invoice no., notes, status DRAFT/POSTED/CANCELLED, who/when, posted_at/by). Unique supplier + invoice number except cancelled. Read: a receipts permission plus access to the place. Triggers make posted/cancelled rows immutable and forbid deletes.
+- `goods_receipt_lines` (receipt, item, quantity > 0, one line per item) and `goods_receipt_costs` (line, unit_cost >= 0; read only with `receipts.cost`). Lines and prices are locked once the receipt is not a draft.
+- Writes only through `save_goods_receipt` (needs `receipts.create`, place access, validates every line, replaces lines of the draft), `post_goods_receipt` (needs `receipts.post`, locks the receipt, inserts RECEIPT movements with reference = number, sets POSTED, audit), `cancel_goods_receipt` (draft only).
+- Tests: `supabase/tests/009_receiving.sql`.
+
 ## Known gaps in this design
 - (fixed by migration 3) archive-only users could edit other columns.
 - `item_barcodes` and `categories` inserts are not blocked for archive-only users beyond RLS permission checks (barcodes need items.edit or items.create).

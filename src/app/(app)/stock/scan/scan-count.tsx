@@ -3,15 +3,13 @@
 import { useRef, useState, useTransition } from "react";
 import { lookupBarcode, saveScanCount, type StockState } from "../actions";
 import { parseQuantity } from "@/lib/validation/stock";
+import { MIN_SCAN_GAP_MS, beep } from "@/lib/client/beep";
 import { inputClass, primaryButton, secondaryButton } from "@/lib/ui";
 
 type Line = {
   itemId: string; code: string; name: string; unit: string; decimals: number;
   current: number | null; counted: string; scans: number;
 };
-
-// Same gap Odoo uses between scans: a second scan within 100 ms is treated as an accidental double read.
-const MIN_GAP_MS = 100;
 
 export function ScanCount({ placeName }: { placeName: string }) {
   const [lines, setLines] = useState<Line[]>([]);
@@ -22,31 +20,12 @@ export function ScanCount({ placeName }: { placeName: string }) {
   const [saving, startSave] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
   const lastScan = useRef(0);
-  const audio = useRef<AudioContext | null>(null);
-
-  function beep(ok: boolean) {
-    try {
-      const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-      if (!Ctx) return;
-      audio.current ??= new Ctx();
-      const o = audio.current.createOscillator();
-      const g = audio.current.createGain();
-      o.frequency.value = ok ? 880 : 220; // high = found, low = problem
-      g.gain.value = 0.08;
-      o.connect(g);
-      g.connect(audio.current.destination);
-      o.start();
-      o.stop(audio.current.currentTime + (ok ? 0.08 : 0.25));
-    } catch {
-      // Sound is a convenience only.
-    }
-  }
 
   async function onScan(raw: string) {
     const code = raw.trim();
     if (!code) return;
     const now = Date.now();
-    if (now - lastScan.current < MIN_GAP_MS) return;
+    if (now - lastScan.current < MIN_SCAN_GAP_MS) return;
     lastScan.current = now;
     setResult(null);
 

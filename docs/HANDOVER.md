@@ -2,7 +2,30 @@
 
 Newest entry on top. Read this first, update it last.
 
-## 2026-10-25 (latest): Odoo Barcode docs read; scan-to-count built (Claude Sonnet 5.5)
+## 2026-10-25 (newest): scan-count pushed; P5 receiving built (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- Scan-to-count committed as `065e20f` and **pushed** (`git ls-remote` = local HEAD). Known-good for `docs/ROLLBACK.md` is now `065e20f` (database at migration 009).
+- P5 per `docs/features/FEATURE-006-RECEIVING.md` section 0: migration 10 applied; DB tests 32/32; unit tests 28/28; lint/typecheck/build pass; advisor shows no new warning.
+- The owner's reply to the P5 questions was empty, so the plan's DEFAULTS were used (D-023). Easy to change.
+- **Uncommitted and not pushed:** all of P5 (migration 10, tests, suppliers + receipts screens, label/beep refactor, docs).
+
+### Owner to try (browser)
+1. Admin Users page: give a user `suppliers.manage`, `receipts.create`, `receipts.post`, `receipts.cost`, `items.view`, `stock.view` and a place. (As admin you already have everything.)
+2. Suppliers > New supplier. Receipts > New receipt: scan or search items, quantities, prices, Save draft, then "Save and post". Check Stock for the added quantity and the History page for the RECEIPT line. Print the receipt and its labels.
+3. Still untried in the browser: uploads, barcode print/scan, Excel import, locations, stock, scan-count.
+
+### Open
+- GRN numbers can have gaps (sequence). Does the owner need gap-free numbers per financial year?
+- Purchase orders, returns to supplier, landed cost: not built; tell the AI if wanted.
+- Printer model and label size; which real items are sold per metre.
+
+### Next
+P6 transfers (warehouse to shop with an in-transit state) or P7 billing with barcode scan. The ledger already supports TRANSFER and SALE movements.
+
+---
+
+## 2026-10-25 (earlier): Odoo Barcode docs read; scan-to-count built (Claude Sonnet 5.5)
 
 - Owner asked to read Odoo's Barcode docs (Setup, Daily operations), check against our system and develop. Read (partially, see FEATURE-003 section 0b); findings written there and in ROADMAP.
 - Built `/stock/scan`: count by scanning, per FEATURE-003 section 0c. lint/typecheck/build pass, unit tests 25/25. No new migration, no new dependency.

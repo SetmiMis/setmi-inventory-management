@@ -3,8 +3,10 @@
 ## Current known-good points
 | What | Value | Notes |
 |---|---|---|
-| Last commit pushed to GitHub (`origin/main`) | `2fab60a` (P4: stock) | Verified with `git ls-remote origin` on 2026-10-25. Previous known-good: `e2eb995` (P3) |
-| Database state matching it | migrations 001 to 009 | 007-009 are the stock migrations (applied to the dev Supabase project) |
+| Last commit pushed to GitHub (`origin/main`) | `065e20f` (scan-to-count) | Verified with `git ls-remote origin` on 2026-10-25. Previous known-good: `2fab60a` (P4), `e2eb995` (P3) |
+| Database state matching it | migrations 001 to 009 | 010 (receiving) is applied to the dev database but not yet in a pushed commit |
+
+Undo migration 10 (receiving) only if no receipt was ever posted: the posted receipts are part of the audit trail and the stock ledger points at their numbers. If only drafts exist: drop `goods_receipt_costs`, `goods_receipt_lines`, `goods_receipts`, `suppliers`, the three functions, the guard functions, the enum `receipt_status`, the sequence `goods_receipt_seq` and the six permission rows, in that order, after a backup.
 
 ## Undo an application change
 1. `git log --oneline` and pick the commit before the bad one.

@@ -1,6 +1,17 @@
 # FEATURE-006: Suppliers and goods receipts (P5)
 
-**Status:** PLAN ONLY (2026-10-25). Nothing implemented. Waiting for the owner's "haan" and answers to section 7.
+**Status:** IMPLEMENTED 2026-10-25 (P5a) using the plan's DEFAULTS, because the owner's answer message contained only "1)" with no content. Every default below can be changed. Not yet clicked through in a browser or tried with a real scanner.
+
+## 0. What exists now (actual code)
+- Defaults taken for the seven questions: (1) no purchase orders, receipts only; (2) supplier = name, type, contact person, phone, email, address, country, GSTIN, notes; (3) buying price optional, entered in rupees, visible only with `receipts.cost`; (4) one running number `GRN-000001`; (5) no landed cost; (6) receiving is allowed in any place the user works in (warehouse or shop); (7) damaged goods: enter only the good quantity, correct later with a stock count.
+- Migration 10 (`20261025000010_receiving.sql`, applied): tables `suppliers`, `goods_receipts`, `goods_receipt_lines`, `goods_receipt_costs` (prices live in their own table so the database hides them), sequence for numbers, permissions `suppliers.view`, `suppliers.manage`, `receipts.view`, `receipts.create`, `receipts.post`, `receipts.cost`, functions `save_goods_receipt`, `post_goods_receipt`, `cancel_goods_receipt`. DB tests `supabase/tests/009_receiving.sql`: all 32 lines PASS (see TESTING).
+- Rules enforced by the database: draft has no stock effect; posting writes RECEIPT movements in one transaction and cannot happen twice; posted/cancelled receipts, their lines and prices can never change or be deleted (even for the project owner); the same supplier invoice cannot be received twice (a cancelled one does not count); archived items/suppliers refused; quantities follow the unit's decimals; people without `receipts.cost` cannot see prices and, when editing a draft, keep the existing prices.
+- Screens: `/suppliers` (list, new, edit, archive), `/receipts` (list, status filter), `/receipts/new` and `/receipts/[id]` (editor: supplier, date, invoice no., notes, scan box with 100 ms guard + beep, search by code/name for items without barcode, quantity and price per line, Save draft, "Save and post", Cancel draft), `/receipts/[id]/print` (A4), `/receipts/[id]/labels` (one sticker per received piece for whole-number items that have an EAN-13 barcode; others are listed as skipped).
+- Needs `items.view` too: the editor looks items up through the items table.
+- GRN numbers can have gaps (a database sequence never rolls back, e.g. after a failed save or the test runs). Treat the number as an identifier, not as a gap-free invoice series. If the owner needs gap-free numbers this must be redesigned (tell the AI).
+- Not done: purchase orders, returns to suppliers, landed cost, supplier Excel import, "receive" from a transfer (P6), a unit column in the item import.
+
+## 0a. Original plan (kept for reference)
 
 ## 1. Goal
 Record goods that arrive from suppliers (LOCAL or IMPORT) into a warehouse or shop, so stock goes up with a proper document: who supplied, when, which invoice, how much of each item. Receiving is also where new stickers (barcode labels) are printed.

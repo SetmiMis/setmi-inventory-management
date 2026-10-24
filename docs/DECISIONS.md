@@ -122,6 +122,14 @@ Format: context, options, choice, reason, date, model.
 - **Owner instruction (2026-10-25):** commit and push. Before pushing: repo not visible without login (404, so private), a secret scan of all commits found nothing, no `.env` file tracked. Plain push, no force. Remote `origin/main` = `e2eb995` afterwards.
 - **Date / model:** 2026-10-25, Claude Sonnet 5.5
 
+## D-023: Goods receipts (P5) built on the plan's defaults
+- **Context:** the owner's reply to the seven questions arrived empty ("1)"). The owner had earlier said to decide sensibly and change afterwards, so the plan's proposals were used and are listed in FEATURE-006 section 0.
+- **Choices:** draft then post; posting is the only way stock goes up from a receipt; posted documents are immutable; prices in a separate table with their own permission; the same supplier invoice cannot be received twice; scan-to-add like the scan-count screen; labels for received pieces.
+- **Alternatives:** purchase orders first (more work, owner has not asked), editing posted receipts (breaks the audit trail), prices in the lines table with hidden columns on screen only (shop staff could read them through the API).
+- **Trade-offs:** GRN numbers may have gaps; a wrong posted receipt is fixed with a stock count, not by editing; people who receive need `items.view` as well.
+- **Revisit if:** the owner wants purchase orders, gap-free numbers per financial year, landed costs, or returns to suppliers.
+- **Date / model:** 2026-10-25, Claude Sonnet 5.5
+
 ## D-012: `Import_item_code` is optional
 - **Owner decision:** some items need it, some do not. It is optional, unique when filled, and not tied to LOCAL/IMPORT by a database rule.
 - **Date:** 2026-10-24

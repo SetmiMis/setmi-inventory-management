@@ -112,6 +112,17 @@ NOT run: the stock screens in a browser with a login, the count sheet with a use
 
 NOT run: the screen in a browser, a real USB scanner, the beep (browsers may block sound until the page was clicked), a user with `stock.adjust` but without `items.view` (lookup answers "You cannot see this item"), two scans closer than 100 ms. There is no automated test for the client component (no browser test tool installed yet).
 
+## P5 receiving checks (2026-10-25)
+| Check | Result |
+|---|---|
+| DB tests `supabase/tests/009_receiving.sql` | 32 lines, all PASS: draft saved with a GRN number and no stock effect; user without `receipts.cost` sees no prices and keeps old prices when editing; posting needs `receipts.post`; posting adds stock and writes RECEIPT movements; posting twice refused and stock unchanged; posted receipt cannot be edited or cancelled; lines, prices and receipt are locked even for the project owner and cannot be deleted; pieces refuse fractions; same item twice refused; cannot receive into a place you do not work in; archived supplier refused; same supplier invoice twice refused, reusable after cancel; cancelled receipt cannot be posted; no direct insert; archived item blocks posting; viewer sees receipts and lines but no prices; shop user sees no warehouse receipts; suppliers need `suppliers.manage`; GSTIN format; duplicate supplier name; anonymous sees nothing; audit row |
+| `npm test` | 28/28 PASS (3 new for the supplier rules) |
+| lint, typecheck, build | exit 0; new routes `/receipts`, `/receipts/new`, `/receipts/[id]`, `/receipts/[id]/print`, `/receipts/[id]/labels`, `/suppliers`, `/suppliers/new`, `/suppliers/[id]` |
+| Supabase security advisor | no new warning (only the accepted "signed-in users can execute SECURITY DEFINER" notes; every such function checks permission inside) and the dashboard-setting warning "leaked password protection disabled" |
+| First test run failed, second passed | the first run was my test script's mistake (login identity left set after `reset role`), not a database fault |
+
+NOT run: the receipt editor in a browser, a real scanner on it, A4 print, label print for a receipt, a user with `receipts.create` but without `items.view` (lookups fail), two people posting at the same moment (covered by a row lock; not stress-tested).
+
 ## Not tested yet (gaps)
 - Real login with a real user, the admin page with real data, and the Save button. No user exists yet; first admin must be created in the Supabase dashboard.
 - No automated browser/end-to-end tests.
