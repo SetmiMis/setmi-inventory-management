@@ -32,7 +32,20 @@ Run in the Supabase SQL editor or with `execute_sql`. It creates temporary users
 | T19 | Anonymous user sees nothing |
 | T20 | Changes are written to the audit log |
 
+## P1 app checks (2026-10-24)
+| Check | Result |
+|---|---|
+| `npm run lint` | exit 0 |
+| `npm run typecheck` (clean `.next`) | exit 0 |
+| `npm run build` | exit 0; routes `/` and `/admin/users` partial-prerender, `/login` static, Proxy active |
+| `npm run start` then GET without a session | `/login` 200; `/` 307; `/admin/users` 307 (redirect target not captured in the output) |
+| `/login` HTML | contains "Sign in"; does not contain "service_role" |
+
+Note: a stale `.next` folder after deleting a page can break `typecheck`; delete `.next` and rerun.
+
 ## Not tested yet (gaps)
+- Real login with a real user, the admin page with real data, and the Save button. No user exists yet; first admin must be created in the Supabase dashboard.
+- No automated browser/end-to-end tests.
 - Storage bucket policies (`item-files`): upload/download as different users.
 - `locations` policies and `user_locations` scoping.
 - `admin_set_user_*` success path as a real admin (only the denial path is tested).

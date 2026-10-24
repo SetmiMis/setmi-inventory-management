@@ -2,6 +2,31 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-24: P1 app code, login + guard + admin users (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- Commit `8c5e5a3`: Task 002/003 docs and migrations (local only).
+- Installed `@supabase/supabase-js`, `@supabase/ssr`, `zod`. Created `.env.local` (git-ignored) with the project URL and publishable key.
+- Code: `src/proxy.ts`, `src/lib/supabase/*`, `src/lib/auth.ts`, login (page/form/action), `(app)` layout with sign-out and inactive guard, home page, `/admin/users` with permission and location toggles. Flow in `docs/FLOW.md`.
+- Template `src/app/page.tsx` removed (replaced by `(app)/page.tsx`); page title updated.
+- lint, typecheck, build pass; unauthenticated `/` and `/admin/users` redirect (307).
+
+### NOT verified
+- A real login and the admin Save button: no user exists yet. Untested.
+- Supabase rows are untyped in code (types file not generated into the repo yet).
+
+### Owner steps still needed (Supabase dashboard)
+1. Authentication settings: turn OFF "Allow new users to sign up".
+2. Authentication > Users > Add user (email + password, auto-confirm). Tell the AI the EMAIL only; it will mark that user admin + active by SQL.
+
+### Uncommitted
+All P1 code and doc changes.
+
+### Next
+After first admin exists: test login + admin page for real, then P2: categories and Item Master screens.
+
+---
+
 ## 2026-10-24: Task 003, roadmap and database design (Claude Sonnet 5.5)
 
 ### Done

@@ -1,8 +1,11 @@
 # ENVIRONMENT
 
-No environment variables are used yet.
+| Name | Public or secret | Where set | Purpose |
+|---|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | public | local `.env.local` (set 2026-10-24); Vercel later | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | public by design | local `.env.local`; Vercel later | Supabase publishable key. Safe in the browser because RLS protects data |
 
-When Supabase is added, list here: variable NAME, public or secret, where configured (local `.env.local`, Vercel preview, Vercel production). Never write values in this file.
+No secret variable is used. A service-role key is NOT used anywhere in the code. Never write values in this file.
 
 Rules:
 - `NEXT_PUBLIC_*` variables are visible in the browser. Only non-secret values may use that prefix.

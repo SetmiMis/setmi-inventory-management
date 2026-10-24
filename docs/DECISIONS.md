@@ -74,6 +74,13 @@ Format: context, options, choice, reason, date, model.
 - Owner undecided (list vs free text). A `categories` table gives a list that admins can extend, so it behaves like free text with no typo duplicates. `items.category_id` is nullable. Change later if owner prefers.
 - **Date / model:** 2026-10-24, Claude Sonnet 5.5
 
+## D-016: Auth approach for P1
+- **Choice:** Supabase email + password; server-only Supabase client (`@supabase/ssr`); no browser-side Supabase client yet; login via a server action; `getUser()` (asks the Auth server) for page guards and `getClaims()` (signature check) in the proxy.
+- **Alternatives:** browser-side login (more code in the browser, more attack surface); trusting the cookie only (a revoked session would still pass).
+- **Trade-off:** one extra network call per page for `getUser()`. Acceptable for an internal tool; revisit if pages feel slow.
+- **No self-signup page** (signups disabled in Supabase): admins create users in the Supabase dashboard for now. An in-app "create user" would need the service-role key on the server; postponed on purpose.
+- **Date / model:** 2026-10-24, Claude Sonnet 5.5
+
 ## D-012: `Import_item_code` is optional
 - **Owner decision:** some items need it, some do not. It is optional, unique when filled, and not tied to LOCAL/IMPORT by a database rule.
 - **Date:** 2026-10-24

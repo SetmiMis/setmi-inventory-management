@@ -19,4 +19,13 @@ From `package.json` (all added by the official `create-next-app` scaffold on 202
 - `unrs-resolver` has a postinstall script that npm did not run (allowScripts). Not needed so far.
 - Run `npm audit` again before any release.
 
-Planned, not installed: Supabase client libraries (needs approval when Task for Supabase starts).
+## Added 2026-10-24 (P1, owner authorised building the app)
+| Package | Version | Why |
+|---|---|---|
+| @supabase/supabase-js | ^2.118.0 | Supabase client (database, auth) |
+| @supabase/ssr | ^0.12.7 | Cookie-based sessions for Next.js server code |
+| zod | ^4.6.7 | Server-side validation of form input |
+
+`npm install` after adding: 0 vulnerabilities.
+
+Not installed yet: Excel library for import (choose carefully; some spreadsheet parsers have had security issues), test runner.
