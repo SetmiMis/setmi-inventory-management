@@ -44,6 +44,16 @@ Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search 
 ## Migration 6: `20261025000006_location_guards.sql` (applied 2026-10-25)
 - Checks: `locations_code_len` (<= 20), `locations_name_len` (<= 100), `locations_address_len` (<= 500). Trigger `locations_guard`: `updated_by` = caller, `created_by`/`created_at` cannot change. Tests `supabase/tests/006_locations.sql`: 17/17 pass.
 
+## Migrations 7, 8, 9 (applied 2026-10-25): stock
+- `units(code, name, decimals)`: PCS 0, MTR 3, BOX 0, SET 0, KG 3. `items.unit` now references it. Trigger `items_unit_guard` blocks a unit change after the item has movements. Writes need `units.manage`.
+- `stock_movements(id, item_id, from_location_id, to_location_id, quantity > 0, movement_type, reason, reference, created_at, created_by)`: types OPENING, ADJUSTMENT, RECEIPT, SALE, TRANSFER. At least one place; the two places differ. Append-only (trigger refuses update and delete). No insert/update/delete policy: only `apply_stock_count` (and later receipt/transfer/sale functions) write.
+- `stock_balances(item_id, location_id, quantity >= 0)`: changed only by trigger `stock_movements_apply` after each movement; a movement that would make it negative fails with "Not enough stock".
+- `reorder_levels(item_id, location_id, min_qty, max_qty)`: writes need `stock.min_levels` and access to the place.
+- `apply_stock_count(location, rows, reason, kind)`: needs `stock.adjust` and access to the place; validates every row first (item exists, 0..99,999,999, decimals allowed by the unit, opening only where no history), writes nothing if any row is bad; locks the balance row; one movement per changed item; audit row.
+- View `stock_overview` (security invoker): one row per active item and active place with quantity, min, max, low flag; empty for users without `stock.view`.
+- Reads: `stock.view` plus access to the place (RLS). Admins see all.
+- Tests: `supabase/tests/007_stock.sql` 28/28, `008_stock_overview.sql` 4/4.
+
 ## Known gaps in this design
 - (fixed by migration 3) archive-only users could edit other columns.
 - `item_barcodes` and `categories` inserts are not blocked for archive-only users beyond RLS permission checks (barcodes need items.edit or items.create).

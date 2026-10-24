@@ -18,13 +18,17 @@ export type ItemValues = {
   remarks: string | null;
 };
 
+export type UnitOption = { code: string; name: string };
+
 export function ItemForm({
   item,
   categories,
+  units,
   canEditSellingName,
 }: {
   item?: ItemValues;
   categories: CategoryOption[];
+  units: UnitOption[];
   canEditSellingName: boolean;
 }) {
   const editing = Boolean(item);
@@ -92,8 +96,12 @@ export function ItemForm({
         </div>
         <div>
           <label htmlFor="unit" className={labelClass}>Unit *</label>
-          <input id="unit" name="unit" required maxLength={20} defaultValue={item?.unit ?? "PCS"} className={inputClass} />
-          <p className="mt-1 text-xs text-neutral-500">PCS, MTR, BOX ...</p>
+          <select id="unit" name="unit" required defaultValue={item?.unit ?? "PCS"} className={inputClass}>
+            {units.map((u) => (
+              <option key={u.code} value={u.code}>{u.code} - {u.name}</option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-neutral-500">How stock is counted. Metres allow decimals, pieces do not. Cannot be changed once the item has stock.</p>
         </div>
       </div>
 

@@ -6,7 +6,10 @@ import { ItemForm } from "../item-form";
 export default async function NewItemPage() {
   await requirePermission("items.create");
   const supabase = await createClient();
-  const { data: categories } = await supabase.from("categories").select("id, name").eq("is_active", true).order("name");
+  const [{ data: categories }, { data: units }] = await Promise.all([
+    supabase.from("categories").select("id, name").eq("is_active", true).order("name"),
+    supabase.from("units").select("code, name").eq("is_active", true).order("code"),
+  ]);
 
   return (
     <main className="space-y-4">
@@ -14,7 +17,7 @@ export default async function NewItemPage() {
         <Link href="/items" className="text-blue-700 underline">Items</Link> / New
       </p>
       <h1 className="text-xl font-semibold">New item</h1>
-      <ItemForm categories={categories ?? []} canEditSellingName />
+      <ItemForm categories={categories ?? []} units={units ?? []} canEditSellingName />
     </main>
   );
 }

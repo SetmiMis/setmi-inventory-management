@@ -15,6 +15,10 @@ export function friendlyDbError(e: DbError): string {
   if (e.code === "42501" || msg.includes("row-level security")) {
     return "You do not have permission to do this.";
   }
+  if (msg.includes("unit cannot be changed")) return "The unit cannot be changed after the item has stock history.";
+  if (msg.includes("stock_balances_not_negative") || msg.includes("Not enough stock")) return "Not enough stock.";
+  if (msg.includes("items_unit_fk")) return "This unit does not exist.";
+  if (msg.includes("reorder_levels_max_ok")) return "Maximum cannot be lower than minimum.";
   if (e.code === "23514") return "A value is not allowed (blank text or too many files).";
   if (e.code === "23503") return "This record is still used elsewhere.";
   return "Could not save. Please try again.";

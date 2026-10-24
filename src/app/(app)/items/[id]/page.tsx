@@ -21,13 +21,14 @@ export default async function ItemPage({
   const warn = (await searchParams).warn;
 
   const supabase = await createClient();
-  const [{ data: item }, { data: categories }] = await Promise.all([
+  const [{ data: item }, { data: categories }, { data: units }] = await Promise.all([
     supabase
       .from("items")
       .select("*, item_barcodes(id, barcode, is_generated)")
       .eq("id", idParse.data)
       .maybeSingle(),
     supabase.from("categories").select("id, name, is_active").order("name"),
+    supabase.from("units").select("code, name").order("code"),
   ]);
   if (!item) notFound();
 
@@ -71,6 +72,7 @@ export default async function ItemPage({
       {canEdit ? (
         <ItemForm
           categories={categoryOptions}
+          units={units ?? []}
           canEditSellingName={can(user, "items.edit_selling_name")}
           item={{
             id: item.id,

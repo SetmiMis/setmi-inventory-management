@@ -14,7 +14,8 @@ export const itemSchema = z.object({
   sellingItemName: z.string().trim().max(200, "Selling Item Name is too long."),
   categoryId: z.preprocess(blankToNull, z.uuid("Invalid category.").nullable()),
   purchaseSource: z.enum(["LOCAL", "IMPORT"], "Purchase Source must be LOCAL or IMPORT."),
-  unit: z.string().trim().min(1, "Unit is required.").max(20, "Unit is too long."),
+  // A code from the units table (PCS, MTR ...). Upper-cased here; the database checks it exists.
+  unit: z.string().trim().min(1, "Unit is required.").max(10, "Unit is too long.").regex(/^[A-Za-z0-9]+$/, "Unit is not valid.").transform((s) => s.toUpperCase()),
   remarks: z.preprocess(blankToNull, z.string().trim().max(2000, "Remarks are too long.").nullable()),
 });
 

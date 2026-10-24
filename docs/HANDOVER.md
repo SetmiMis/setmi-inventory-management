@@ -2,6 +2,27 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-25: pushed to GitHub; P4 stock built (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- P3 committed (`e2eb995`) and **pushed**: `git ls-remote origin` shows `main` at `e2eb995`. Pre-push checks: repo is not visible without login (404), secret scan over all commits clean, no `.env` tracked. See D-022.
+- P4 per `docs/features/FEATURE-005-STOCK.md`: migrations 7-9 applied, DB tests 28/28 + 4/4, unit tests 25/25, lint/typecheck/build pass, demo data loaded (and its removal tested). Rollback record: `docs/ROLLBACK.md`.
+- **Uncommitted and not pushed:** all of P4 (code, migrations 7-9, tests, seed scripts, docs).
+
+### Owner to do (Supabase dashboard / browser)
+1. Open Stock (header link): you are admin, so you see all DEMO places; use the header switcher. Try: count stock, opening-stock tick, History, min/max level, the "Low stock only" filter (some DEMO items are below minimum on purpose), an item page's unit dropdown.
+2. Supabase dashboard > Authentication > Providers/Password: turn ON "leaked password protection" if your plan allows (advisor warning).
+3. Still untried in the browser: uploads, barcode print/scan, Excel import, locations.
+
+### Questions answered / open
+- Answered: dummy data first; cables sold per metre; minimum levels wanted.
+- Open: which REAL items are sold per metre (all are PCS until told); reel-to-metre conversion; printer model and label size.
+
+### Next
+Commit P4 (and push if you say so). Then P5: receiving goods from suppliers into a place (supplier list, receipt document, stock +). Or P4b: Excel import of stock counts. Tell the AI which first.
+
+---
+
 ## 2026-10-25: Odoo docs read; P3 locations built (Claude Sonnet 5.5)
 
 ### Done (verified by command output)

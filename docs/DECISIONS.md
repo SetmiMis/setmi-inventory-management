@@ -110,6 +110,18 @@ Format: context, options, choice, reason, date, model.
 - **Trade-offs:** the browser sends parsed rows back for the commit, so the server validates them again; limits 3 MB / 2000 rows; zip unpacked in memory.
 - **Date / model:** 2026-10-24, Claude Sonnet 5.5
 
+## D-021: Stock design (P4), informed by Odoo's Inventory docs
+- **Choices:** append-only ledger with from/to places (empty end = outside); balances changed only by a trigger on the ledger; no negative stock; users cannot write stock tables directly, only through `apply_stock_count`; quantities `numeric(14,3)` with the allowed decimals decided by the item's unit (units table); minimum/maximum per item per place; count sheet where the user enters the COUNTED number and the database computes the difference.
+- **Odoo ideas adopted:** per-place stock, from/to movements, adjustment = count vs on-hand, reordering minimum/maximum, units of measure, movement history. **Not adopted:** lots/serials, expiry, putaway, routes, valuation.
+- **Differences from Odoo:** negative stock is refused (Odoo allows it). Revisit if shops must bill before the system knows the stock.
+- **Trade-offs:** a wrong count is fixed by a new count (history is never edited); the ledger cannot be cleaned, so demo data needs the special remove script; unit cannot change after stock exists.
+- **Owner inputs:** dummy data first, cables are sold per metre (so MTR with 3 decimals), minimum levels per item per place wanted.
+- **Date / model:** 2026-10-25, Claude Sonnet 5.5
+
+## D-022: First push to GitHub
+- **Owner instruction (2026-10-25):** commit and push. Before pushing: repo not visible without login (404, so private), a secret scan of all commits found nothing, no `.env` file tracked. Plain push, no force. Remote `origin/main` = `e2eb995` afterwards.
+- **Date / model:** 2026-10-25, Claude Sonnet 5.5
+
 ## D-012: `Import_item_code` is optional
 - **Owner decision:** some items need it, some do not. It is optional, unique when filled, and not tied to LOCAL/IMPORT by a database rule.
 - **Date:** 2026-10-24

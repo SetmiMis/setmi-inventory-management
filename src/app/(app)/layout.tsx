@@ -32,6 +32,11 @@ async function Shell({ children }: { children: React.ReactNode }) {
               Items
             </Link>
           )}
+          {can(user, "stock.view") && (
+            <Link href="/stock" className="text-blue-700 underline">
+              Stock
+            </Link>
+          )}
           {(can(user, "locations.manage") || myLocations.length > 0) && (
             <Link href="/locations" className="text-blue-700 underline">
               Locations

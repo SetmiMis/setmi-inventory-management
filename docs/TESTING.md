@@ -92,6 +92,18 @@ NOT run: the import screen in a browser with a login (needs the owner), a 2000-r
 
 NOT run: the screens in a browser with a login; the switcher with a user who has two places; the cookie being ignored when it holds a place the user is not assigned to (logic reviewed, not exercised).
 
+## P4 stock checks (2026-10-25)
+| Check | Result |
+|---|---|
+| DB tests `supabase/tests/007_stock.sql` | 28/28 PASS: opening stock, correction down and up, same count writes nothing, reason required, pieces refuse fractions, metres accept 3 decimals, negative refused, one bad row writes nothing, opening twice refused, cannot count in a place you do not work in, no direct insert into ledger or edit of balances, min/max rules, ledger update and delete refused, transfer moves stock, stock never negative and a failed movement leaves the balance alone, unit locked once stock exists, shop user sees only own place, view-only user cannot count, admin sees all, anonymous sees nothing, audit rows |
+| DB tests `supabase/tests/008_stock_overview.sql` | 4/4 PASS |
+| `npm test` | 25/25 PASS (quantity parser added) |
+| lint, typecheck, build | exit 0; new routes `/stock`, `/stock/count`, `/stock/movements` |
+| Demo seed and removal on the dev project | seed loaded (12 items, 36 movements, balances match the arithmetic), removal emptied everything and the append-only trigger was back on, seed loaded again |
+| Supabase security advisor | one new warning (trigger function executable) fixed by migration 9; remaining: the accepted SECURITY DEFINER notes, and "leaked password protection disabled" (dashboard setting, owner) |
+
+NOT run: the stock screens in a browser with a login, the count sheet with a user who has two places, a 500-row count, concurrent counts by two users.
+
 ## Not tested yet (gaps)
 - Real login with a real user, the admin page with real data, and the Save button. No user exists yet; first admin must be created in the Supabase dashboard.
 - No automated browser/end-to-end tests.
