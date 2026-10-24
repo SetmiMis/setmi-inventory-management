@@ -48,6 +48,11 @@ export async function createItem(_prev: FormState, fd: FormData): Promise<FormSt
       .insert(bc.barcodes.map((barcode) => ({ item_id: data.id, barcode })));
     if (bcError) warn = "?warn=barcodes";
   }
+  // Owner request: the system makes a barcode for every new item (can be switched off per item).
+  if (fd.get("generateBarcode") === "on") {
+    const { error: genError } = await supabase.rpc("generate_item_barcode", { p_item: data.id });
+    if (genError) warn = "?warn=barcodes";
+  }
 
   revalidatePath("/items");
   redirect(`/items/${data.id}${warn}`);
@@ -129,6 +134,21 @@ export async function addBarcode(_prev: FormState, fd: FormData): Promise<FormSt
 
   revalidatePath(`/items/${itemId.data}`);
   return { ok: true, message: "Barcode added." };
+}
+
+// Gives the item its own EAN-13 barcode (starts with 2). The database function checks
+// items.edit again, never makes a second generated barcode for the same item, and logs it.
+export async function generateBarcode(_prev: FormState, fd: FormData): Promise<FormState> {
+  await requirePermission("items.edit");
+  const itemId = z.uuid().safeParse(fd.get("itemId"));
+  if (!itemId.success) return fail("Invalid form data.");
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("generate_item_barcode", { p_item: itemId.data });
+  if (error) return fail(friendlyDbError(error));
+
+  revalidatePath(`/items/${itemId.data}`);
+  return { ok: true, message: `Barcode ${data} created.` };
 }
 
 export async function removeBarcode(_prev: FormState, fd: FormData): Promise<FormState> {

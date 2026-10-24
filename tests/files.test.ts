@@ -87,6 +87,10 @@ test("itemSchema rules", () => {
     assert.equal(ok.data.remarks, null);
   }
   assert.equal(itemSchema.safeParse({ ...base, internalItemCode: "  " }).success, false);
+  // Real code from the owner's sheet (row 32), 85 characters with double spaces and a dot.
+  const real = "SETMI-POWER CORD EXTENSION METAL BOARD 2.5 METER  4 SOCKET WITH 1 SWITCH-15-AMP";
+  assert.equal(itemSchema.safeParse({ ...base, internalItemCode: real }).success, true);
+  assert.equal(itemSchema.safeParse({ ...base, internalItemCode: "x".repeat(121) }).success, false);
   assert.equal(itemSchema.safeParse({ ...base, itemName: "" }).success, false);
   assert.equal(itemSchema.safeParse({ ...base, purchaseSource: "OTHER" }).success, false);
   assert.equal(itemSchema.safeParse({ ...base, categoryId: "not-a-uuid" }).success, false);

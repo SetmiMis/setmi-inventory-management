@@ -6,7 +6,8 @@ const blankToNull = (v: unknown) => (typeof v === "string" && v.trim() === "" ? 
 // Server-side rules for an item (never trust the browser). They mirror database constraints;
 // the database stays the final judge (unique codes, non-blank, max 4 images).
 export const itemSchema = z.object({
-  internalItemCode: z.string().trim().min(1, "Internal Item Code is required.").max(64, "Internal Item Code is too long."),
+  // 120, not 64: the owner's real codes are "SETMI-" + the full item name and reach about 85 characters.
+  internalItemCode: z.string().trim().min(1, "Internal Item Code is required.").max(120, "Internal Item Code is too long (max 120)."),
   importItemCode: z.preprocess(blankToNull, z.string().trim().max(64, "Import Item Code is too long.").nullable()),
   itemName: z.string().trim().min(1, "Item Name is required.").max(200, "Item Name is too long."),
   // May be blank on create: the action then uses Item Name (owner decision D-008).

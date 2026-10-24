@@ -43,7 +43,7 @@ export function ItemForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="internalItemCode" className={labelClass}>Internal Item Code *</label>
-          <input id="internalItemCode" name="internalItemCode" required maxLength={64}
+          <input id="internalItemCode" name="internalItemCode" required maxLength={120}
             defaultValue={item?.internalItemCode} className={inputClass} />
         </div>
         <div>
@@ -98,9 +98,12 @@ export function ItemForm({
       </div>
 
       {!editing && (
-        <div>
-          <label htmlFor="barcodes" className={labelClass}>Barcodes (one per line, optional)</label>
-          <textarea id="barcodes" name="barcodes" rows={3} className={inputClass} />
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="generateBarcode" defaultChecked /> Generate a SETMI barcode for this item (EAN-13, you can print it)
+          </label>
+          <label htmlFor="barcodes" className={labelClass}>Manufacturer barcodes you already have (one per line, optional)</label>
+          <textarea id="barcodes" name="barcodes" rows={2} className={inputClass} />
         </div>
       )}
 

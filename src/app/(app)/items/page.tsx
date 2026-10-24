@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { can, requirePermission } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -22,6 +23,13 @@ export default async function ItemsPage({ searchParams }: { searchParams: Promis
   const page = Math.min(Math.max(parseInt(first(sp.page) ?? "1", 10) || 1, 1), 10000);
 
   const supabase = await createClient();
+
+  // Scanner support: a USB scanner types the digits and presses Enter. If the text is exactly
+  // one item's barcode, go straight to that item (the same lookup billing will use later).
+  if (q) {
+    const { data: exact } = await supabase.from("item_barcodes").select("item_id").eq("barcode", q).maybeSingle();
+    if (exact) redirect(`/items/${exact.item_id}`);
+  }
 
   // Barcode search: find items whose barcode matches, then include them in the filter.
   let barcodeItemIds: string[] = [];
@@ -83,7 +91,7 @@ export default async function ItemsPage({ searchParams }: { searchParams: Promis
       </div>
 
       <form method="get" className="grid gap-3 rounded border border-neutral-300 p-3 sm:grid-cols-5">
-        <input name="q" defaultValue={q} placeholder="Search code, name, barcode" aria-label="Search"
+        <input name="q" defaultValue={q} placeholder="Search code, name, or scan a barcode" aria-label="Search" autoFocus
           className={`${inputClass} !mt-0 sm:col-span-2`} />
         <select name="category" defaultValue={categoryId} aria-label="Category" className={`${inputClass} !mt-0`}>
           <option value="">All categories</option>

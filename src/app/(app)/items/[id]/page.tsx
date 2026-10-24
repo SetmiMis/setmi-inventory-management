@@ -24,7 +24,7 @@ export default async function ItemPage({
   const [{ data: item }, { data: categories }] = await Promise.all([
     supabase
       .from("items")
-      .select("*, item_barcodes(id, barcode)")
+      .select("*, item_barcodes(id, barcode, is_generated)")
       .eq("id", idParse.data)
       .maybeSingle(),
     supabase.from("categories").select("id, name, is_active").order("name"),

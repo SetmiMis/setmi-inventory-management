@@ -33,6 +33,10 @@ Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search 
 - `created_by` defaults to `auth.uid()` on items, item_barcodes, locations.
 - `items_guard_update` now: forces `updated_by` to the caller, keeps `created_by`/`created_at` unchangeable, and blocks a user who has only `items.archive` from editing any field except `is_active`. Tests: `supabase/tests/002_item_guards.sql`, 7/7 pass.
 
+## Migration 4: `20261024000004_barcode_generation.sql` (applied 2026-10-24)
+- Sequence `item_barcode_seq` (no rights for app users). Function `ean13_check_digit(text)`. Function `generate_item_barcode(uuid)` (security definer, needs `items.edit`, advisory lock per item so a double click cannot create two, returns existing generated barcode, writes audit row). Column `item_barcodes.is_generated`.
+- Generated format: `2` + 11 digits + check digit. Tests: `supabase/tests/004_barcode_generation.sql`, 13/13 pass.
+
 ## Known gaps in this design
 - (fixed by migration 3) archive-only users could edit other columns.
 - `item_barcodes` and `categories` inserts are not blocked for archive-only users beyond RLS permission checks (barcodes need items.edit or items.create).

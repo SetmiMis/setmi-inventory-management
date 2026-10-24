@@ -63,6 +63,16 @@ Note: Supabase blocks direct SQL DELETE on storage tables, so delete permission 
 
 NOT run: a real browser upload (needs a login), the 4-image limit in the UI, replacing a datasheet, removing files, the signed view links.
 
+## Barcode checks (2026-10-24)
+| Check | Result |
+|---|---|
+| DB tests `supabase/tests/004_barcode_generation.sql` | 13/13 PASS (real EAN check digits 4006381333931 and 5901234123457; 13 digits starting with 2; idempotent; different items get different numbers; reuse on another item refused; viewer and anonymous refused; audit rows) |
+| `npm test` | 12/12 PASS (5 new EAN-13 tests) |
+| Independent decoder (ZXing, throw-away folder, script not kept in the project) | 2112/2112 correct decodes, 704 numbers x 3 sizes |
+| lint, typecheck, build | exit 0; new route `/items/[id]/labels` |
+
+NOT run: printing on a real printer, scanning a printed label with a real scanner, the generate button and label page in a browser (login needed). Please print ONE label first and scan it.
+
 ## Not tested yet (gaps)
 - Real login with a real user, the admin page with real data, and the Save button. No user exists yet; first admin must be created in the Supabase dashboard.
 - No automated browser/end-to-end tests.

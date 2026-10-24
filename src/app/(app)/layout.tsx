@@ -18,7 +18,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-4">
-      <header className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-neutral-300 pb-3">
+      <header className="mb-6 print:hidden flex flex-wrap items-center justify-between gap-3 border-b border-neutral-300 pb-3">
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/" className="font-semibold">
             SETMI INDIA IMS

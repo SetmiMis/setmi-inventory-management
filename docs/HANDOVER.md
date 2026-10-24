@@ -2,6 +2,44 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-24: barcode generation, labels, scan jump (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- Migration 4 applied; DB tests 13/13; unit tests 12/12; ZXing independent decode 2112/2112; lint, typecheck, build pass. Details in `docs/features/FEATURE-003-BARCODE.md` section 0 and `docs/TESTING.md`.
+- UI: generate on item create (default on) and by button; label page with size presets; scan jump from the item search box; header hidden when printing.
+- Internal_Item_Code limit 120 (D-019).
+
+### Owner to try
+1. Create an item (leave "Generate a SETMI barcode" ticked) -> see the barcode on the item page.
+2. "Print labels" -> pick size -> Print one label on your label printer, margins None, scale 100%.
+3. Scan it with your scanner into the Items search box: it should open the same item.
+Tell the AI the printer model and label size so a preset can match it.
+
+### Not done
+- Billing (P7) uses the same scan lookup later. Excel import (P2c) still waits for the library "haan".
+- Uncommitted: migration 4, tests, barcode code, label page, docs, the 120-length fix.
+
+---
+
+## 2026-10-24: barcode request + real sheet reviewed (Claude Sonnet 5.5)
+
+- Owner shared a Scribd link (a 54-page student report; only a summary was readable, nothing useful for barcodes) and the Google Sheet with the real item master. Findings are in `docs/features/FEATURE-002-EXCEL-IMPORT.md` section 5b.
+- **Bug found and fixed from the sample:** Internal_Item_Code max length was 64 but real codes reach about 85. Now 120 in `lib/validation/item.ts` and the item form (the database column has no limit). Unit test added with the real row. 7/7 tests, lint, typecheck pass. Uncommitted.
+- New plan: `docs/features/FEATURE-003-BARCODE.md` (EAN-13 internal numbers starting with 2, label printing from the browser, scanner lookup). Not implemented. Waiting for "haan" and printer/label size.
+- Plan P2c unchanged otherwise; the owner's Excel can be exported from the Google Sheet as .xlsx.
+
+---
+
+## 2026-10-24: P2c plan written (Claude Sonnet 5.5)
+
+- P2b committed locally as `fbb2483` (not pushed). The owner has not yet tried uploads in the browser.
+- Plan: `docs/features/FEATURE-002-EXCEL-IMPORT.md`. Proposed library `read-excel-file` (npm audit: 0 vulnerabilities); `xlsx` rejected (high, no fix); `exceljs` rejected (stale, moderate).
+- `samples/` folder created and git-ignored for the owner's sample Excel.
+- Nothing installed, no code written for P2c. Waiting for: owner's "haan" on the library, sample file in `samples/`, answers to section 6 of the plan.
+- Uncommitted: `.gitignore` (samples/), the plan doc, this note.
+
+---
+
 ## 2026-10-24: P2b images and datasheet upload (Claude Sonnet 5.5)
 
 ### Done (verified by command output)
