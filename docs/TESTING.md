@@ -135,6 +135,17 @@ NOT run: the receipt editor in a browser, a real scanner on it, A4 print, label 
 
 NOT run: the transfer screens in a browser, the receive screen with a real scanner, A4 dispatch note print, two people sending/receiving at the same moment (row lock; not stress-tested).
 
+## P7 billing checks (2026-10-25)
+| Check | Result |
+|---|---|
+| DB tests `supabase/tests/011_billing.sql` | 37 lines, all PASS: switch OFF by default; the database refuses bills while OFF; only an admin can switch, no direct update of the setting; admin ON; bill total 250.75 and stock 10 -> 8 with SALE movements; bill keeps the printed name and price; not enough stock blocks the bill and writes nothing; item without price, cashier price change, fractions for pieces, 4 decimals for metres, same item twice, discount above the bill, negative discount and unknown payment mode are all refused; no billing at another place; no direct insert into bills; billing needs `bills.create`; override right lets a price change; voiding needs `bills.void` and a reason; void puts stock back (2 SALE_RETURN movements) and cannot be repeated; switching OFF stops new bills again but voiding still works; a cashier at another place sees none of these bills; bill lines, amounts and bills can never be changed or deleted; changing a price needs `items.edit_price` (a price-only user cannot change anything else); anonymous sees nothing; audit rows |
+| `npm test` | 31/31 PASS (3 new for money parsing and rounding) |
+| lint, typecheck, build | exit 0; new routes `/admin/settings`, `/billing`, `/bills`, `/bills/[id]`, `/bills/[id]/print` |
+| State of the real database after the test | billing_enabled = false, 0 bills (the test rolled back) |
+| Two test-script mistakes on the way | reading stock as a user without `stock.view` gave NULL (the protection works); fixed in the script |
+
+NOT run: the billing screen in a browser, a real scanner on it, a thermal receipt printer, two cashiers selling the last piece at the same time (the stock check and the balance row lock should serialise them; not stress-tested), turning the switch ON/OFF from the browser.
+
 ## Note about the older DB tests
 Tests 006-009 (and 003/004 in places) assume an EMPTY database: they count rows. With the demo data and the hidden in-transit place present, some of those counts differ and the tests would report FAIL. Run them on an empty copy (a Supabase branch) or read the failing line before trusting it.
 

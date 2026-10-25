@@ -2,7 +2,33 @@
 
 Newest entry on top. Read this first, update it last.
 
-## 2026-10-25 (very latest): P6 transfers built (Claude Sonnet 5.5)
+## 2026-10-25 (newest): P6 pushed; P7 billing built behind an ON/OFF switch (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- P6 committed and pushed as `981259d` (`git ls-remote` = local HEAD at that time).
+- P7 per `docs/features/FEATURE-008-BILLING.md`: migrations 13 and 14 applied; DB tests 37/37; unit tests 31/31; lint/typecheck/build pass. After the tests the real database still has `billing_enabled = false` and 0 bills.
+- Owner instruction: billing is done in Zoho now, so billing is built but switchable; tax left out for now (D-025).
+- **Uncommitted and not pushed:** all of P7 (plus a ROLLBACK.md note about P6).
+
+### What the owner must know
+- The switch is OFF. Admin > Settings > "Switch billing ON" turns it on. While OFF, Zoho sales do not reduce stock here.
+- Items need a selling price (item page, needs `items.edit_price`). Admins have it.
+- These bills are not tax invoices.
+
+### Owner to try (browser)
+1. Item page: set a Selling price on a DEMO item. Settings: switch billing ON. Switch to a DEMO shop in the header, Billing: scan/search, complete a bill, print the receipt, then void it with a reason. Check Stock/History. Switch billing OFF again.
+2. Still untried in the browser: uploads, barcode print/scan, Excel import, locations, stock, scan-count, receipts, transfers.
+
+### Open
+- Tax / GST / invoice numbers (owner postponed), returns with credit notes, customers, Zoho sales import, Excel import of prices.
+- `remove_demo_data.sql` does not remove bills (see DATA.md).
+
+### Next
+P8 reports (stock by place incl. in-transit, low stock, sales per day, history export to Excel) or follow-ups from the owner's browser test.
+
+---
+
+## 2026-10-25 (earlier): P6 transfers built (Claude Sonnet 5.5)
 
 ### Done (verified by command output)
 - P5 was pushed earlier as `83f8d1c`.

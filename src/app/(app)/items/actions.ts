@@ -15,7 +15,7 @@ const fail = (message: string): FormState => ({ ok: false, message });
 // Needs items.create. Two database calls (item, then barcodes), not one transaction:
 // if the barcodes fail, the item stays and the user is sent to its page to add them again.
 export async function createItem(_prev: FormState, fd: FormData): Promise<FormState> {
-  await requirePermission("items.create");
+  const user = await requirePermission("items.create");
 
   const parsed = itemFromForm(fd);
   if (!parsed.success) return fail(parsed.error.issues[0].message);
@@ -36,6 +36,8 @@ export async function createItem(_prev: FormState, fd: FormData): Promise<FormSt
       purchase_source: v.purchaseSource,
       unit: v.unit,
       remarks: v.remarks,
+      // Only people with items.edit_price may set a price (the database enforces it for updates).
+      selling_price: v.sellingPrice && can(user, "items.edit_price") ? Number(v.sellingPrice) : null,
     })
     .select("id")
     .single();
@@ -88,6 +90,7 @@ export async function updateItem(_prev: FormState, fd: FormData): Promise<FormSt
       purchase_source: v.purchaseSource,
       unit: v.unit,
       remarks: v.remarks,
+      ...(can(user, "items.edit_price") ? { selling_price: v.sellingPrice ? Number(v.sellingPrice) : null } : {}),
     })
     .eq("id", id.data)
     .eq("updated_at", expected.data)

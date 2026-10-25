@@ -16,6 +16,7 @@ export type ItemValues = {
   purchaseSource: "LOCAL" | "IMPORT";
   unit: string;
   remarks: string | null;
+  sellingPrice: string | null;
 };
 
 export type UnitOption = { code: string; name: string };
@@ -25,11 +26,13 @@ export function ItemForm({
   categories,
   units,
   canEditSellingName,
+  canEditPrice,
 }: {
   item?: ItemValues;
   categories: CategoryOption[];
   units: UnitOption[];
   canEditSellingName: boolean;
+  canEditPrice: boolean;
 }) {
   const editing = Boolean(item);
   const [state, formAction, pending] = useActionState<FormState, FormData>(editing ? updateItem : createItem, null);
@@ -102,6 +105,17 @@ export function ItemForm({
             ))}
           </select>
           <p className="mt-1 text-xs text-neutral-500">How stock is counted. Metres allow decimals, pieces do not. Cannot be changed once the item has stock.</p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="sellingPrice" className={labelClass}>Selling price (rupees per unit, as charged)</label>
+          <input id="sellingPrice" name="sellingPrice" inputMode="decimal" maxLength={11} defaultValue={item?.sellingPrice ?? ""}
+            disabled={!canEditPrice} className={inputClass} />
+          <p className="mt-1 text-xs text-neutral-500">
+            {canEditPrice ? "Used when billing is switched on. Leave empty if the item is not billed here. No tax is calculated." : "You do not have permission to change the price."}
+          </p>
         </div>
       </div>
 

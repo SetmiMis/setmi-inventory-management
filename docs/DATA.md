@@ -68,6 +68,15 @@ Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search 
 - Read: any transfers permission plus access to the from OR to place. Writes only through the functions listed in FEATURE-007 section 0.
 - Tests: `supabase/tests/010_transfers.sql` (38 lines).
 
+## Migrations 13 and 14 (applied 2026-10-25): billing
+- Enum value `stock_movement_type` + `SALE_RETURN` (own migration).
+- `app_settings(key, value)`: key limited to `billing_enabled`; value `false` by default; readable by signed-in users; changed only by `admin_set_billing_enabled` (admin). Function `billing_enabled()`.
+- `items.selling_price numeric(14,2)` (optional). Trigger `items_guard_update` extended: price needs `items.edit_price`; a price-only user cannot change other columns. The update policy now also allows `items.edit_price`.
+- `bills`, `bill_lines` (see FEATURE-008): immutable by triggers, no delete, no direct write policy; `create_bill` and `void_bill` are the only writers; read needs a bills permission plus access to the place.
+- Permissions added: `items.edit_price`, `bills.view`, `bills.create`, `bills.void`, `bills.override_price`.
+- Tests: `supabase/tests/011_billing.sql` (37 lines).
+- `remove_demo_data.sql` does NOT yet remove bills of DEMO places (bills are locked by triggers): if you make test bills at a DEMO shop, void them and ask the AI to extend the script before cleaning up.
+
 ## Known gaps in this design
 - (fixed by migration 3) archive-only users could edit other columns.
 - `item_barcodes` and `categories` inserts are not blocked for archive-only users beyond RLS permission checks (barcodes need items.edit or items.create).

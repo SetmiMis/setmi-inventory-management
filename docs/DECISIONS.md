@@ -138,6 +138,14 @@ Format: context, options, choice, reason, date, model.
 - **Open (owner):** GST/e-way bill rules for transfers between your places; whether shortages should stay open instead.
 - **Date / model:** 2026-10-25, Claude Sonnet 5.5
 
+## D-025: Billing built behind an admin switch, no tax (P7)
+- **Owner:** billing is done in Zoho today; build it anyway, with an ON/OFF option; tax later.
+- **Choice:** switch stored in the database, OFF by default, enforced by the bill-creating function itself; single-call atomic bill; snapshot of name/price on the bill; void instead of delete; selling price on the item with its own permission; narrow receipt print.
+- **Why:** lets the owner finish and test billing without risking double billing next to Zoho; the database, not the menu, is the control.
+- **Trade-offs:** while OFF, Zoho sales do not reduce stock here (counts needed); without a tax design these bills are not invoices.
+- **Revisit if:** the owner moves billing here (then tax, invoice numbers, returns/credit notes and customers must be designed), or wants a Zoho sales import.
+- **Date / model:** 2026-10-25, Claude Sonnet 5.5
+
 ## D-012: `Import_item_code` is optional
 - **Owner decision:** some items need it, some do not. It is optional, unique when filled, and not tied to LOCAL/IMPORT by a database rule.
 - **Date:** 2026-10-24

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { can, requireUser } from "@/lib/auth";
 import { getCurrentLocation, getMyLocations } from "@/lib/location";
+import { isBillingEnabled } from "@/lib/settings";
 import { logout } from "./actions";
 import { LocationSwitcher } from "./location-switcher";
 
@@ -19,6 +20,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
   const myLocations = await getMyLocations(user);
   const current = await getCurrentLocation(user);
+  const billingOn = await isBillingEnabled();
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-4">
@@ -35,6 +37,16 @@ async function Shell({ children }: { children: React.ReactNode }) {
           {(can(user, "receipts.view") || can(user, "receipts.create") || can(user, "receipts.post")) && (
             <Link href="/receipts" className="text-blue-700 underline">
               Receipts
+            </Link>
+          )}
+          {billingOn && can(user, "bills.create") && (
+            <Link href="/billing" className="text-blue-700 underline">
+              Billing
+            </Link>
+          )}
+          {(can(user, "bills.view") || can(user, "bills.create") || can(user, "bills.void")) && (
+            <Link href="/bills" className="text-blue-700 underline">
+              Bills
             </Link>
           )}
           {(can(user, "transfers.view") || can(user, "transfers.create") || can(user, "transfers.send") || can(user, "transfers.receive")) && (
@@ -58,9 +70,14 @@ async function Shell({ children }: { children: React.ReactNode }) {
             </Link>
           )}
           {user.isActive && user.isAdmin && (
-            <Link href="/admin/users" className="text-blue-700 underline">
-              Users
-            </Link>
+            <>
+              <Link href="/admin/users" className="text-blue-700 underline">
+                Users
+              </Link>
+              <Link href="/admin/settings" className="text-blue-700 underline">
+                Settings
+              </Link>
+            </>
           )}
         </nav>
         {myLocations.length > 1 && current ? (

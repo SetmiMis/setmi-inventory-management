@@ -74,6 +74,7 @@ export default async function ItemPage({
           categories={categoryOptions}
           units={units ?? []}
           canEditSellingName={can(user, "items.edit_selling_name")}
+          canEditPrice={can(user, "items.edit_price")}
           item={{
             id: item.id,
             updatedAt: item.updated_at,
@@ -85,6 +86,7 @@ export default async function ItemPage({
             purchaseSource: item.purchase_source,
             unit: item.unit,
             remarks: item.remarks,
+            sellingPrice: item.selling_price === null ? null : String(item.selling_price),
           }}
         />
       ) : (
@@ -95,6 +97,7 @@ export default async function ItemPage({
           <div><dt className="font-medium">Selling Item Name</dt><dd>{item.selling_item_name}</dd></div>
           <div><dt className="font-medium">Purchase Source</dt><dd>{item.purchase_source}</dd></div>
           <div><dt className="font-medium">Unit</dt><dd>{item.unit}</dd></div>
+          <div><dt className="font-medium">Selling price</dt><dd>{item.selling_price ?? ""}</dd></div>
           <div className="sm:col-span-2"><dt className="font-medium">Remarks</dt><dd>{item.remarks ?? ""}</dd></div>
         </dl>
       )}

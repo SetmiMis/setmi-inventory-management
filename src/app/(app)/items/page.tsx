@@ -40,7 +40,7 @@ export default async function ItemsPage({ searchParams }: { searchParams: Promis
 
   let query = supabase
     .from("items")
-    .select("id, internal_item_code, item_name, selling_item_name, purchase_source, unit, is_active, categories(name)", {
+    .select("id, internal_item_code, item_name, selling_item_name, purchase_source, unit, selling_price, is_active, categories(name)", {
       count: "exact",
     });
   if (status !== "all") query = query.eq("is_active", status === "active");
@@ -130,6 +130,7 @@ export default async function ItemsPage({ searchParams }: { searchParams: Promis
                 <th className="pr-3">Category</th>
                 <th className="pr-3">Source</th>
                 <th className="pr-3">Unit</th>
+                <th className="pr-3 text-right">Price</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -147,6 +148,7 @@ export default async function ItemsPage({ searchParams }: { searchParams: Promis
                   <td className="pr-3">{(it.categories as unknown as { name: string } | null)?.name ?? ""}</td>
                   <td className="pr-3">{it.purchase_source}</td>
                   <td className="pr-3">{it.unit}</td>
+                  <td className="pr-3 text-right font-mono">{it.selling_price ?? ""}</td>
                   <td>{it.is_active ? "Active" : "Archived"}</td>
                 </tr>
               ))}

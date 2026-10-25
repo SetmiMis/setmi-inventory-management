@@ -17,6 +17,8 @@ export const itemSchema = z.object({
   // A code from the units table (PCS, MTR ...). Upper-cased here; the database checks it exists.
   unit: z.string().trim().min(1, "Unit is required.").max(10, "Unit is too long.").regex(/^[A-Za-z0-9]+$/, "Unit is not valid.").transform((s) => s.toUpperCase()),
   remarks: z.preprocess(blankToNull, z.string().trim().max(2000, "Remarks are too long.").nullable()),
+  // Rupees, up to 2 decimals. Optional: an item without a price cannot be billed yet.
+  sellingPrice: z.preprocess(blankToNull, z.string().trim().regex(/^\d{1,8}(\.\d{1,2})?$/, "Selling price: digits with up to 2 decimals.").nullish()),
 });
 
 export function itemFromForm(fd: FormData) {
@@ -29,6 +31,7 @@ export function itemFromForm(fd: FormData) {
     purchaseSource: fd.get("purchaseSource"),
     unit: fd.get("unit"),
     remarks: fd.get("remarks"),
+    sellingPrice: fd.get("sellingPrice"),
   });
 }
 
