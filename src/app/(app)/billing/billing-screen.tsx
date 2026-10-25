@@ -127,13 +127,13 @@ export function BillingScreen({ placeName, canOverridePrice }: { placeName: stri
                   <tr key={l.itemId} className="border-b border-neutral-200">
                     <td className="py-2 pr-3">{l.name}<span className="block text-xs text-neutral-500">{l.code}{l.available !== null ? ` | in stock ${l.available}` : ""}</span>{short && <span className="block text-xs text-red-600">More than in stock</span>}</td>
                     <td className="pr-3">
-                      <input value={l.qty} inputMode="decimal" aria-label={`Quantity ${l.code}`} onChange={(e) => set(l.itemId, { qty: e.target.value })}
-                        className={`w-20 rounded border bg-transparent px-2 py-1 text-right font-mono ${l.qty !== "" && q === null ? "border-red-500" : "border-neutral-400"}`} /> {l.unit}
+                      <input onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("scan")?.focus(); } }} value={l.qty} inputMode="decimal" aria-label={`Quantity ${l.code}`} onChange={(e) => set(l.itemId, { qty: e.target.value })}
+                        className={`w-20 rounded border bg-transparent px-2 min-h-11 text-base sm:min-h-9 sm:text-sm text-right font-mono ${l.qty !== "" && q === null ? "border-red-500" : "border-neutral-400"}`} /> {l.unit}
                     </td>
                     <td className="pr-3">
                       {canOverridePrice ? (
-                        <input value={l.priceText} inputMode="decimal" aria-label={`Price ${l.code}`} onChange={(e) => set(l.itemId, { priceText: e.target.value })}
-                          className="w-24 rounded border border-neutral-400 bg-transparent px-2 py-1 text-right font-mono" />
+                        <input onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("scan")?.focus(); } }} value={l.priceText} inputMode="decimal" aria-label={`Price ${l.code}`} onChange={(e) => set(l.itemId, { priceText: e.target.value })}
+                          className="w-24 rounded border border-neutral-400 bg-transparent px-2 min-h-11 text-base sm:min-h-9 sm:text-sm text-right font-mono" />
                       ) : <span className="font-mono">{l.listPrice ?? "no price"}</span>}
                     </td>
                     <td className="pr-3 text-right font-mono">{lineSum(l).toFixed(2)}</td>

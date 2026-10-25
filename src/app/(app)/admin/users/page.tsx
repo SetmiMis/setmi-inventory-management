@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { UserForm, type LocationOption, type PermissionOption, type UserRow } from "./user-form";
+import { friendlyDbError } from "@/lib/db-errors";
 
 // Admin-only. requireAdmin() redirects everyone else. The database enforces it again:
 // RLS lets only an admin read other users' rows, and admin_* functions re-check is_admin().
@@ -18,7 +19,7 @@ export default async function UsersPage() {
 
   const failed = [profiles, permissions, userPermissions, locations, userLocations].find((r) => r.error);
   if (failed?.error) {
-    return <p role="alert" className="text-red-600">Could not load users: {failed.error.message}</p>;
+    return <p role="alert" className="text-red-600">Could not load users: {friendlyDbError(failed.error)}</p>;
   }
 
   const permissionOptions: PermissionOption[] = permissions.data ?? [];

@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  poweredByHeader: false, // do not tell strangers which framework runs the site
   cacheComponents: true,
   partialPrefetching: true,
   experimental: {

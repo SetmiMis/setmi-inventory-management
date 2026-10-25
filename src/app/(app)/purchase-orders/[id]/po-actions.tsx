@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Ban, CheckCheck, Send } from "lucide-react";
 import { cancelPurchaseOrder, closePurchaseOrder, sendPurchaseOrder } from "../actions";
-import { inputClass, primaryButton, secondaryButton } from "@/lib/ui";
+import { dangerButton, inputClass, primaryButton, secondaryButton } from "@/lib/ui";
 
 // Buttons on the order page. The database re-checks everything; these only call it.
 export function PoActions({ id, status, canApprove }: { id: string; status: string; canApprove: boolean }) {
@@ -33,7 +33,7 @@ export function PoActions({ id, status, canApprove }: { id: string; status: stri
           </button>
         )}
         {(status === "DRAFT" || status === "SENT") && (
-          <button type="button" disabled={busy} className={secondaryButton}
+          <button type="button" disabled={busy} className={dangerButton}
             onClick={() => act(() => cancelPurchaseOrder({ id }), "Cancel this order?")}>
             <Ban size={16} aria-hidden /> Cancel order
           </button>

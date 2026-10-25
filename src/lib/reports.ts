@@ -116,7 +116,10 @@ const dateOk = z.iso.date(); // a real calendar date, so 2026-13-45 is rejected 
 // Everything from the URL is untrusted: anything that does not parse falls back to a safe default.
 export function parseParams(get: (name: string) => string | undefined): ReportParams {
   const to = dateOk.safeParse(get("to")).data ?? today();
-  const from = dateOk.safeParse(get("from")).data ?? daysAgo(6);
+  let from = dateOk.safeParse(get("from")).data ?? daysAgo(6);
+  // At most one year at a time, so nobody can ask the database for year 0001 to 9999 again and again.
+  const earliest = new Date(new Date(`${to}T00:00:00Z`).getTime() - 366 * 86_400_000).toISOString().slice(0, 10);
+  if (from < earliest) from = earliest;
   const days = Math.min(Math.max(parseInt(get("days") ?? "90", 10) || 90, 1), 3650);
   return { from, to, location: z.uuid().safeParse(get("location")).data ?? null, days };
 }

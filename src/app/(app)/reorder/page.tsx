@@ -5,6 +5,7 @@ import { getCurrentLocation, getMyLocations } from "@/lib/location";
 import { createClient } from "@/lib/supabase/server";
 import { cardClass, inputClass, primaryButton } from "@/lib/ui";
 import { ReorderTable, type ReorderRow } from "./reorder-table";
+import { friendlyDbError } from "@/lib/db-errors";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
@@ -66,7 +67,7 @@ export default async function ReorderPage({ searchParams }: { searchParams: Prom
       </form>
 
       {error ? (
-        <p role="alert" className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700">{error.message.length <= 200 ? error.message : "Could not build the reorder list."}</p>
+        <p role="alert" className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700">{friendlyDbError(error)}</p>
       ) : (
         <>
           <p className="text-sm">

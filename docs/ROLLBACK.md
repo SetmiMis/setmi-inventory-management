@@ -3,7 +3,7 @@
 ## Current known-good points
 | What | Value | Notes |
 |---|---|---|
-| Last commit pushed to GitHub (`origin/main`) | `c6abc95` (G1+G2). Before it: `ace1134` (dashboard), `2250bf9` (languages), `843ef76` (usability), `c6d77b7` (P9), `124cb10` (P8), `aa208e2` (UI look), `beb401f` (P7 billing) | Verified with `git ls-remote origin` on 2026-10-25. Previous known-good: `981259d` (P6), `83f8d1c` (P5), `065e20f`, `2fab60a` (P4), `e2eb995` (P3) |
+| Last commit pushed to GitHub (`origin/main`) | `d942ba8` (UI/UX pass). Before it: `8d8f672` (Zoho widgets), `c6abc95` (G1+G2), `ace1134` (dashboard), `2250bf9` (languages), `843ef76` (usability), `c6d77b7` (P9), `124cb10` (P8), `aa208e2` (UI look), `beb401f` (P7 billing) | Verified with `git ls-remote origin` on 2026-10-25. Previous known-good: `981259d` (P6), `83f8d1c` (P5), `065e20f`, `2fab60a` (P4), `e2eb995` (P3) |
 | Database state matching it | migrations 001 to 027 | all applied to the dev Supabase project |
 
 Undo migrations 11-12 (transfers) only if no transfer was ever sent: sent transfers leave movements that point at the in-transit place. If only drafts exist: drop the transfer functions, `stock_transfer_lines`, `stock_transfers`, the sequence and the four permission rows, then the in-transit place and its triggers; the two new enum values cannot be removed from the enums (harmless if unused). Take a backup first.
@@ -30,3 +30,6 @@ Supabase keeps automatic backups depending on the plan. Before any risky change 
 
 ## After a rollback verify
 Sign in; open Items, Locations, Stock; run the SQL tests in `supabase/tests/` (each ends with a deliberate error that rolls back and prints PASS/FAIL lines).
+
+## Undo migration 28 (security hardening)
+Only if something breaks: `grant select on all tables in schema public to anon;` is NOT recommended (RLS still blocks it). To restore the old read rules, recreate `app_settings_select`, `permissions_select`, `units_select` with `using (true)` and the old `item_files_insert` check (bucket and `items.edit` only). Nothing in the data changes.

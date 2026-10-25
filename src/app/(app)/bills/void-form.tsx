@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { voidBill } from "../billing/actions";
-import { inputClass, secondaryButton } from "@/lib/ui";
+import { dangerButton, inputClass } from "@/lib/ui";
 
 export function VoidForm({ billId }: { billId: string }) {
   const router = useRouter();
@@ -14,7 +14,7 @@ export function VoidForm({ billId }: { billId: string }) {
     <div className="space-y-2 rounded border border-neutral-300 p-4 text-sm">
       <label htmlFor="reason" className="block font-medium">Void this bill (the goods come back into stock)</label>
       <input id="reason" value={reason} maxLength={300} placeholder="Reason, e.g. customer returned the goods" onChange={(e) => setReason(e.target.value)} className={inputClass} />
-      <button type="button" disabled={busy} className={secondaryButton}
+      <button type="button" disabled={busy} className={dangerButton}
         onClick={() => {
           if (!window.confirm("Void this bill? This cannot be undone. The bill stays in the list as voided.")) return;
           start(async () => { const r = await voidBill({ id: billId, reason }); setMsg({ ok: r.ok, text: r.message }); if (r.ok) router.refresh(); });

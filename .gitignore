@@ -40,6 +40,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# local AI tooling folders (never commit)
+/.claude/
+/.claude-flow/
+/.agentic-qe/
+
 # local sample data from the company (never commit)
 /samples/
 !.env.example

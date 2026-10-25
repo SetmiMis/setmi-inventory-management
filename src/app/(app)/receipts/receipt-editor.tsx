@@ -9,7 +9,7 @@ import {
 } from "./actions";
 import { MIN_SCAN_GAP_MS, beep } from "@/lib/client/beep";
 import { parseQuantity } from "@/lib/validation/stock";
-import { inputClass, labelClass, primaryButton, secondaryButton } from "@/lib/ui";
+import { dangerButton, inputClass, labelClass, primaryButton, secondaryButton } from "@/lib/ui";
 
 export type EditorLine = { itemId: string; code: string; name: string; unit: string; decimals: number; quantity: string; unitCost: string };
 export type EditorInitial = {
@@ -151,7 +151,7 @@ export function ReceiptEditor({
       <div className="space-y-3 rounded border border-neutral-300 p-4">
         <div>
           <label htmlFor="scan" className="block text-sm font-medium">Scan an item barcode (keep this box selected)</label>
-          <input id="scan" ref={scanRef} autoComplete="off" inputMode="none" placeholder="Scan here" className={`${inputClass} font-mono`}
+          <input id="scan" ref={scanRef} autoFocus autoComplete="off" inputMode="none" placeholder="Scan here" className={`${inputClass} font-mono`}
             onKeyDown={(e) => {
               if (e.key === "Enter") { e.preventDefault(); const el = e.currentTarget; const v = el.value; el.value = ""; void onScan(v); }
             }} />
@@ -189,13 +189,13 @@ export function ReceiptEditor({
                 <tr key={l.itemId} className="border-b border-neutral-200">
                   <td className="py-2 pr-3">{l.code}<span className="block text-xs text-neutral-500">{l.name}</span></td>
                   <td className="pr-3">
-                    <input value={l.quantity} inputMode="decimal" aria-label={`Quantity ${l.code}`} onChange={(e) => set(l.itemId, { quantity: e.target.value })}
-                      className={`w-24 rounded border bg-transparent px-2 py-1 text-right font-mono ${l.quantity !== "" && parseQuantity(l.quantity) === null ? "border-red-500" : "border-neutral-400"}`} /> {l.unit}
+                    <input onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("scan")?.focus(); } }} value={l.quantity} inputMode="decimal" aria-label={`Quantity ${l.code}`} onChange={(e) => set(l.itemId, { quantity: e.target.value })}
+                      className={`w-24 rounded border bg-transparent px-2 min-h-11 text-base sm:min-h-9 sm:text-sm text-right font-mono ${l.quantity !== "" && parseQuantity(l.quantity) === null ? "border-red-500" : "border-neutral-400"}`} /> {l.unit}
                   </td>
                   {canCost && (
                     <td className="pr-3">
-                      <input value={l.unitCost} inputMode="decimal" aria-label={`Price ${l.code}`} onChange={(e) => set(l.itemId, { unitCost: e.target.value })}
-                        className="w-28 rounded border border-neutral-400 bg-transparent px-2 py-1 text-right font-mono" />
+                      <input onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("scan")?.focus(); } }} value={l.unitCost} inputMode="decimal" aria-label={`Price ${l.code}`} onChange={(e) => set(l.itemId, { unitCost: e.target.value })}
+                        className="w-28 rounded border border-neutral-400 bg-transparent px-2 min-h-11 text-base sm:min-h-9 sm:text-sm text-right font-mono" />
                     </td>
                   )}
                   <td><button type="button" className={secondaryButton} onClick={() => setLines((p) => p.filter((x) => x.itemId !== l.itemId))}>Remove</button></td>
@@ -214,7 +214,7 @@ export function ReceiptEditor({
       <div className="flex flex-wrap items-center gap-3">
         <button type="button" disabled={busy} onClick={() => run(false)} className={secondaryButton}>{busy ? "Working..." : "Save draft"}</button>
         {canPost && <button type="button" disabled={busy} onClick={() => run(true)} className={primaryButton}>Save and post (adds stock)</button>}
-        {initial.receiptId && <button type="button" disabled={busy} onClick={cancelDraft} className={secondaryButton}>Cancel draft</button>}
+        {initial.receiptId && <button type="button" disabled={busy} onClick={cancelDraft} className={dangerButton}>Cancel draft</button>}
         {initial.receiptId && <Link href={`/receipts/${initial.receiptId}/print`} className="text-sm text-blue-700 underline">Print</Link>}
         {!canPost && <span className="text-xs text-neutral-500">Someone with the posting right must post this receipt.</span>}
       </div>

@@ -71,6 +71,7 @@ export function ScanCount({ placeName }: { placeName: string }) {
       setResult({ ok: false, message: `Fix the quantity for: ${bad.map((l) => l.code).join(", ")}` });
       return;
     }
+    if (!window.confirm(`Replace the stock of ${lines.length} item${lines.length === 1 ? "" : "s"} with your counted numbers?`)) return;
     startSave(async () => {
       const r = await saveScanCount({
         rows: lines.map((l) => ({ itemId: l.itemId, counted: parseQuantity(l.counted) as number })),
@@ -134,9 +135,9 @@ export function ScanCount({ placeName }: { placeName: string }) {
                   <td className="pr-3">
                     <div className="flex items-center gap-1">
                       <button type="button" className={secondaryButton} onClick={() => bump(l, -1)} aria-label={`Minus one ${l.code}`}>-1</button>
-                      <input value={l.counted} inputMode="decimal" aria-label={`Counted ${l.code}`}
+                      <input onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("scan")?.focus(); } }} value={l.counted} inputMode="decimal" aria-label={`Counted ${l.code}`}
                         onChange={(e) => change(l.itemId, { counted: e.target.value })}
-                        className={`w-24 rounded border px-2 py-1 text-right font-mono ${parseQuantity(l.counted) === null ? "border-red-500" : "border-neutral-400"} bg-transparent`} />
+                        className={`w-24 rounded border px-2 min-h-11 text-base sm:min-h-9 sm:text-sm text-right font-mono ${parseQuantity(l.counted) === null ? "border-red-500" : "border-neutral-400"} bg-transparent`} />
                       <button type="button" className={secondaryButton} onClick={() => bump(l, 1)} aria-label={`Plus one ${l.code}`}>+1</button>
                       <span className="text-xs text-neutral-500">{l.unit}</span>
                     </div>

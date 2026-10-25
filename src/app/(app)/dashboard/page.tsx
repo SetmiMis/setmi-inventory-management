@@ -12,6 +12,7 @@ import { getMyLocations } from "@/lib/location";
 import { createClient } from "@/lib/supabase/server";
 import { MOVEMENT_LABELS } from "@/lib/validation/stock";
 import { cardClass } from "@/lib/ui";
+import { friendlyDbError } from "@/lib/db-errors";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
@@ -107,7 +108,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </div>
       </div>
 
-      {error && <p role="alert" className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700">{error.message.length <= 200 ? error.message : "Could not load the dashboard."}</p>}
+      {error && <p role="alert" className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700">{friendlyDbError(error)}</p>}
       {!error && !hasAny && <p role="status" className="rounded-xl border border-amber-400 bg-amber-50 p-4 text-sm text-amber-900">{t("dash_no_sections")}</p>}
 
       {hasAny && (

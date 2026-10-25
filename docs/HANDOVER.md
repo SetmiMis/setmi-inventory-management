@@ -6,7 +6,7 @@ Newest entry on top. Read this first, update it last.
 
 ### Done (verified by command output)
 - Logos from `Setmi_india_logos` resized into `public/brand` and `src/app/icon.png`; colours #005A84 and #EEF8FF in `src/app/globals.css`; grouped menu; Ctrl+K search with quick actions; phone bottom bar; 44 px touch targets; empty states; Help section. Details: `docs/features/FEATURE-015-UX-AND-BRAND.md`.
-- `typecheck`, `lint`, `build` pass; unit tests 42/42; login page seen in a browser. NOT committed yet. The last pushed commit is `8d8f672` (repo private).
+- `typecheck`, `lint`, `build` pass; unit tests 42/42; login page seen in a browser. Pushed as `d942ba8` (repo private).
 
 ### Not done / owner must do
 - Open the home page after signing in, press Ctrl+K, try the phone view; tell me what feels hard.
@@ -459,3 +459,6 @@ DNS, Vercel/production, any Supabase project, git history.
 
 ### Next recommended task
 Task 002: finalize Item Master requirements (spec only, no code). Open questions are in `docs/ASSUMPTIONS.md`.
+
+## 2026-10-25 audit session (hack / DevOps / UI-UX)
+Read `docs/SECURITY-AUDIT-2026-10-25.md`. Migration 28 (security hardening) applied to the dev project, test `supabase/tests/018_security_hardening.sql` (10 PASS). CI workflow added at `.github/workflows/ci.yml` (never run yet). UI fixes: dark-mode contrast tokens, 44 px inline inputs, Enter returns to scan box, confirm on stock-count save, phone-menu keyboard handling, red cancel/void buttons. All of this is UNCOMMITTED, waiting for the owner's OK. Open items: discount permission, shortage approval, CSP, Supabase dashboard settings, rest of the UI list, matching the website look (owner link https://system-master-mu.vercel.app/).

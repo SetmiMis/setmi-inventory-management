@@ -26,7 +26,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // The server (layout) decides which links this person may see and sends only names.
 // Icons are picked here, so no component has to cross from server to client.
@@ -97,23 +97,35 @@ export function NavLinks({ items }: { items: NavItem[] }) {
 // Phone: a menu button that opens the same list over the page.
 export function MobileMenu({ items, openLabel = "Open menu", closeLabel = "Close menu" }: { items: NavItem[]; openLabel?: string; closeLabel?: string }) {
   const [open, setOpen] = useState(false);
+  const openRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  // Keyboard users: Escape closes the menu, focus moves into it, and goes back to the menu button afterwards.
+  useEffect(() => {
+    if (!open) return;
+    const trigger = openRef.current;
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("keydown", onKey); trigger?.focus(); };
+  }, [open]);
   return (
     <>
       <button
+        ref={openRef}
         type="button"
         onClick={() => setOpen(true)}
         aria-label={openLabel}
-        className="rounded-lg border border-line bg-surface p-2 lg:hidden"
+        className="min-h-11 min-w-11 rounded-lg border border-line bg-surface p-2 lg:hidden"
       >
-        <Menu size={20} aria-hidden />
+        <Menu size={20} aria-hidden className="mx-auto" />
       </button>
       {open && (
-        <div className="fixed inset-0 z-40 lg:hidden print:hidden">
+        <div role="dialog" aria-modal="true" aria-label={openLabel} className="fixed inset-0 z-40 lg:hidden print:hidden">
           <button type="button" aria-label={closeLabel} onClick={() => setOpen(false)} className="absolute inset-0 bg-black/50" />
           <aside className="absolute inset-y-0 left-0 w-64 overflow-y-auto bg-[var(--sidebar)] p-3">
             <div className="mb-3 flex items-center justify-between px-1">
               <Image src="/brand/setmi-logo-wide.png" alt="SETMI INDIA" width={150} height={46} className="h-auto w-[150px]" />
-              <button type="button" onClick={() => setOpen(false)} aria-label={closeLabel} className="text-white">
+              <button ref={closeRef} type="button" onClick={() => setOpen(false)} aria-label={closeLabel} className="p-3 text-white">
                 <X size={20} aria-hidden />
               </button>
             </div>
@@ -144,7 +156,7 @@ export function BottomBar({ items }: { items: NavItem[] }) {
             key={it.href}
             href={it.href}
             aria-current={active ? "page" : undefined}
-            className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 px-1 text-[11px] font-medium ${active ? "text-brand" : "text-muted"}`}
+            className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 px-1 text-xs font-medium ${active ? "text-brand" : "text-muted"}`}
           >
             <Icon size={20} aria-hidden />
             <span className="max-w-full truncate">{it.label}</span>

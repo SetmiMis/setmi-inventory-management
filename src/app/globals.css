@@ -7,8 +7,13 @@
   --surface: #ffffff;
   --surface-muted: #e2f0fb;
   --line: #cfe3f1;
+  --line-strong: #7f9fb5;
   --muted: #4f6272;
   --brand: #005a84;
+  --brand-text: #005a84;
+  --danger: #b3261e;
+  /* Same blue sweep as the Setmi India website header. */
+  --header-gradient: linear-gradient(45deg, #4c9fc4 0%, #013556 100%);
   --brand-strong: #0a5075;
   --brand-soft: #d9ecf8;
   --sidebar: #062f45;
@@ -24,9 +29,13 @@
     --surface: #112331;
     --surface-muted: #173044;
     --line: #25435a;
+    --line-strong: #5d7f96;
     --muted: #93aab9;
-    --brand: #4fb0dc;
-    --brand-strong: #7cc6e8;
+    /* Buttons keep a dark enough fill for white text (4.6:1); links and text use the lighter blue. */
+    --brand: #1f7fae;
+    --brand-text: #7cc6e8;
+    --danger: #f87171;
+    --brand-strong: #2b92c4;
     --brand-soft: #14384d;
     --sidebar: #051e2d;
     --sidebar-active: #0d3a54;
@@ -56,7 +65,7 @@
   --color-neutral-200: var(--line);
   --color-neutral-500: var(--muted);
   --color-blue-700: var(--brand);
-  --color-red-600: #b50505;
+  --color-red-600: var(--danger);
 }
 
 body {
@@ -129,7 +138,7 @@ main table a:hover {
 
 /* Plain links inside pages use the brand colour (the pages that have no link classes got the browser blue). */
 main a:not([class]) {
-  color: var(--brand);
+  color: var(--brand-text);
   font-weight: 500;
   text-decoration: none;
 }

@@ -69,7 +69,7 @@ export function ReceiveForm({ transferId, lines }: { transferId: string; lines: 
       </label>
       {scanMode && (
         <div>
-          <input ref={scanRef} autoComplete="off" inputMode="none" placeholder="Scan here" aria-label="Scan an item" className={`${inputClass} font-mono`}
+          <input id="scan" ref={scanRef} autoComplete="off" inputMode="none" placeholder="Scan here" aria-label="Scan an item" className={`${inputClass} font-mono`}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); const el = e.currentTarget; const v = el.value; el.value = ""; void onScan(v); } }} />
           <p role="status" className={`mt-1 min-h-5 text-sm ${feedback ? (feedback.ok ? "text-green-700" : "text-red-600") : "text-neutral-500"}`}>{feedback ? feedback.text : "Scan each piece that arrived."}</p>
         </div>
@@ -86,8 +86,8 @@ export function ReceiveForm({ transferId, lines }: { transferId: string; lines: 
                   <td className="py-2 pr-3">{l.code}<span className="block text-xs text-neutral-500">{l.name}</span></td>
                   <td className="pr-3 text-right font-mono">{l.sent} {l.unit}</td>
                   <td className="pr-3">
-                    <input value={vals[l.itemId]} inputMode="decimal" aria-label={`Arrived ${l.code}`} onChange={(e) => setVals((p) => ({ ...p, [l.itemId]: e.target.value }))}
-                      className={`w-24 rounded border bg-transparent px-2 py-1 text-right font-mono ${got === null || got > l.sent ? "border-red-500" : "border-neutral-400"}`} />
+                    <input onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); document.getElementById("scan")?.focus(); } }} value={vals[l.itemId]} inputMode="decimal" aria-label={`Arrived ${l.code}`} onChange={(e) => setVals((p) => ({ ...p, [l.itemId]: e.target.value }))}
+                      className={`w-24 rounded border bg-transparent px-2 min-h-11 text-base sm:min-h-9 sm:text-sm text-right font-mono ${got === null || got > l.sent ? "border-red-500" : "border-neutral-400"}`} />
                   </td>
                   <td className={diff === null || diff === 0 ? "" : diff < 0 ? "font-medium text-red-600" : "text-red-600"}>
                     {diff === null ? "?" : diff === 0 ? "OK" : diff < 0 ? `${-diff} short` : "more than sent"}

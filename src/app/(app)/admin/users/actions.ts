@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { friendlyDbError } from "@/lib/db-errors";
 
 export type SaveUserState = { ok: boolean; message: string } | null;
 
@@ -42,7 +43,7 @@ export async function saveUser(_prev: SaveUserState, formData: FormData): Promis
   for (const step of steps) {
     // Run in order: admin first, then active, so a rule like "cannot deactivate yourself" reports clearly.
     const { error } = await step;
-    if (error) return { ok: false, message: error.message };
+    if (error) return { ok: false, message: friendlyDbError(error) };
   }
 
   revalidatePath("/admin/users");
