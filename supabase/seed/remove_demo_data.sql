@@ -22,6 +22,17 @@ alter table public.goods_receipt_costs enable trigger goods_receipt_costs_guard;
 alter table public.goods_receipt_lines enable trigger goods_receipt_lines_guard;
 alter table public.goods_receipts enable trigger goods_receipts_no_change;
 
+-- purchase orders for a DEMO place or a DEMO supplier (lines and prices go with them)
+alter table public.purchase_orders disable trigger purchase_orders_flow_guard;
+alter table public.purchase_order_lines disable trigger purchase_order_lines_guard;
+alter table public.purchase_order_costs disable trigger purchase_order_costs_guard;
+delete from public.purchase_orders
+ where location_id in (select id from public.locations where code like 'DEMO-%')
+    or supplier_id in (select id from public.suppliers where name like 'DEMO %');
+alter table public.purchase_order_costs enable trigger purchase_order_costs_guard;
+alter table public.purchase_order_lines enable trigger purchase_order_lines_guard;
+alter table public.purchase_orders enable trigger purchase_orders_flow_guard;
+
 -- transfers that start or end at a DEMO place
 alter table public.stock_transfers disable trigger stock_transfers_flow_trg;
 alter table public.stock_transfer_lines disable trigger stock_transfer_lines_flow_trg;
