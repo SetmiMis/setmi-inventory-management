@@ -59,11 +59,27 @@ begin
     case when (d->'purchase'->>'open')::int = 1 and (d->'purchase'->>'late')::int = 1 and (d->'purchase'->>'drafts')::int = 1
               and (d->'receipts'->>'drafts')::int = 1 and (d->'transfers'->>'incoming')::int = 1 and (d->'transfers'->>'outgoing')::int = 1 then 'PASS' else 'FAIL' end || E'\n';
   res := res || 'D3b recent activity is filled (' || jsonb_array_length(d->'stock'->'recent') || ' rows): ' || case when jsonb_array_length(d->'stock'->'recent') > 0 then 'PASS' else 'FAIL' end || E'\n';
+  -- D9: top stocked (by quantity, all my places) and the receive widgets (no receipt posted yet in this test)
+  d := public.dashboard_data(td, td, null);
+  res := res || 'D9 top stocked item is IA with ' || coalesce(d->'stock'->'top_stocked'->0->>'code','?') || ' ' || coalesce(d->'stock'->'top_stocked'->0->>'qty','?') || ': ' ||
+    case when d->'stock'->'top_stocked'->0->>'code' = 'IA' and jsonb_array_length(d->'stock'->'top_stocked') >= 1 then 'PASS' else 'FAIL' end || E'\n';
+  res := res || 'D10 receive widgets are present and empty (history ' || jsonb_array_length(d->'receipts'->'history') || ', vendors ' || jsonb_array_length(d->'receipts'->'top_vendors') || '): ' ||
+    case when jsonb_array_length(d->'receipts'->'history') = 0 and jsonb_array_length(d->'receipts'->'top_vendors') = 0 then 'PASS' else 'FAIL' end || E'\n';
   d := public.dashboard_data(td, td, wh);
   res := res || 'D7 filtered to the warehouse: bills ' || (d->'sales'->>'bills') || ' (want 0), orders open ' || (d->'purchase'->>'open') || ' (want 1): ' ||
     case when (d->'sales'->>'bills')::int = 0 and (d->'purchase'->>'open')::int = 1 then 'PASS' else 'FAIL' end || E'\n';
   begin perform public.dashboard_data(td - 400, td, null); res := res || 'D6 range over a year: FAIL' || E'\n';
   exception when others then res := res || 'D6 a range over one year is refused: PASS' || E'\n'; end;
+  reset role;
+
+  -- D11: post a receipt and see it in the receive history and top vendors
+  perform set_config('request.jwt.claims', json_build_object('sub',adm,'role','authenticated')::text, true);
+  set local role authenticated;
+  x := public.save_goods_receipt(null, jsonb_build_object('supplier_id',s1,'location_id',wh,'receipt_date',td), jsonb_build_array(jsonb_build_object('item_id',ic,'quantity',12)));
+  perform public.post_goods_receipt((x->>'id')::uuid);
+  d := public.dashboard_data(td, td, null);
+  res := res || 'D11 after posting a receipt: history ' || jsonb_array_length(d->'receipts'->'history') || ' (want 1, qty ' || coalesce(d->'receipts'->'history'->0->>'qty','?') || ' = 12), top vendor ' || coalesce(d->'receipts'->'top_vendors'->0->>'name','?') || ': ' ||
+    case when jsonb_array_length(d->'receipts'->'history') = 1 and (d->'receipts'->'history'->0->>'qty')::numeric = 12 and d->'receipts'->'top_vendors'->0->>'name' = 'Sup' then 'PASS' else 'FAIL' end || E'\n';
   reset role;
 
   -- D4: a user with only stock.view (no items.view) and nothing else gets no sections (not zeros)

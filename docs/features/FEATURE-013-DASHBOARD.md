@@ -33,3 +33,6 @@ Every tile links to the screen where you act on it (bills, low-stock report, pur
 - "Low stock" counts only items that have a minimum level set for that place.
 - No profit or stock value yet (needs a decision about which cost to use, and the cost permission).
 - Before the page's JavaScript loads, animated columns start hidden (standard for Motion); on a very slow connection they appear a moment later.
+
+## Update (2026-10-25): Zoho-style widgets
+The dashboard now also shows Top stocked items (by quantity), Top vendors (by posted receipts) and Receive history, as on the Zoho Inventory demo dashboard. See `docs/REFERENCE-ZOHO-ODOO.md` for the full comparison with Zoho and Odoo.

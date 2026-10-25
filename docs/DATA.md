@@ -109,3 +109,5 @@ Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search 
 - `reorder_suggestions(place, days)` (invoker, needs stock.view and items.view). Migration 25 fixes a numeric type in it. Tests `supabase/tests/016_stock_entries_and_reorder.sql` (21 lines). Details: FEATURE-014.
 
 - Migration 26 (review fixes): the movement reason is cut to 300 characters; a recalled transfer is no longer demand; only sales, transfers sent away and stock outs marked "sold" count as demand (damaged, lost, sample, own use and returns to the supplier do not). Tests `supabase/tests/017_entry_reorder_review.sql` (5 lines).
+
+- Migration 27 (dashboard, Zoho-style widgets): `top_stocked` (top 5 items by quantity), `receipts.history` (last 6 posted receipts in the chosen days) and `receipts.top_vendors` (by number of posted receipts). No costs. Test 015 now has 13 lines.

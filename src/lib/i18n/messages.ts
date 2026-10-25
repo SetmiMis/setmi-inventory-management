@@ -57,6 +57,8 @@ const en = {
   nav_entry: "Stock In / Out", nav_reorder: "Reorder",
   task_entry: "Quick Stock In / Out", task_entry_hint: "Sold in Zoho, sample, damaged, returned",
   task_reorder: "What to order", task_reorder_hint: "Reorder list from real use, then a draft purchase order",
+  chart_stocked: "Top stocked items", chart_stocked_empty: "No stock yet", chart_vendors: "Top vendors", chart_vendors_empty: "No goods received in these days",
+  unit_receipts: "receipts", list_receive: "Receive history", list_receive_empty: "No goods received in these days",
 } as const;
 
 export type MessageKey = keyof typeof en;
@@ -109,6 +111,8 @@ const hi: Record<MessageKey, string> = {
   nav_entry: "स्टॉक इन / आउट", nav_reorder: "फिर से मँगवाएँ",
   task_entry: "जल्दी स्टॉक इन / आउट", task_entry_hint: "Zoho में बिका, सैंपल, ख़राब, वापसी",
   task_reorder: "क्या मँगवाना है", task_reorder_hint: "असली खपत से सूची, फिर ड्राफ़्ट खरीद ऑर्डर",
+  chart_stocked: "सबसे ज़्यादा स्टॉक वाले आइटम", chart_stocked_empty: "अभी स्टॉक नहीं", chart_vendors: "मुख्य सप्लायर", chart_vendors_empty: "इन दिनों में कोई माल नहीं आया",
+  unit_receipts: "रसीदें", list_receive: "माल आने का इतिहास", list_receive_empty: "इन दिनों में कोई माल नहीं आया",
 };
 
 export const MESSAGES: Record<"en" | "hi", Record<MessageKey, string>> = { en, hi };

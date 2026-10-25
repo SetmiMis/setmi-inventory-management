@@ -2,13 +2,24 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-25 (night 4): Zoho and Odoo comparison, Zoho-style dashboard widgets
+
+### Done (verified by command output)
+- G1/G2 pushed as `c6abc95`. **The GitHub repo turned out to be PUBLIC** (it was private before; every check until then said 404). Owner must make it private again (GitHub > Settings > Danger Zone). Until that is confirmed, new work is committed locally only and NOT pushed.
+- `docs/REFERENCE-ZOHO-ODOO.md`: honest comparison. Inventory side is on par with Zoho/Odoo core; the sales and accounting side (customers, sales orders, invoices, credit notes, GST) is the large gap.
+- Dashboard: top stocked items, top vendors, receive history (migration 27). DB test 015 13/13; typecheck, lint, build pass.
+
+### Not done / owner must do
+- Make the repo private; then say so and the local commits get pushed.
+- Decide the next big step: customers + sales orders (no tax) or the sheet gaps G3/G7/G4 first.
+
 ## 2026-10-25 (night 3): quick Stock In/Out (G1) and automatic reorder (G2) (Claude Opus 5.5)
 
 ### Done (verified by command output)
 - Read the owner's shop sheet 'IMS For Shop' (forms, AppSheet, Apps Script effects, reorder and indent tabs): `docs/REFERENCE-SHOP-SHEET.md` lists 8 gaps (G1-G8).
 - G1 `/stock/entry`: Stock Out / Stock In with a reason (sold in Zoho, sample, damaged ...), scan, reference, English and Hindi; permission `stock.entry`.
 - G2: item planning fields (lead time, safety factor, MOQ); `/reorder` with target and order quantity from real consumption, then one click to a draft purchase order.
-- Migrations 23, 24, 25 applied; DB tests 016 21/21; unit tests 42/42; typecheck, lint, build pass. Details: `docs/features/FEATURE-014-QUICK-ENTRY-AND-REORDER.md`. NOT committed yet.
+- Migrations 23, 24, 25 applied; DB tests 016 21/21; unit tests 42/42; typecheck, lint, build pass. Details: `docs/features/FEATURE-014-QUICK-ENTRY-AND-REORDER.md`. Pushed as `c6abc95`.
 
 ### Not done / owner must do
 - Give `stock.entry` to the shop staff in Admin > Users; fill Reorder planning on items (or wait for the sheet import, G7).

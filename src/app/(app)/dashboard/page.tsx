@@ -31,9 +31,14 @@ type Dash = {
     low_list: { code: string; name: string; unit: string; place: string; qty: number; min: number }[];
     by_place: { place: string; place_name: string; in_stock: number; low: number }[];
     recent: { at: string; type: string; qty: number; code: string; unit: string; from_place: string | null; to_place: string | null }[];
+    top_stocked: { code: string; name: string; unit: string; qty: number }[];
   };
   purchase?: { open: number; late: number; drafts: number };
-  receipts?: { drafts: number };
+  receipts?: {
+    drafts: number;
+    history: { d: string; no: string; vendor: string; qty: number }[];
+    top_vendors: { name: string; receipts: number }[];
+  };
   transfers?: { incoming: number; outgoing: number };
 };
 
@@ -217,6 +222,55 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                           {num(x.qty) === 0 && <PackageX size={14} aria-hidden />}{num(x.qty)} / {num(x.min)} {x.unit}
                         </span>
                       </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
+        </div>
+      )}
+
+      {(d.stock || d.receipts) && (
+        <div className="grid gap-4 lg:grid-cols-3">
+          {d.stock && (
+            <section className={cardClass}>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-base">{t("chart_stocked")}</h2>
+                <Link href="/reports?r=stock" className="text-sm">{t("see_all")}</Link>
+              </div>
+              <BarList
+                rows={d.stock.top_stocked.map((x) => ({ key: x.code, label: x.name, sub: x.code, value: num(x.qty), display: `${num(x.qty).toLocaleString("en-IN", { maximumFractionDigits: 3 })} ${x.unit}` }))}
+                emptyText={t("chart_stocked_empty")}
+              />
+            </section>
+          )}
+          {d.receipts && (
+            <section className={cardClass}>
+              <h2 className="mb-3 text-base">{t("chart_vendors")}</h2>
+              <BarList
+                rows={d.receipts.top_vendors.map((x) => ({ key: x.name, label: x.name, value: num(x.receipts), display: `${num(x.receipts)} ${t("unit_receipts")}` }))}
+                emptyText={t("chart_vendors_empty")}
+              />
+            </section>
+          )}
+          {d.receipts && (
+            <section className={cardClass}>
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-base">{t("list_receive")}</h2>
+                <Link href="/receipts" className="text-sm">{t("see_all")}</Link>
+              </div>
+              {d.receipts.history.length === 0 ? (
+                <p className="py-6 text-center text-sm text-muted">{t("list_receive_empty")}</p>
+              ) : (
+                <ul className="divide-y divide-line text-sm">
+                  {d.receipts.history.map((h) => (
+                    <li key={h.no} className="flex items-center justify-between gap-3 py-2">
+                      <span className="min-w-0">
+                        <span className="block truncate font-medium">{h.vendor}</span>
+                        <span className="block text-xs text-muted">{h.no} · {h.d}</span>
+                      </span>
+                      <span className="shrink-0 font-mono">{num(h.qty).toLocaleString("en-IN", { maximumFractionDigits: 3 })}</span>
                     </li>
                   ))}
                 </ul>
