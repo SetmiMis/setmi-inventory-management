@@ -2,6 +2,20 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-25 (night 6): UI/UX pass with the owner's logos and colours (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- Logos from `Setmi_india_logos` resized into `public/brand` and `src/app/icon.png`; colours #005A84 and #EEF8FF in `src/app/globals.css`; grouped menu; Ctrl+K search with quick actions; phone bottom bar; 44 px touch targets; empty states; Help section. Details: `docs/features/FEATURE-015-UX-AND-BRAND.md`.
+- `typecheck`, `lint`, `build` pass; unit tests 42/42; login page seen in a browser. NOT committed yet. The last pushed commit is `8d8f672` (repo private).
+
+### Not done / owner must do
+- Open the home page after signing in, press Ctrl+K, try the phone view; tell me what feels hard.
+
+## 2026-10-25 (night 5): repo private again, UI/UX skill installed
+
+- Repo was made private again by the owner (anonymous page and API give 404); `8d8f672` pushed after that. Earlier commits were visible while it was public: no secrets were ever committed (scanned before every push), but the code and the Supabase project name were exposed.
+- Installed the `ui-ux-pro-max` skill into `.claude/skills/ui-ux-pro-max/` (project level, not committed). Use in a NEW session; run `python .claude/skills/ui-ux-pro-max/scripts/search.py "<query>" --design-system` (see its LOCAL-NOTE.md). Details: `docs/DEPENDENCIES.md`.
+
 ## 2026-10-25 (night 4): Zoho and Odoo comparison, Zoho-style dashboard widgets
 
 ### Done (verified by command output)

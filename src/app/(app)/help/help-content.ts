@@ -25,6 +25,18 @@ const EN: HelpSection[] = [
     tips: ["Look at the top first to be sure the right place is selected before you start."],
   },
   {
+    id: "search", title: "Search anything fast (Ctrl+K) and the phone bar", short: "Search",
+    intro: "One search box finds items and takes you to any page. You never have to hunt through the menu.",
+    steps: [
+      "Press Ctrl+K (or the / key) anywhere, or tap 'Search or jump to...' at the top.",
+      "Type an item code, part of the name, or scan the barcode: the item opens straight away.",
+      "Or type a page name (for example 'receipts') or a job (for example 'new purchase order') and press Enter.",
+      "Use the up and down keys to choose, Enter to open, Esc to close. Pages you opened recently are listed first.",
+      "On a phone, the bar at the bottom has the four things used most. The menu button at the top has everything else.",
+    ],
+    tips: ["The search only shows what you are allowed to open."],
+  },
+  {
     id: "items", title: "Making and finding items", short: "Items",
     intro: "An item is your product (for example a BNC connector). Every item has a unique code.",
     steps: [
@@ -237,6 +249,18 @@ const HI: HelpSection[] = [
       "कोई बटन या मेनू नहीं दिख रहा? मतलब आपको उसकी अनुमति नहीं मिली है। एडमिन से कहें।",
     ],
     tips: ["काम शुरू करने से पहले ऊपर देख लें कि सही जगह चुनी हुई है।"],
+  },
+  {
+    id: "search", title: "कुछ भी जल्दी खोजें (Ctrl+K) और फ़ोन की नीचे वाली पट्टी", short: "खोज",
+    intro: "एक ही खोज बॉक्स आइटम ढूँढता है और किसी भी पेज पर ले जाता है। मेनू में ढूँढना नहीं पड़ता।",
+    steps: [
+      "कहीं भी Ctrl+K (या / कुंजी) दबाएँ, या ऊपर 'खोजें या कहीं भी जाएँ...' पर टैप करें।",
+      "आइटम का कोड, नाम का हिस्सा लिखें या बारकोड स्कैन करें: आइटम सीधे खुल जाता है।",
+      "या पेज का नाम (जैसे 'receipts') या कोई काम (जैसे 'new purchase order') लिखकर Enter दबाएँ।",
+      "ऊपर-नीचे कुंजी से चुनें, Enter से खोलें, Esc से बंद करें। हाल में खोले पेज सबसे ऊपर दिखते हैं।",
+      "फ़ोन पर नीचे की पट्टी में सबसे ज़्यादा इस्तेमाल होने वाली चार चीज़ें हैं। बाकी सब ऊपर के मेनू बटन में।",
+    ],
+    tips: ["खोज सिर्फ़ वही दिखाती है जो आप खोल सकते हैं।"],
   },
   {
     id: "items", title: "आइटम बनाना और ढूँढना", short: "आइटम",

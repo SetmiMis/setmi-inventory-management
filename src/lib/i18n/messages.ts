@@ -59,6 +59,12 @@ const en = {
   task_reorder: "What to order", task_reorder_hint: "Reorder list from real use, then a draft purchase order",
   chart_stocked: "Top stocked items", chart_stocked_empty: "No stock yet", chart_vendors: "Top vendors", chart_vendors_empty: "No goods received in these days",
   unit_receipts: "receipts", list_receive: "Receive history", list_receive_empty: "No goods received in these days",
+  // groups and search
+  group_daily: "Daily work", group_inventory: "Inventory", group_buying: "Buying", group_insights: "Insights", group_admin: "Admin", group_support: "Support",
+  search_button: "Search or jump to...", search_title: "Search", search_placeholder: "Item code, name or barcode, or a page...",
+  search_items: "Items", search_pages: "Go to", search_actions: "Quick actions", search_recent: "Recently opened", search_none: "Nothing found. Try the item code, part of the name, or scan the barcode.",
+  search_hint: "Up and down to choose, Enter to open, Esc to close", search_typing: "Searching...",
+  act_new_item: "New item", act_new_receipt: "New goods receipt", act_new_po: "New purchase order", act_new_transfer: "New transfer", act_stock_out: "Stock Out (sold in Zoho, damaged...)",
 } as const;
 
 export type MessageKey = keyof typeof en;
@@ -113,6 +119,11 @@ const hi: Record<MessageKey, string> = {
   task_reorder: "क्या मँगवाना है", task_reorder_hint: "असली खपत से सूची, फिर ड्राफ़्ट खरीद ऑर्डर",
   chart_stocked: "सबसे ज़्यादा स्टॉक वाले आइटम", chart_stocked_empty: "अभी स्टॉक नहीं", chart_vendors: "मुख्य सप्लायर", chart_vendors_empty: "इन दिनों में कोई माल नहीं आया",
   unit_receipts: "रसीदें", list_receive: "माल आने का इतिहास", list_receive_empty: "इन दिनों में कोई माल नहीं आया",
+  group_daily: "दैनिक काम", group_inventory: "इन्वेंटरी", group_buying: "खरीद", group_insights: "रिपोर्ट व जानकारी", group_admin: "एडमिन", group_support: "सहायता",
+  search_button: "खोजें या कहीं भी जाएँ...", search_title: "खोज", search_placeholder: "आइटम का कोड, नाम या बारकोड, या कोई पेज...",
+  search_items: "आइटम", search_pages: "यहाँ जाएँ", search_actions: "जल्दी के काम", search_recent: "हाल में खोले", search_none: "कुछ नहीं मिला। आइटम का कोड, नाम का हिस्सा लिखें या बारकोड स्कैन करें।",
+  search_hint: "ऊपर-नीचे से चुनें, Enter से खोलें, Esc से बंद करें", search_typing: "खोज रहे हैं...",
+  act_new_item: "नया आइटम", act_new_receipt: "नई माल की रसीद", act_new_po: "नया खरीद ऑर्डर", act_new_transfer: "नया ट्रांसफर", act_stock_out: "स्टॉक आउट (Zoho में बिका, ख़राब...)",
 };
 
 export const MESSAGES: Record<"en" | "hi", Record<MessageKey, string>> = { en, hi };

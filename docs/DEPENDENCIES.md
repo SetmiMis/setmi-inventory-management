@@ -37,3 +37,5 @@ Added 2026-10-25 (UI polish, owner said "use the best UI/UX libraries and icons"
 Added 2026-10-25 (languages): the font **Noto Sans Devanagari** (SIL Open Font Licence) through `next/font/google`, so Hindi letters show correctly. It is downloaded when the app is built; it is not an npm package and adds no dependency to package.json.
 
 Added 2026-10-25 (dashboard): **motion ^14.6.0** (MIT), the animation library recommended first in the blog the owner shared; used for card reveal, count-up numbers and growing chart bars, and it respects "reduce motion". `npm audit --omit=dev`: 0 vulnerabilities. Charts are hand-made SVG, so no chart library was added.
+
+Added 2026-10-25 (tooling, not an app dependency): the **ui-ux-pro-max** Claude skill (MIT, https://github.com/nextlevelbuilder/ui-ux-pro-max-skill), copied into `.claude/skills/ui-ux-pro-max/` (73 files, ~3.5 MB; Python standard library only, no network calls, nothing installed globally; scripts and SKILL.md were read first). It is NOT in `package.json` and not shipped with the app. It is not committed (the `.claude/` folder stays out of git). To remove: delete that folder. See its `LOCAL-NOTE.md`.

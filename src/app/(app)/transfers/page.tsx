@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { EmptyState } from "@/components/empty-state";
+import { ArrowLeftRight } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { can, requireAnyPermission } from "@/lib/auth";
 import { getCurrentLocation } from "@/lib/location";
@@ -54,7 +56,7 @@ export default async function TransfersPage({ searchParams }: { searchParams: Pr
         </select>
         <button type="submit" className={secondaryButton}>Filter</button>
       </form>
-      {error ? <p role="alert" className="text-red-600">Could not load transfers.</p> : rows.length === 0 ? <p className="text-sm">No transfers yet.</p> : (
+      {error ? <p role="alert" className="text-red-600">Could not load transfers.</p> : rows.length === 0 ? <EmptyState icon={ArrowLeftRight} title="No transfers yet" text="A transfer moves goods from one warehouse or shop to another, and shows them as on the way until they arrive." actionHref="/transfers/new" actionLabel="New transfer" /> : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead><tr className="border-b border-neutral-300"><th className="py-2 pr-3">Number</th><th className="pr-3">From</th><th className="pr-3">To</th><th className="pr-3 text-right">Lines</th><th>Status</th></tr></thead>

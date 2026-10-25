@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { EmptyState } from "@/components/empty-state";
+import { ClipboardList } from "lucide-react";
 import { Plus } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { can, requireAnyPermission } from "@/lib/auth";
@@ -51,7 +53,7 @@ export default async function PurchaseOrdersPage({ searchParams }: { searchParam
       {error ? (
         <p role="alert" className="text-red-600">Could not load purchase orders.</p>
       ) : rows.length === 0 ? (
-        <p className="text-sm">No purchase orders yet.</p>
+        <EmptyState icon={ClipboardList} title="No purchase orders yet" text="A purchase order is what you send a supplier. It also shows how much has arrived. You can also make one from the Reorder list." actionHref={can(user, "purchase.create") ? "/purchase-orders/new" : undefined} actionLabel="New order" />
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">

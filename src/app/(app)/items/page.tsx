@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { EmptyState } from "@/components/empty-state";
+import { Package } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -120,7 +122,7 @@ export default async function ItemsPage({ searchParams }: { searchParams: Promis
       {error ? (
         <p role="alert" className="text-red-600">Could not load items.</p>
       ) : (items ?? []).length === 0 ? (
-        <p className="text-sm">No items found.</p>
+        <EmptyState icon={Package} title="No items found" text={q || source || categoryId || status !== "active" ? "Try a different word, or clear the filters above. You can also scan the barcode." : "Items are your products. Add the first one, or bring many at once from Excel."} actionHref={can(user, "items.create") ? "/items/new" : undefined} actionLabel="New item" />
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">

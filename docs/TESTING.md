@@ -196,3 +196,7 @@ Tests 006-009 (and 003/004 in places) assume an EMPTY database: they count rows.
 - Independent review of G1/G2 by the ruflo verifier: no authorization, data-leak or negative-stock problem; 4 defects fixed (stale ticks and decimal typing on the reorder screen, remark length, recall counted as demand) plus the demand rule. Still noted, not changed: concurrent entries with a different item order can deadlock (one is aborted, retry); open purchase orders are not counted for people without purchase rights (the screen warns); a MOQ with more decimals than the unit is rejected later by the purchase order.
 
 - `supabase/tests/015_dashboard.sql` re-run after migration 27: 13 lines, all PASS (adds top stocked, empty and filled receive history and top vendors, and zero for another place). `typecheck`, `lint`, `build` pass. NOT seen on screen.
+
+## UI/UX pass checks (2026-10-25)
+- `typecheck`, `lint`, `build` pass; unit tests 42/42. The login page was looked at in a browser in light and dark mode (logo, #005A84 button, white card).
+- NOT checked on screen: the grouped menu, the search box (Ctrl+K, scanner barcode jump, quick actions), the phone bottom bar and the empty states (all behind login); the Devanagari text in the search box.

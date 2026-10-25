@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { EmptyState } from "@/components/empty-state";
+import { PackageCheck } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { can, requireAnyPermission } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -46,7 +48,7 @@ export default async function ReceiptsPage({ searchParams }: { searchParams: Pro
       {error ? (
         <p role="alert" className="text-red-600">Could not load receipts.</p>
       ) : rows.length === 0 ? (
-        <p className="text-sm">No receipts yet.</p>
+        <EmptyState icon={PackageCheck} title="No receipts yet" text="A receipt records goods that arrived. Stock goes up when you post it." actionHref={can(user, "receipts.create") ? "/receipts/new" : undefined} actionLabel="New receipt" />
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">

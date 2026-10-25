@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -36,9 +37,12 @@ export default async function PurchaseOrderPrintPage({ params }: { params: Promi
         <PrintButton />
       </div>
       <header className="flex items-start justify-between border-b border-black pb-3">
-        <div>
-          <p className="text-xl font-bold">SETMI INDIA</p>
-          <p className="text-sm">Purchase order</p>
+        <div className="flex items-center gap-3">
+          <Image src="/brand/setmi-badge-96.png" alt="" width={48} height={48} className="h-12 w-12 rounded-full" />
+          <div>
+            <p className="text-xl font-bold">SETMI INDIA</p>
+            <p className="text-sm">Purchase order</p>
+          </div>
         </div>
         <div className="text-right text-sm">
           <p className="text-lg font-bold">{o.po_no}{o.status === "CANCELLED" ? " (CANCELLED)" : ""}</p>

@@ -2,15 +2,15 @@
 
 /* Design tokens. Light by default, dark follows the computer's setting. */
 :root {
-  --background: #f2f5f7;
+  --background: #eef8ff;
   --foreground: #1f2933;
   --surface: #ffffff;
-  --surface-muted: #eaeff3;
-  --line: #d9e0e6;
-  --muted: #5b6672;
+  --surface-muted: #e2f0fb;
+  --line: #cfe3f1;
+  --muted: #4f6272;
   --brand: #005a84;
   --brand-strong: #0a5075;
-  --brand-soft: #e3f0f6;
+  --brand-soft: #d9ecf8;
   --sidebar: #062f45;
   --sidebar-text: #a9c3d2;
   --sidebar-active: #0b4663;
@@ -125,6 +125,35 @@ main table a {
 }
 main table a:hover {
   text-decoration: underline;
+}
+
+/* Plain links inside pages use the brand colour (the pages that have no link classes got the browser blue). */
+main a:not([class]) {
+  color: var(--brand);
+  font-weight: 500;
+  text-decoration: none;
+}
+main a:not([class]):hover {
+  text-decoration: underline;
+}
+/* A very light stripe makes long tables easier to follow across the row. */
+main table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--surface-muted) 45%, transparent);
+}
+main table tbody tr:hover {
+  background: var(--brand-soft);
+}
+::selection {
+  background: var(--brand);
+  color: #fff;
+}
+/* Respect "reduce motion" everywhere. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Receipt and label pages set their own white paper: keep plain tables there, also on screen. */

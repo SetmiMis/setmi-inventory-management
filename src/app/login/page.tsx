@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Warehouse } from "lucide-react";
+import Image from "next/image";
 import { LanguageSwitch } from "@/components/language-switch";
 import { getLang, tr } from "@/lib/i18n";
 import { LoginForm } from "./login-form";
@@ -19,10 +19,8 @@ async function LoginCard() {
   const lang = await getLang();
   return (
     <div className="w-full max-w-sm rounded-2xl border border-line bg-surface p-8 shadow-2xl">
-      <div className="mb-6 flex items-center gap-3">
-        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand text-white shadow">
-          <Warehouse size={24} aria-hidden />
-        </span>
+      <div className="mb-6 flex flex-col items-center gap-3 text-center">
+        <Image src="/brand/setmi-badge-256.png" alt="SETMI INDIA" width={96} height={96} priority className="h-24 w-24 rounded-full shadow-md" />
         <div>
           <h1 className="text-xl font-semibold leading-tight">SETMI INDIA</h1>
           <p className="text-sm text-muted">{tr(lang, "login_subtitle")}</p>

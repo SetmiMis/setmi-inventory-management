@@ -204,3 +204,11 @@ Format: context, options, choice, reason, date, model.
 - **Trade-offs:** the exact sheet script rule is unknown; transfers out count as consumption for the sender; open purchase orders count only for people who may see them.
 - **Revisit if:** the Apps Script shows a different rule, or the owner wants per-place lead times.
 - **Date / model:** 2026-10-25, Claude Opus 5.5
+
+## D-033: UI/UX pass: owner logos and colours, grouped menu, global search, phone bar
+- **Owner:** "make it easy for anyone, industry standard; use the logos in Setmi_india_logos; colours #005A84 and #EEF8FF; main focus UI/UX".
+- **Choice:** logos resized into `public/brand`; colour tokens in one CSS file; menu in groups; Ctrl+K search with quick actions and recent pages; phone bottom bar; 44 px touch targets; empty states with a next step.
+- **Why:** fewer clicks and no dead ends for non-technical staff; same brand as setmiindia.com.
+- **Trade-offs:** the search shows only items (not yet suppliers or documents); recent pages are stored in the browser only; the bottom bar is fixed to four links.
+- **Revisit if:** staff ask for bulk actions, saved filters or document-number search.
+- **Date / model:** 2026-10-25, Claude Sonnet 5.5

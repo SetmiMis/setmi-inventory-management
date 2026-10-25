@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { EmptyState } from "@/components/empty-state";
+import { Truck } from "lucide-react";
 import { can, requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { inputClass, primaryButton, secondaryButton } from "@/lib/ui";
@@ -36,7 +38,7 @@ export default async function SuppliersPage({ searchParams }: { searchParams: Pr
       {error ? (
         <p role="alert" className="text-red-600">You may not see suppliers, or they could not be loaded.</p>
       ) : (data ?? []).length === 0 ? (
-        <p className="text-sm">No suppliers yet.</p>
+        <EmptyState icon={Truck} title="No suppliers yet" text="Suppliers are the people you buy goods from. Add them once; then they can be chosen on purchase orders and receipts." actionHref={can(user, "suppliers.manage") ? "/suppliers/new" : undefined} actionLabel="New supplier" />
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
