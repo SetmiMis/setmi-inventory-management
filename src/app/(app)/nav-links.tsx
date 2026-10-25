@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ArrowLeftRight,
+  ArrowUpDown,
   Boxes,
+  RefreshCw,
   CircleHelp,
   ClipboardList,
   LayoutDashboard,
@@ -33,6 +35,8 @@ const ICONS: Record<string, LucideIcon> = {
   stock: Boxes,
   help: CircleHelp,
   dashboard: LayoutDashboard,
+  entry: ArrowUpDown,
+  reorder: RefreshCw,
   purchase: ClipboardList,
   receipts: PackageCheck,
   transfers: ArrowLeftRight,
@@ -49,11 +53,14 @@ export type NavItem = { href: string; label: string; icon: string };
 
 function NavList({ items, onPick }: { items: NavItem[]; onPick?: () => void }) {
   const pathname = usePathname();
+  // Only the most specific match is marked (so /stock/entry does not also light up /stock).
+  const matches = (href: string) => (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`));
+  const activeHref = items.filter((it) => matches(it.href)).sort((a, b) => b.href.length - a.href.length)[0]?.href;
   return (
     <ul className="space-y-1">
       {items.map((it) => {
         const Icon = ICONS[it.icon] ?? ReceiptText;
-        const active = it.href === "/" ? pathname === "/" : pathname === it.href || pathname.startsWith(`${it.href}/`);
+        const active = it.href === activeHref;
         return (
           <li key={it.href}>
             <Link

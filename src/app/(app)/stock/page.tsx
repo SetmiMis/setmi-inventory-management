@@ -61,8 +61,10 @@ export default async function StockPage({ searchParams }: { searchParams: Promis
           <h1 className="text-xl font-semibold">Stock in {loc.name}</h1>
           <p className="text-sm text-neutral-500">{loc.type === "SHOP" ? "Shop" : "Warehouse"} {loc.code}. Change the place from the header.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link href="/stock/movements" className={secondaryButton}>History</Link>
+          {can(user, "items.view") && <Link href="/reorder" className={secondaryButton}>Reorder</Link>}
+          {can(user, "stock.entry") && <Link href="/stock/entry" className={secondaryButton}>Quick Stock In / Out</Link>}
           {can(user, "stock.adjust") && <Link href="/stock/scan" className={secondaryButton}>Count by scanning</Link>}
           {can(user, "stock.adjust") && <Link href="/stock/count" className={primaryButton}>Count stock</Link>}
         </div>

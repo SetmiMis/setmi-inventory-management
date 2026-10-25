@@ -196,3 +196,11 @@ Format: context, options, choice, reason, date, model.
 - **Trade-offs:** hand-made charts must be maintained by us; animations start hidden until JavaScript loads.
 - **Revisit if:** many more chart types are needed (then consider a chart library), or the owner wants profit and stock value (needs a cost decision).
 - **Date / model:** 2026-10-25, Claude Opus 5.5
+
+## D-032: Quick stock entries and reorder suggestions from the shop sheet
+- **Owner:** "first build G1 (quick Stock In/Out with reason) and G2 (automatic reorder)".
+- **Choice:** an immutable stock-entry document with fixed reasons and its own permission; planning fields on the item; an invoker function that applies the sheet Max Level formula to real consumption and subtracts stock, open orders and transfers on the way; one click from ticked suggestions to a draft purchase order.
+- **Why:** keeps stock right while billing stays in Zoho, and replaces the hidden Apps Script with a visible, tested rule.
+- **Trade-offs:** the exact sheet script rule is unknown; transfers out count as consumption for the sender; open purchase orders count only for people who may see them.
+- **Revisit if:** the Apps Script shows a different rule, or the owner wants per-place lead times.
+- **Date / model:** 2026-10-25, Claude Opus 5.5

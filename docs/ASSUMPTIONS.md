@@ -30,3 +30,8 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 ## Usability pass: to confirm with the owner (2026-10-25)
 - Language: owner answered "both". Phase 1 done (shell + Help in English and Hindi, see FEATURE-012). Still open: who checks the Hindi words, and which working screens to translate first.
 - Who are the first real users and which jobs do they do most? The home page order can then be adjusted per role.
+
+## G1/G2 rules to confirm with the owner (2026-10-25)
+- Reorder: the sheet Apps Script rule is unknown; we use Max Level = average daily use x lead time x safety factor (sheet formula) and order = Max Level - (stock + on order + on the way). Please share the script.
+- Average period: 30 days by default (30/60/90 on screen). Which one do you want as default?
+- Should transfers sent from a warehouse to a shop count as the warehouse consumption? (now: yes)

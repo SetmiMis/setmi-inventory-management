@@ -17,6 +17,9 @@ export type ItemValues = {
   unit: string;
   remarks: string | null;
   sellingPrice: string | null;
+  leadTimeDays: string | null;
+  safetyFactor: string | null;
+  moq: string | null;
 };
 
 export type UnitOption = { code: string; name: string };
@@ -118,6 +121,27 @@ export function ItemForm({
           </p>
         </div>
       </div>
+
+      <fieldset className="rounded-xl border border-line p-4">
+        <legend className="px-1 text-sm font-medium">Reorder planning (optional)</legend>
+        <p className="mb-3 text-xs text-muted">
+          Used by the Reorder screen: maximum level = average daily use x lead time x safety factor. Leave empty if you set a maximum by hand.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div>
+            <label htmlFor="leadTimeDays" className={labelClass}>Lead time (days from order to arrival)</label>
+            <input id="leadTimeDays" name="leadTimeDays" inputMode="numeric" maxLength={4} defaultValue={item?.leadTimeDays ?? ""} className={inputClass} />
+          </div>
+          <div>
+            <label htmlFor="safetyFactor" className={labelClass}>Safety factor (empty = 1.5)</label>
+            <input id="safetyFactor" name="safetyFactor" inputMode="decimal" maxLength={5} defaultValue={item?.safetyFactor ?? ""} className={inputClass} />
+          </div>
+          <div>
+            <label htmlFor="moq" className={labelClass}>MOQ (minimum order quantity)</label>
+            <input id="moq" name="moq" inputMode="decimal" maxLength={12} defaultValue={item?.moq ?? ""} className={inputClass} />
+          </div>
+        </div>
+      </fieldset>
 
       {!editing && (
         <div className="space-y-2">

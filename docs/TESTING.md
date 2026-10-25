@@ -185,3 +185,12 @@ Tests 006-009 (and 003/004 in places) assume an EMPTY database: they count rows.
 - The first run found that the stock part returned zeros without items.view; fixed by migration 22 and re-run.
 - `typecheck`, `lint`, `build` pass; unit tests 35/35; `npm audit --omit=dev` 0 vulnerabilities.
 - NOT tested: the dashboard on screen (behind login), the tooltip, the animations, phone layout.
+
+## Quick Stock In/Out and reorder checks (2026-10-25)
+- `supabase/tests/016_stock_entries_and_reorder.sql`: 21 lines, all PASS (rolled back): stock out sold in Zoho lowers stock and writes a STOCK_OUT movement; more than in stock refused with the short quantity; stock in with metre decimals; reason must fit the direction; "other" needs a remark; PCS decimals refused; no permission and other place refused; entries cannot be edited or deleted; viewers of the place see entries, others do not; audit rows; reorder target, order quantity, MOQ rounding, manual-max fallback, no-plan items listed with 0, open purchase order counted only with purchase rights, period limits, items.view required, other place sees nothing.
+- Two real bugs found by the tests and fixed before commit: a missing min_qty in the test data (test fix) and power() returning double precision in reorder_suggestions (migration 25).
+- Unit tests 42/42 (new: stock-entry, item-planning); `typecheck`, `lint`, `build` pass.
+- NOT tested: the two screens and the item form on screen; creating a draft purchase order from the reorder screen through the app.
+
+- `supabase/tests/017_entry_reorder_review.sql`: 5 lines, all PASS (long remark accepted and cut to 300; only the sold stock out counts as demand; a recalled transfer is not demand, a real transfer is). `016` re-run after migration 26: 21/21 PASS.
+- Independent review of G1/G2 by the ruflo verifier: no authorization, data-leak or negative-stock problem; 4 defects fixed (stale ticks and decimal typing on the reorder screen, remark length, recall counted as demand) plus the demand rule. Still noted, not changed: concurrent entries with a different item order can deadlock (one is aborted, retry); open purchase orders are not counted for people without purchase rights (the screen warns); a MOQ with more decimals than the unit is rejected later by the purchase order.

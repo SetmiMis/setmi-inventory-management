@@ -90,6 +90,33 @@ const EN: HelpSection[] = [
     tips: ["Stock can never go below zero."],
   },
   {
+    id: "entry", title: "Quick Stock In / Out (sold in Zoho, sample, damage, return)", short: "Stock In/Out",
+    intro: "For goods that leave or come back without a receipt or a bill in this system. While bills are made in Zoho, enter the day's sales here so the stock stays right.",
+    steps: [
+      "Open 'Stock In / Out' in the menu (or the button on the Stock page).",
+      "Press the big 'Stock Out' or 'Stock In' button.",
+      "Choose why: Sold (billed in Zoho), Sample, Damaged, Own use, Lost, Returned to supplier, or Found, Customer return. 'Other' needs a remark.",
+      "Scan the items (each scan adds 1 piece) or search them. Type the quantity for metre or kg items.",
+      "Optionally write the Zoho bill number as Reference. Press 'Save entry'. Stock changes at once.",
+    ],
+    tips: [
+      "You cannot take out more than is in stock; the screen tells you which item is short.",
+      "An entry cannot be changed. If you made a mistake, make the opposite entry (Stock In for a wrong Stock Out).",
+    ],
+  },
+  {
+    id: "reorder", title: "What to order (Reorder)", short: "Reorder",
+    intro: "The system works out what to order from how fast each item really goes, like the shop sheet did.",
+    steps: [
+      "Fill 'Reorder planning' on each item once: lead time in days (from order to arrival), safety factor (empty = 1.5) and MOQ if the supplier has one.",
+      "Open 'Reorder' in the menu. Choose the place and the period for the average (30, 60 or 90 days).",
+      "Target = average daily use x lead time x safety factor. Order = target minus what is in stock, on order and on the way, rounded up to the MOQ.",
+      "'Days left' in red means the stock will run out before a new order can arrive.",
+      "Tick the items, choose a supplier and press 'Create draft order'. A draft purchase order opens: check it, add prices, then send it.",
+    ],
+    tips: ["Items without a lead time use the manual maximum from the Stock page, if one is set."],
+  },
+  {
     id: "transfers", title: "Sending goods to another place (Transfer)", short: "Transfers",
     intro: "Moving goods from one place to another. While on the way they are 'On the way' (in transit).",
     steps: [
@@ -277,6 +304,33 @@ const HI: HelpSection[] = [
     tips: ["स्टॉक कभी माइनस नहीं हो सकता।"],
   },
   {
+    id: "entry", title: "जल्दी स्टॉक इन / आउट (Zoho में बिका, सैंपल, ख़राब, वापसी)", short: "स्टॉक इन/आउट",
+    intro: "उस माल के लिए जो इस सिस्टम में बिना रसीद या बिल के जाता या लौटता है। जब तक बिल Zoho में बन रहे हैं, दिन की बिक्री यहाँ डालें ताकि स्टॉक सही रहे।",
+    steps: [
+      "मेनू में 'स्टॉक इन / आउट' खोलें (या Stock पेज का बटन)।",
+      "बड़ा 'स्टॉक आउट' या 'स्टॉक इन' बटन दबाएँ।",
+      "कारण चुनें: बिका (Zoho में बिल), सैंपल, ख़राब, अपने इस्तेमाल में, गुम, सप्लायर को वापस, या मिला, ग्राहक ने लौटाया। 'अन्य' के लिए टिप्पणी ज़रूरी है।",
+      "आइटम स्कैन करें (हर स्कैन 1 पीस जोड़ता है) या खोजें। मीटर या किलो वाले आइटम की मात्रा लिखें।",
+      "चाहें तो Zoho बिल नंबर रेफ़रेंस में लिखें। 'सेव करें' दबाएँ। स्टॉक तुरंत बदल जाता है।",
+    ],
+    tips: [
+      "स्टॉक से ज़्यादा बाहर नहीं निकाल सकते; स्क्रीन बताती है कौन सा आइटम कम है।",
+      "एंट्री बदली नहीं जा सकती। गलती हो तो उल्टी एंट्री करें (गलत स्टॉक आउट के लिए स्टॉक इन)।",
+    ],
+  },
+  {
+    id: "reorder", title: "क्या मँगवाना है (Reorder)", short: "रीऑर्डर",
+    intro: "सिस्टम हर आइटम की असली खपत देखकर बताता है कि क्या और कितना मँगवाना है, जैसे शॉप वाली शीट करती थी।",
+    steps: [
+      "हर आइटम पर एक बार 'Reorder planning' भरें: लीड टाइम दिनों में (ऑर्डर से माल आने तक), सेफ़्टी फ़ैक्टर (खाली = 1.5) और सप्लायर का MOQ।",
+      "मेनू में 'फिर से मँगवाएँ' खोलें। जगह और औसत का समय (30, 60 या 90 दिन) चुनें।",
+      "टारगेट = रोज़ की औसत खपत x लीड टाइम x सेफ़्टी फ़ैक्टर। ऑर्डर = टारगेट में से स्टॉक, ऑर्डर पर और रास्ते का माल घटाकर, MOQ तक ऊपर।",
+      "लाल 'Days left' का मतलब है नया माल आने से पहले स्टॉक ख़त्म हो जाएगा।",
+      "आइटम पर टिक करें, सप्लायर चुनें और 'Create draft order' दबाएँ। ड्राफ़्ट खरीद ऑर्डर खुलता है: जाँचें, दाम डालें, फिर भेजें।",
+    ],
+    tips: ["जिस आइटम का लीड टाइम नहीं भरा, उसके लिए Stock पेज का मैनुअल अधिकतम (अगर भरा हो) इस्तेमाल होता है।"],
+  },
+  {
     id: "transfers", title: "दूसरी जगह माल भेजना (ट्रांसफर)", short: "ट्रांसफर",
     intro: "एक जगह से दूसरी जगह माल भेजना। रास्ते में माल 'On the way' (in transit) कहलाता है।",
     steps: [
@@ -397,6 +451,8 @@ export function helpSectionFor(pathname: string): string {
     ["/items/categories", "items"],
     ["/labels", "labels"],
     ["/items", "items"],
+    ["/stock/entry", "entry"],
+    ["/reorder", "reorder"],
     ["/stock/scan", "count"],
     ["/stock/count", "count"],
     ["/stock", "count"],

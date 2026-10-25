@@ -38,6 +38,9 @@ export async function createItem(_prev: FormState, fd: FormData): Promise<FormSt
       remarks: v.remarks,
       // Only people with items.edit_price may set a price (the database enforces it for updates).
       selling_price: v.sellingPrice && can(user, "items.edit_price") ? Number(v.sellingPrice) : null,
+      lead_time_days: v.leadTimeDays ? Number(v.leadTimeDays) : null,
+      safety_factor: v.safetyFactor ? Number(v.safetyFactor) : null,
+      moq: v.moq ? Number(v.moq) : null,
     })
     .select("id")
     .single();
@@ -91,6 +94,9 @@ export async function updateItem(_prev: FormState, fd: FormData): Promise<FormSt
       unit: v.unit,
       remarks: v.remarks,
       ...(can(user, "items.edit_price") ? { selling_price: v.sellingPrice ? Number(v.sellingPrice) : null } : {}),
+      lead_time_days: v.leadTimeDays ? Number(v.leadTimeDays) : null,
+      safety_factor: v.safetyFactor ? Number(v.safetyFactor) : null,
+      moq: v.moq ? Number(v.moq) : null,
     })
     .eq("id", id.data)
     .eq("updated_at", expected.data)

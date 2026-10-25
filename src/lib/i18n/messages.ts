@@ -53,6 +53,10 @@ const en = {
   chart_place: "Low stock by place", chart_place_empty: "No low stock anywhere",
   list_low: "Needs reordering", list_low_empty: "Nothing is below its minimum. Well done.", list_recent: "Latest stock movements", list_recent_empty: "No stock movement yet",
   see_all: "See all", unit_bills: "bills",
+  // quick entry and reorder
+  nav_entry: "Stock In / Out", nav_reorder: "Reorder",
+  task_entry: "Quick Stock In / Out", task_entry_hint: "Sold in Zoho, sample, damaged, returned",
+  task_reorder: "What to order", task_reorder_hint: "Reorder list from real use, then a draft purchase order",
 } as const;
 
 export type MessageKey = keyof typeof en;
@@ -102,6 +106,9 @@ const hi: Record<MessageKey, string> = {
   chart_place: "जगह के हिसाब से कम स्टॉक", chart_place_empty: "कहीं भी स्टॉक कम नहीं",
   list_low: "फिर से मँगवाना है", list_low_empty: "कोई भी आइटम अपने न्यूनतम से नीचे नहीं है। बढ़िया।", list_recent: "हाल की स्टॉक हलचल", list_recent_empty: "अभी कोई स्टॉक हलचल नहीं",
   see_all: "सब देखें", unit_bills: "बिल",
+  nav_entry: "स्टॉक इन / आउट", nav_reorder: "फिर से मँगवाएँ",
+  task_entry: "जल्दी स्टॉक इन / आउट", task_entry_hint: "Zoho में बिका, सैंपल, ख़राब, वापसी",
+  task_reorder: "क्या मँगवाना है", task_reorder_hint: "असली खपत से सूची, फिर ड्राफ़्ट खरीद ऑर्डर",
 };
 
 export const MESSAGES: Record<"en" | "hi", Record<MessageKey, string>> = { en, hi };

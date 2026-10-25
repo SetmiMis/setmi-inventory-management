@@ -18,4 +18,7 @@ export const MOVEMENT_LABELS: Record<string, string> = {
   SALE: "Sold",
   TRANSFER: "Transfer",
   TRANSFER_SHORTAGE: "Lost in transit",
+  SALE_RETURN: "Bill voided (back to stock)",
+  STOCK_OUT: "Stock out",
+  STOCK_IN: "Stock in",
 };

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {
-  ArrowLeftRight, BarChart3, Boxes, CheckCircle2, ChevronRight, CircleHelp, ClipboardList, MapPin, Package, PackageCheck,
+  ArrowLeftRight, ArrowUpDown, BarChart3, RefreshCw, Boxes, CheckCircle2, ChevronRight, CircleHelp, ClipboardList, MapPin, Package, PackageCheck,
   LayoutDashboard, Receipt, ScanLine, ShieldCheck, ShoppingCart, Truck, type LucideIcon,
 } from "lucide-react";
 import { Reveal, RevealItem } from "@/components/motion";
@@ -23,6 +23,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   // (the pages still check on the server).
   const tasks: Task[] = [
     { href: "/dashboard", label: "task_dashboard", hint: "task_dashboard_hint", icon: LayoutDashboard, show: showDashboard(user) },
+    { href: "/stock/entry", label: "task_entry", hint: "task_entry_hint", icon: ArrowUpDown, show: can(user, "stock.entry") },
+    { href: "/reorder", label: "task_reorder", hint: "task_reorder_hint", icon: RefreshCw, show: can(user, "stock.view") && can(user, "items.view") },
     { href: "/items", label: "task_items", hint: "task_items_hint", icon: Package, show: can(user, "items.view") },
     { href: "/receipts/new", label: "task_receive", hint: "task_receive_hint", icon: PackageCheck, show: can(user, "receipts.create") },
     { href: "/purchase-orders/new", label: "task_order", hint: "task_order_hint", icon: ClipboardList, show: can(user, "purchase.create") },

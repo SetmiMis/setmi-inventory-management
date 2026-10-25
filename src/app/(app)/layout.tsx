@@ -34,6 +34,8 @@ async function Shell({ children }: { children: React.ReactNode }) {
   if (showDashboard(user)) nav.push({ href: "/dashboard", label: tr(lang, "nav_dashboard"), icon: "dashboard" });
   if (can(user, "items.view")) nav.push({ href: "/items", label: tr(lang, "nav_items"), icon: "items" });
   if (can(user, "stock.view")) nav.push({ href: "/stock", label: tr(lang, "nav_stock"), icon: "stock" });
+  if (can(user, "stock.entry")) nav.push({ href: "/stock/entry", label: tr(lang, "nav_entry"), icon: "entry" });
+  if (can(user, "stock.view") && can(user, "items.view")) nav.push({ href: "/reorder", label: tr(lang, "nav_reorder"), icon: "reorder" });
   if (can(user, "purchase.view") || can(user, "purchase.create") || can(user, "purchase.approve"))
     nav.push({ href: "/purchase-orders", label: tr(lang, "nav_purchase"), icon: "purchase" });
   if (can(user, "receipts.view") || can(user, "receipts.create") || can(user, "receipts.post"))

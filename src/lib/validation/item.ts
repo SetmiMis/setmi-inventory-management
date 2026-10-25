@@ -19,6 +19,11 @@ export const itemSchema = z.object({
   remarks: z.preprocess(blankToNull, z.string().trim().max(2000, "Remarks are too long.").nullable()),
   // Rupees, up to 2 decimals. Optional: an item without a price cannot be billed yet.
   sellingPrice: z.preprocess(blankToNull, z.string().trim().regex(/^\d{1,8}(\.\d{1,2})?$/, "Selling price: digits with up to 2 decimals.").nullish()),
+  // Reorder planning (optional, same meaning as the shop sheet): days from ordering to receiving,
+  // a safety factor (1 to 10, empty = 1.5 in the calculation) and the minimum order quantity.
+  leadTimeDays: z.preprocess(blankToNull, z.string().trim().regex(/^\d{1,4}$/, "Lead time: whole days.").refine((s) => Number(s) <= 3650, "Lead time: at most 3650 days.").nullish()),
+  safetyFactor: z.preprocess(blankToNull, z.string().trim().regex(/^\d{1,2}(\.\d{1,2})?$/, "Safety factor: a number like 1.5.").refine((s) => Number(s) >= 1 && Number(s) <= 10, "Safety factor: between 1 and 10.").nullish()),
+  moq: z.preprocess(blankToNull, z.string().trim().regex(/^\d{1,8}(\.\d{1,3})?$/, "MOQ: a number with up to 3 decimals.").refine((s) => Number(s) > 0, "MOQ: more than 0.").nullish()),
 });
 
 export function itemFromForm(fd: FormData) {
@@ -32,6 +37,9 @@ export function itemFromForm(fd: FormData) {
     unit: fd.get("unit"),
     remarks: fd.get("remarks"),
     sellingPrice: fd.get("sellingPrice"),
+    leadTimeDays: fd.get("leadTimeDays"),
+    safetyFactor: fd.get("safetyFactor"),
+    moq: fd.get("moq"),
   });
 }
 

@@ -87,6 +87,9 @@ export default async function ItemPage({
             unit: item.unit,
             remarks: item.remarks,
             sellingPrice: item.selling_price === null ? null : String(item.selling_price),
+            leadTimeDays: item.lead_time_days === null ? null : String(item.lead_time_days),
+            safetyFactor: item.safety_factor === null ? null : String(Number(item.safety_factor)),
+            moq: item.moq === null ? null : String(Number(item.moq)),
           }}
         />
       ) : (
@@ -98,6 +101,8 @@ export default async function ItemPage({
           <div><dt className="font-medium">Purchase Source</dt><dd>{item.purchase_source}</dd></div>
           <div><dt className="font-medium">Unit</dt><dd>{item.unit}</dd></div>
           <div><dt className="font-medium">Selling price</dt><dd>{item.selling_price ?? ""}</dd></div>
+          <div><dt className="font-medium">Lead time (days)</dt><dd>{item.lead_time_days ?? ""}</dd></div>
+          <div><dt className="font-medium">Safety factor / MOQ</dt><dd>{item.safety_factor ?? ""} / {item.moq ?? ""}</dd></div>
           <div className="sm:col-span-2"><dt className="font-medium">Remarks</dt><dd>{item.remarks ?? ""}</dd></div>
         </dl>
       )}

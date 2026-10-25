@@ -101,3 +101,11 @@ Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search 
 
 ## Migrations 21 and 22 (applied 2026-10-25): dashboard
 - `dashboard_data(from, to, place)`: read-only, security invoker, returns JSON with the parts the caller may see (sales, stock, purchase, receipts, transfers). Migration 22: the stock part needs `stock.view` and `items.view` (without items.view it returned zeros, found by the test). Tests `supabase/tests/015_dashboard.sql` (10 lines). Details: FEATURE-013.
+
+## Migrations 23, 24, 25 (applied 2026-10-25): quick Stock In/Out and reorder
+- Enum `stock_movement_type` + `STOCK_IN`, `STOCK_OUT` (own migration). Permission `stock.entry`.
+- `stock_entries` (SE-000001, place, direction, reason, reference, remarks) and `stock_entry_lines`; immutable by trigger; read with stock.entry or stock.view plus the place; written only by `create_stock_entry`.
+- `items.lead_time_days`, `items.safety_factor`, `items.moq` (optional, checked ranges).
+- `reorder_suggestions(place, days)` (invoker, needs stock.view and items.view). Migration 25 fixes a numeric type in it. Tests `supabase/tests/016_stock_entries_and_reorder.sql` (21 lines). Details: FEATURE-014.
+
+- Migration 26 (review fixes): the movement reason is cut to 300 characters; a recalled transfer is no longer demand; only sales, transfers sent away and stock outs marked "sold" count as demand (damaged, lost, sample, own use and returns to the supplier do not). Tests `supabase/tests/017_entry_reorder_review.sql` (5 lines).

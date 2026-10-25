@@ -2,11 +2,24 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-25 (night 3): quick Stock In/Out (G1) and automatic reorder (G2) (Claude Opus 5.5)
+
+### Done (verified by command output)
+- Read the owner's shop sheet 'IMS For Shop' (forms, AppSheet, Apps Script effects, reorder and indent tabs): `docs/REFERENCE-SHOP-SHEET.md` lists 8 gaps (G1-G8).
+- G1 `/stock/entry`: Stock Out / Stock In with a reason (sold in Zoho, sample, damaged ...), scan, reference, English and Hindi; permission `stock.entry`.
+- G2: item planning fields (lead time, safety factor, MOQ); `/reorder` with target and order quantity from real consumption, then one click to a draft purchase order.
+- Migrations 23, 24, 25 applied; DB tests 016 21/21; unit tests 42/42; typecheck, lint, build pass. Details: `docs/features/FEATURE-014-QUICK-ENTRY-AND-REORDER.md`. NOT committed yet.
+
+### Not done / owner must do
+- Give `stock.entry` to the shop staff in Admin > Users; fill Reorder planning on items (or wait for the sheet import, G7).
+- Share the Apps Script code; answer the three questions at the end of `docs/ASSUMPTIONS.md`.
+- Next gaps: G3 indent with approval, G7 import from the sheet, G4 daily closing report.
+
 ## 2026-10-25 (night 2): business dashboard (Claude Opus 5.5)
 
 ### Done (verified by command output)
 - Language phase 1 pushed as `2250bf9`.
-- `/dashboard`: sales with change vs the previous period, bills, average bill, low/out of stock, open and late purchase orders, goods on the way, receipts to post, sales-per-day chart, top items, payment mix, low stock by place, reorder list, latest movements; filters Today/7/30/90 days and place; English and Hindi. Data from `dashboard_data` (migrations 21, 22). DB tests 015 10/10; typecheck, lint, build, 35 unit tests pass; `motion` added (0 vulnerabilities). Details: `docs/features/FEATURE-013-DASHBOARD.md`. NOT committed yet.
+- `/dashboard`: sales with change vs the previous period, bills, average bill, low/out of stock, open and late purchase orders, goods on the way, receipts to post, sales-per-day chart, top items, payment mix, low stock by place, reorder list, latest movements; filters Today/7/30/90 days and place; English and Hindi. Data from `dashboard_data` (migrations 21, 22). DB tests 015 10/10; typecheck, lint, build, 35 unit tests pass; `motion` added (0 vulnerabilities). Details: `docs/features/FEATURE-013-DASHBOARD.md`. Pushed as `ace1134`.
 
 ### Not done / owner must do
 - Open `/dashboard` after signing in and check the look (it could not be seen without signing in).
