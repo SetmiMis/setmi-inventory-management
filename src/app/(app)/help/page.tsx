@@ -1,27 +1,31 @@
 import { CircleHelp, Lightbulb } from "lucide-react";
 import { requireUser } from "@/lib/auth";
+import { getLang, tr } from "@/lib/i18n";
 import { cardClass } from "@/lib/ui";
-import { HELP_SECTIONS } from "./help-content";
+import { helpSections } from "./help-content";
 
-// A plain, step-by-step guide for people who have never used the system. Every signed-in user can open it.
+// A plain, step-by-step guide for people who have never used the system, in English or Hindi.
+// Every signed-in user can open it.
 export default async function HelpPage() {
   await requireUser();
+  const lang = await getLang();
+  const sections = helpSections(lang);
   return (
     <main className="space-y-6">
       <div>
-        <h1 className="flex items-center gap-2"><CircleHelp size={26} className="text-brand" aria-hidden /> Help</h1>
-        <p className="mt-1 text-sm text-muted">Har kaam ke steps simple bhasha mein. Upar ke &quot;Help&quot; button se hamesha usi screen ka section khulta hai jis par aap ho.</p>
+        <h1 className="flex items-center gap-2"><CircleHelp size={26} className="text-brand" aria-hidden /> {tr(lang, "help_title")}</h1>
+        <p className="mt-1 text-sm text-muted">{tr(lang, "help_intro")}</p>
       </div>
 
-      <nav aria-label="Help topics" className={`${cardClass} flex flex-wrap gap-2`}>
-        {HELP_SECTIONS.map((s) => (
+      <nav aria-label={tr(lang, "help_title")} className={`${cardClass} flex flex-wrap gap-2`}>
+        {sections.map((s) => (
           <a key={s.id} href={`#${s.id}`} className="rounded-full bg-brand-soft px-3 py-1 text-sm font-medium text-brand hover:underline">
-            {s.title.split(":")[0].split("(")[0].trim()}
+            {s.short}
           </a>
         ))}
       </nav>
 
-      {HELP_SECTIONS.map((s) => (
+      {sections.map((s) => (
         <section key={s.id} id={s.id} className={`${cardClass} help-section scroll-mt-24 space-y-3`}>
           <h2 className="text-lg">{s.title}</h2>
           <p className="text-sm text-muted">{s.intro}</p>

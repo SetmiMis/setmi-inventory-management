@@ -177,3 +177,5 @@ Tests 006-009 (and 003/004 in places) assume an EMPTY database: they count rows.
 ## Usability pass checks (2026-10-25)
 - `typecheck`, `lint`, `build` pass; unit tests 35/35. The Help text was compared with the real button names in the code.
 - NOT tested: the Help page, the Help button and the new home page on screen behind login; the "no permission" message with a real restricted user; a first-time person using the app.
+
+- Language switch (phase 1): `typecheck`, `lint`, `build` pass. On the login page the switch was clicked in the browser: the page text changed to Hindi and back. NOT checked: menu, top bar, home and Help in Hindi behind login, how the Devanagari font looks, Hindi words by a native reader.

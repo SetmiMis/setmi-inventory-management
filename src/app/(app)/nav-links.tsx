@@ -80,25 +80,25 @@ export function NavLinks({ items }: { items: NavItem[] }) {
 }
 
 // Phone: a menu button that opens the same list over the page.
-export function MobileMenu({ items }: { items: NavItem[] }) {
+export function MobileMenu({ items, openLabel = "Open menu", closeLabel = "Close menu" }: { items: NavItem[]; openLabel?: string; closeLabel?: string }) {
   const [open, setOpen] = useState(false);
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Open menu"
+        aria-label={openLabel}
         className="rounded-lg border border-line bg-surface p-2 lg:hidden"
       >
         <Menu size={20} aria-hidden />
       </button>
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden print:hidden">
-          <button type="button" aria-label="Close menu" onClick={() => setOpen(false)} className="absolute inset-0 bg-black/50" />
+          <button type="button" aria-label={closeLabel} onClick={() => setOpen(false)} className="absolute inset-0 bg-black/50" />
           <aside className="absolute inset-y-0 left-0 w-64 overflow-y-auto bg-[var(--sidebar)] p-3">
             <div className="mb-3 flex items-center justify-between px-1">
               <span className="font-semibold text-white">SETMI INDIA</span>
-              <button type="button" onClick={() => setOpen(false)} aria-label="Close menu" className="text-white">
+              <button type="button" onClick={() => setOpen(false)} aria-label={closeLabel} className="text-white">
                 <X size={20} aria-hidden />
               </button>
             </div>

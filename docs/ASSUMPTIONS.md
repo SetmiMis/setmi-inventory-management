@@ -28,5 +28,5 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - Who may send orders: only people with `purchase.approve`. Should a manager approve large orders first (an amount limit)?
 
 ## Usability pass: to confirm with the owner (2026-10-25)
-- Language: Help is in Roman Hindi with English product words, screens are English. Do the staff want Hindi (Devanagari) or only English on screens?
+- Language: owner answered "both". Phase 1 done (shell + Help in English and Hindi, see FEATURE-012). Still open: who checks the Hindi words, and which working screens to translate first.
 - Who are the first real users and which jobs do they do most? The home page order can then be adjusted per role.

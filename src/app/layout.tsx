@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Inter } from "next/font/google";
+import { Geist_Mono, Inter, Noto_Sans_Devanagari } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Inter({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+});
+
+// Hindi (Devanagari) letters are not in Inter; this font fills in only for those letters.
+const devanagari = Noto_Sans_Devanagari({
+  variable: "--font-devanagari",
+  subsets: ["devanagari"],
 });
 
 const geistMono = Geist_Mono({
@@ -21,7 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${devanagari.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

@@ -180,3 +180,11 @@ Format: context, options, choice, reason, date, model.
 - **Trade-offs:** the Help text is in the code and must be kept in step with the screens; screens stay in English.
 - **Revisit if:** a real new user gets stuck (watch them once), or the owner wants Hindi screens.
 - **Date / model:** 2026-10-25, Claude Sonnet 5.5
+
+## D-030: Two screen languages, English and Hindi, in phases
+- **Owner:** "give it in both" (English and Hindi).
+- **Choice:** a cookie-based language switch (login page and top bar); a typed word list for the shell (menu, top bar, login, home); a full Help in both languages; Devanagari font. The working screens are phase 2.
+- **Why:** every user sees the shell and the Help; the working screens carry money and stock, so they should be translated module by module and read by a Hindi-speaking staff member.
+- **Trade-offs:** in Hindi mode the working screens are still English; the Hindi words are AI-written and unreviewed.
+- **Revisit if:** staff cannot work with the English screens (then do phase 2 first for the screens they use most, probably Receipts, Count stock, Billing).
+- **Date / model:** 2026-10-25, Claude Sonnet 5.5

@@ -5,20 +5,22 @@ import { Loader2, LogIn, TriangleAlert } from "lucide-react";
 import { inputClass, labelClass, primaryButton } from "@/lib/ui";
 import { login, type LoginState } from "./actions";
 
-export function LoginForm() {
+type Labels = { email: string; password: string; button: string; busy: string };
+
+export function LoginForm({ labels }: { labels: Labels }) {
   const [state, formAction, pending] = useActionState<LoginState, FormData>(login, null);
 
   return (
     <form action={formAction} className="space-y-4">
       <div>
         <label htmlFor="email" className={labelClass}>
-          Email
+          {labels.email}
         </label>
         <input id="email" name="email" type="email" autoComplete="username" required className={inputClass} />
       </div>
       <div>
         <label htmlFor="password" className={labelClass}>
-          Password
+          {labels.password}
         </label>
         <input id="password" name="password" type="password" autoComplete="current-password" required className={inputClass} />
       </div>
@@ -30,7 +32,7 @@ export function LoginForm() {
       )}
       <button type="submit" disabled={pending} className={`${primaryButton} w-full py-2.5`}>
         {pending ? <Loader2 size={18} className="animate-spin" aria-hidden /> : <LogIn size={18} aria-hidden />}
-        {pending ? "Signing in..." : "Sign in"}
+        {pending ? labels.busy : labels.button}
       </button>
     </form>
   );

@@ -2,11 +2,20 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-25 (evening): English + Hindi screens, phase 1 (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- Usability work pushed as `843ef76`.
+- Language switch English / Hindi on the login page and top bar (cookie `ims_lang`). Menu, top bar, login, home and the whole Help page are in both languages; Devanagari font added. Details and limits: `docs/features/FEATURE-012-LANGUAGES.md`. `typecheck`, `lint`, `build` pass; the login switch was clicked in the browser. NOT committed yet.
+
+### Not done / owner must do
+- Phase 2: translate the working screens module by module. Ask a Hindi-reading staff member to read the Hindi Help and menu and list wrong words.
+
 ## 2026-10-25 (later): usability pass, easy for anyone to use (Claude Sonnet 5.5)
 
 ### Done (verified by command output)
 - Help page `/help` (Hinglish, 16 sections), context Help button on every screen, Help in the menu, home page rebuilt around jobs, admin first-time checklist from real data, clear message when a page is not allowed (`/?denied=1`). Details: `docs/features/FEATURE-011-EASY-TO-USE.md`.
-- `typecheck`, `lint`, `build` pass; unit tests 35/35. P9 is pushed as `c6d77b7`; this usability work is NOT committed yet.
+- `typecheck`, `lint`, `build` pass; unit tests 35/35. P9 is pushed as `c6d77b7`; the usability work is pushed as `843ef76`.
 
 ### Not done / owner must do
 - Look at the new home page and Help page after signing in; watch one new person do a job with only the app and tell me where they get stuck.
