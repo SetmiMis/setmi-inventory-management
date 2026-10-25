@@ -2,6 +2,15 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-25 (night 2): business dashboard (Claude Opus 5.5)
+
+### Done (verified by command output)
+- Language phase 1 pushed as `2250bf9`.
+- `/dashboard`: sales with change vs the previous period, bills, average bill, low/out of stock, open and late purchase orders, goods on the way, receipts to post, sales-per-day chart, top items, payment mix, low stock by place, reorder list, latest movements; filters Today/7/30/90 days and place; English and Hindi. Data from `dashboard_data` (migrations 21, 22). DB tests 015 10/10; typecheck, lint, build, 35 unit tests pass; `motion` added (0 vulnerabilities). Details: `docs/features/FEATURE-013-DASHBOARD.md`. NOT committed yet.
+
+### Not done / owner must do
+- Open `/dashboard` after signing in and check the look (it could not be seen without signing in).
+
 ## 2026-10-25 (evening): English + Hindi screens, phase 1 (Claude Sonnet 5.5)
 
 ### Done (verified by command output)

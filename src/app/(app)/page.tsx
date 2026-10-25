@@ -1,9 +1,10 @@
 import Link from "next/link";
 import {
   ArrowLeftRight, BarChart3, Boxes, CheckCircle2, ChevronRight, CircleHelp, ClipboardList, MapPin, Package, PackageCheck,
-  Receipt, ScanLine, ShieldCheck, ShoppingCart, Truck, type LucideIcon,
+  LayoutDashboard, Receipt, ScanLine, ShieldCheck, ShoppingCart, Truck, type LucideIcon,
 } from "lucide-react";
-import { can, requireUser } from "@/lib/auth";
+import { Reveal, RevealItem } from "@/components/motion";
+import { can, requireUser, showDashboard } from "@/lib/auth";
 import { getLang, tr, type MessageKey } from "@/lib/i18n";
 import { isBillingEnabled } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
@@ -21,6 +22,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   // Big buttons named after what the person wants to DO. Only what this person may open is shown
   // (the pages still check on the server).
   const tasks: Task[] = [
+    { href: "/dashboard", label: "task_dashboard", hint: "task_dashboard_hint", icon: LayoutDashboard, show: showDashboard(user) },
     { href: "/items", label: "task_items", hint: "task_items_hint", icon: Package, show: can(user, "items.view") },
     { href: "/receipts/new", label: "task_receive", hint: "task_receive_hint", icon: PackageCheck, show: can(user, "receipts.create") },
     { href: "/purchase-orders/new", label: "task_order", hint: "task_order_hint", icon: ClipboardList, show: can(user, "purchase.create") },
@@ -94,12 +96,12 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       )}
 
       {tasks.length > 0 && (
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Reveal className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {tasks.map((x) => (
+            <RevealItem key={x.href}>
             <Link
-              key={x.href}
               href={x.href}
-              className={`${cardClass} group flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:border-brand hover:shadow-md`}
+              className={`${cardClass} group flex h-full items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:border-brand hover:shadow-md`}
             >
               <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand transition group-hover:bg-brand group-hover:text-white">
                 <x.icon size={24} aria-hidden />
@@ -109,8 +111,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
                 <span className="block text-sm text-muted">{t(x.hint)}</span>
               </span>
             </Link>
+            </RevealItem>
           ))}
-        </section>
+        </Reveal>
       )}
 
       {tasks.length === 0 && (

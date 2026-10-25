@@ -188,3 +188,11 @@ Format: context, options, choice, reason, date, model.
 - **Trade-offs:** in Hindi mode the working screens are still English; the Hindi words are AI-written and unreviewed.
 - **Revisit if:** staff cannot work with the English screens (then do phase 2 first for the screens they use most, probably Receipts, Count stock, Billing).
 - **Date / model:** 2026-10-25, Claude Sonnet 5.5
+
+## D-031: Business dashboard with hand-made SVG charts and the Motion library
+- **Owner:** "like Blinkit: metrics and analysis"; shared a blog of animation libraries.
+- **Choice:** one invoker database function for all numbers; tiles, column chart, bar lists and lists; charts in plain SVG (no chart library); Motion for calm animations that respect reduce-motion; English and Hindi words.
+- **Why:** same access rules as everywhere; no heavy chart dependency; Motion is MIT and the standard for React; 3D and scroll libraries do not fit a work tool.
+- **Trade-offs:** hand-made charts must be maintained by us; animations start hidden until JavaScript loads.
+- **Revisit if:** many more chart types are needed (then consider a chart library), or the owner wants profit and stock value (needs a cost decision).
+- **Date / model:** 2026-10-25, Claude Opus 5.5

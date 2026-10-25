@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { can, requireUser } from "@/lib/auth";
+import { can, requireUser, showDashboard } from "@/lib/auth";
 import { getLang, tr } from "@/lib/i18n";
 import { getCurrentLocation, getMyLocations } from "@/lib/location";
 import { isBillingEnabled } from "@/lib/settings";
@@ -31,6 +31,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
 
   // Which links this person may see. Same rules as before; only the look and the language changed.
   const nav: NavItem[] = [{ href: "/", label: tr(lang, "nav_home"), icon: "home" }];
+  if (showDashboard(user)) nav.push({ href: "/dashboard", label: tr(lang, "nav_dashboard"), icon: "dashboard" });
   if (can(user, "items.view")) nav.push({ href: "/items", label: tr(lang, "nav_items"), icon: "items" });
   if (can(user, "stock.view")) nav.push({ href: "/stock", label: tr(lang, "nav_stock"), icon: "stock" });
   if (can(user, "purchase.view") || can(user, "purchase.create") || can(user, "purchase.approve"))

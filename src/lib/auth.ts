@@ -73,3 +73,11 @@ export async function requireAnyPermission(...keys: string[]): Promise<CurrentUs
 export function can(user: CurrentUser, key: string): boolean {
   return user.isActive && (user.isAdmin || user.permissions.includes(key));
 }
+
+// The dashboard is worth showing when the person may see at least one of its parts
+// (the database decides the numbers; this only decides whether to show the link).
+export function showDashboard(user: CurrentUser): boolean {
+  return ["bills.view", "stock.view", "purchase.view", "purchase.create", "purchase.approve",
+    "receipts.view", "receipts.create", "receipts.post", "transfers.view", "transfers.create",
+    "transfers.send", "transfers.receive"].some((k) => can(user, k));
+}

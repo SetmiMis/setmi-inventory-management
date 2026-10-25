@@ -39,6 +39,20 @@ const en = {
   step_stock: "Enter opening stock", step_stock_hint: "Stock > Scan count, tick 'opening stock'",
   // help page
   help_title: "Help", help_intro: "Simple steps for every job. The Help button at the top always opens the part for the screen you are on.",
+  // dashboard
+  nav_dashboard: "Dashboard", task_dashboard: "Business dashboard", task_dashboard_hint: "Sales, stock and orders at a glance",
+  dash_title: "Dashboard", dash_subtitle: "Your business at a glance. Only your places are counted.",
+  dash_today: "Today", dash_7: "7 days", dash_30: "30 days", dash_90: "90 days", dash_place_all: "All my places", dash_place: "Place",
+  dash_no_sections: "There are no numbers for you yet: you have no permission for sales, stock, orders, receipts or transfers. Ask your administrator.",
+  tile_sales: "Sales", tile_vs_prev: "vs previous period", tile_bills: "Bills", tile_avg: "Average bill",
+  tile_low: "Low stock", tile_out: "Out of stock", tile_open_po: "Open purchase orders", tile_late: "late",
+  tile_incoming: "Goods on the way to you", tile_outgoing: "sent by you, not yet received", tile_receipts: "Receipts waiting to post",
+  tile_in_stock: "Items in stock", tile_new: "new",
+  chart_sales: "Sales per day", chart_table: "Show as a table", chart_sales_empty: "No sales in these days",
+  chart_top: "Top selling items", chart_top_empty: "Nothing sold in these days", chart_pay: "How customers paid", chart_pay_empty: "No payments in these days",
+  chart_place: "Low stock by place", chart_place_empty: "No low stock anywhere",
+  list_low: "Needs reordering", list_low_empty: "Nothing is below its minimum. Well done.", list_recent: "Latest stock movements", list_recent_empty: "No stock movement yet",
+  see_all: "See all", unit_bills: "bills",
 } as const;
 
 export type MessageKey = keyof typeof en;
@@ -75,6 +89,19 @@ const hi: Record<MessageKey, string> = {
   step_suppliers: "अपने सप्लायर जोड़ें", step_suppliers_hint: "Suppliers > New supplier",
   step_stock: "शुरुआती स्टॉक डालें", step_stock_hint: "Stock > Scan count, 'opening stock' पर टिक करें",
   help_title: "मदद", help_intro: "हर काम के आसान स्टेप। ऊपर का \"मदद\" बटन हमेशा उसी स्क्रीन का हिस्सा खोलता है जिस पर आप हैं।",
+  nav_dashboard: "डैशबोर्ड", task_dashboard: "बिज़नेस डैशबोर्ड", task_dashboard_hint: "बिक्री, स्टॉक और ऑर्डर एक नज़र में",
+  dash_title: "डैशबोर्ड", dash_subtitle: "आपका बिज़नेस एक नज़र में। सिर्फ़ आपकी जगहें गिनी जाती हैं।",
+  dash_today: "आज", dash_7: "7 दिन", dash_30: "30 दिन", dash_90: "90 दिन", dash_place_all: "मेरी सभी जगहें", dash_place: "जगह",
+  dash_no_sections: "अभी आपके लिए कोई आँकड़े नहीं हैं: आपको बिक्री, स्टॉक, ऑर्डर, रसीद या ट्रांसफर की अनुमति नहीं है। अपने एडमिन से कहें।",
+  tile_sales: "बिक्री", tile_vs_prev: "पिछले समय के मुकाबले", tile_bills: "बिल", tile_avg: "औसत बिल",
+  tile_low: "कम स्टॉक", tile_out: "स्टॉक ख़त्म", tile_open_po: "खुले खरीद ऑर्डर", tile_late: "देरी से",
+  tile_incoming: "आपकी ओर रास्ते में माल", tile_outgoing: "आपने भेजा, अभी पहुँचा नहीं", tile_receipts: "post होने को बाकी रसीदें",
+  tile_in_stock: "स्टॉक में आइटम", tile_new: "नया",
+  chart_sales: "रोज़ की बिक्री", chart_table: "टेबल की तरह देखें", chart_sales_empty: "इन दिनों में कोई बिक्री नहीं",
+  chart_top: "सबसे ज़्यादा बिकने वाले आइटम", chart_top_empty: "इन दिनों में कुछ नहीं बिका", chart_pay: "ग्राहकों ने कैसे पैसे दिए", chart_pay_empty: "इन दिनों में कोई भुगतान नहीं",
+  chart_place: "जगह के हिसाब से कम स्टॉक", chart_place_empty: "कहीं भी स्टॉक कम नहीं",
+  list_low: "फिर से मँगवाना है", list_low_empty: "कोई भी आइटम अपने न्यूनतम से नीचे नहीं है। बढ़िया।", list_recent: "हाल की स्टॉक हलचल", list_recent_empty: "अभी कोई स्टॉक हलचल नहीं",
+  see_all: "सब देखें", unit_bills: "बिल",
 };
 
 export const MESSAGES: Record<"en" | "hi", Record<MessageKey, string>> = { en, hi };

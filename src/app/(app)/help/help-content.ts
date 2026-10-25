@@ -406,6 +406,7 @@ export function helpSectionFor(pathname: string): string {
     ["/billing", "billing"],
     ["/bills", "billing"],
     ["/reports", "reports"],
+    ["/dashboard", "reports"],
     ["/locations", "places"],
     ["/suppliers", "suppliers"],
     ["/admin/users", "users"],

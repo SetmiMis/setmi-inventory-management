@@ -179,3 +179,9 @@ Tests 006-009 (and 003/004 in places) assume an EMPTY database: they count rows.
 - NOT tested: the Help page, the Help button and the new home page on screen behind login; the "no permission" message with a real restricted user; a first-time person using the app.
 
 - Language switch (phase 1): `typecheck`, `lint`, `build` pass. On the login page the switch was clicked in the browser: the page text changed to Hindi and back. NOT checked: menu, top bar, home and Help in Hindi behind login, how the Devanagari font looks, Hindi words by a native reader.
+
+## Dashboard checks (2026-10-25)
+- `supabase/tests/015_dashboard.sql`: 10 lines, all PASS (rolled back): sales total, bills, cash/UPI split with a voided bill left out; day series and top item; low and out-of-stock counts and list for one place; open, late and draft orders, receipts to post, transfers in and out; recent movements; place filter; one-year limit; a user with stock.view but no items.view gets no parts (not zeros); another place sees zeros; anonymous refused.
+- The first run found that the stock part returned zeros without items.view; fixed by migration 22 and re-run.
+- `typecheck`, `lint`, `build` pass; unit tests 35/35; `npm audit --omit=dev` 0 vulnerabilities.
+- NOT tested: the dashboard on screen (behind login), the tooltip, the animations, phone layout.

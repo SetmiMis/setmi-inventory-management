@@ -98,3 +98,6 @@ Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search 
 - Tests `supabase/tests/013_purchase_orders.sql` (37 lines); the older `009_receiving.sql` (32 lines) still passes. Details: FEATURE-010.
 
 - Migration 20 (review fixes): the suppliers read rule also admits `purchase.*`; `purchase_order_open_lines` answers only for SENT or PARTIAL orders. Tests `supabase/tests/014_po_review_fixes.sql` (4 lines, PASS).
+
+## Migrations 21 and 22 (applied 2026-10-25): dashboard
+- `dashboard_data(from, to, place)`: read-only, security invoker, returns JSON with the parts the caller may see (sales, stock, purchase, receipts, transfers). Migration 22: the stock part needs `stock.view` and `items.view` (without items.view it returned zeros, found by the test). Tests `supabase/tests/015_dashboard.sql` (10 lines). Details: FEATURE-013.
