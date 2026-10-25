@@ -1,8 +1,10 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { SESSION_ONLY_COOKIE } from "@/lib/supabase/session-cookie";
 
 export type LoginState = { error: string } | null;
 
@@ -21,9 +23,16 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   });
   if (!parsed.success) return FAIL;
 
-  const supabase = await createClient();
+  // A ticked box keeps the person signed in on this device; unticked means
+  // the sign-in ends when the browser is closed.
+  const remember = formData.get("remember") === "on";
+  const supabase = await createClient({ sessionOnly: !remember });
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) return FAIL;
+
+  const jar = await cookies();
+  if (remember) jar.delete(SESSION_ONLY_COOKIE);
+  else jar.set(SESSION_ONLY_COOKIE, "1", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
 
   redirect("/");
 }

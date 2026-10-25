@@ -96,13 +96,13 @@ textarea:focus {
 }
 
 /* Page content: headings and tables look good without touching every screen. */
-main h1 {
+main:not([data-auth]) h1 {
   font-size: 1.5rem;
   line-height: 2rem;
   font-weight: 650;
   letter-spacing: -0.01em;
 }
-main h2 {
+main:not([data-auth]) h2 {
   font-weight: 600;
 }
 main table {
@@ -219,4 +219,13 @@ main[class*="bg-white"] table tbody tr:hover {
 .help-section:target {
   border-color: var(--brand);
   box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* Login screen: elements slide up softly one after another (switched off by "reduce motion" above). */
+@keyframes login-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.login-rise {
+  animation: login-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

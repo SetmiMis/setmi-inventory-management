@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { supabaseEnv } from "@/lib/supabase/env";
+import { asSessionCookie, SESSION_ONLY_COOKIE } from "@/lib/supabase/session-cookie";
 
 // Runs before every page request. Two jobs:
 // 1. Refresh the Supabase session cookie so it does not expire mid-use.
@@ -17,8 +18,9 @@ export async function proxy(request: NextRequest) {
       setAll(list) {
         for (const { name, value } of list) request.cookies.set(name, value);
         response = NextResponse.next({ request });
+        const sessionOnly = request.cookies.get(SESSION_ONLY_COOKIE)?.value === "1";
         for (const { name, value, options } of list) {
-          response.cookies.set(name, value, options);
+          response.cookies.set(name, value, sessionOnly && value ? asSessionCookie(options) : options);
         }
       },
     },
@@ -27,9 +29,12 @@ export async function proxy(request: NextRequest) {
   // getClaims verifies the token signature, so a forged cookie is not accepted.
   const { data } = await supabase.auth.getClaims();
   const signedIn = Boolean(data?.claims);
-  const onLogin = request.nextUrl.pathname === "/login";
+  const path = request.nextUrl.pathname;
+  const onLogin = path === "/login";
+  // Pages a signed-out person must be able to open: sign in, ask for a reset link, and the link target.
+  const isPublic = onLogin || path === "/forgot-password" || path === "/reset-password" || path === "/auth/callback";
 
-  if (!signedIn && !onLogin) {
+  if (!signedIn && !isPublic) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
   if (signedIn && onLogin) {
