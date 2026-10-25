@@ -149,3 +149,18 @@ Format: context, options, choice, reason, date, model.
 ## D-012: `Import_item_code` is optional
 - **Owner decision:** some items need it, some do not. It is optional, unique when filled, and not tied to LOCAL/IMPORT by a database rule.
 - **Date:** 2026-10-24
+
+## D-026: Reports as invoker database functions with CSV download (P8)
+- **Owner:** "build the whole system"; the AI's defaults were used for the plan's open questions.
+- **Choice:** five read-only `report_*` functions that run as the caller (row rules still apply) and also need `reports.view` plus the matching stock or bills permission; CSV (not xlsx) with a separate `reports.export` permission; no cost or valuation; at most 20,000 rows and one-year date ranges.
+- **Why:** one set of access rules, no new library, no way to see another place's numbers through a report.
+- **Trade-offs:** a person with `reports.view` but no `stock.view`/`bills.view` gets a clear refusal (by design); CSV instead of .xlsx.
+- **Revisit if:** the owner wants valuation, charts or .xlsx.
+- **Date / model:** 2026-10-25, Claude Sonnet 5.5
+
+## D-027: Security headers added to next.config.ts (config change)
+- **Owner:** "build the whole system, ready to use" (the CLAUDE.md rule asks approval for config changes; this is reported here so the owner can object).
+- **Choice:** five safe response headers on every page; no Content-Security-Policy yet.
+- **Why:** cheap protection against clickjacking, MIME sniffing and downgrade; verified with `curl -I` on a local production build.
+- **Revisit if:** a phone-camera scanner is added (Permissions-Policy blocks the camera) or a CSP is added.
+- **Date / model:** 2026-10-25, Claude Sonnet 5.5

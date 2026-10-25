@@ -11,6 +11,7 @@ import {
   PackageCheck,
   Package,
   Receipt,
+  BarChart3,
   ReceiptText,
   Settings,
   ShoppingCart,
@@ -35,6 +36,7 @@ const ICONS: Record<string, LucideIcon> = {
   locations: MapPin,
   users: Users,
   settings: Settings,
+  reports: BarChart3,
 };
 
 export type NavItem = { href: string; label: string; icon: string };

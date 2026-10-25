@@ -1,8 +1,23 @@
 # HANDOVER
 
 Newest entry on top. Read this first, update it last.
+## 2026-10-25 (late): P8 reports built; UI polish pushed; deployment plan written (Claude Sonnet 5.5)
 
-## 2026-10-25 (newest): P6 pushed; P7 billing built behind an ON/OFF switch (Claude Sonnet 5.5)
+### Done (verified by command output)
+- Owner asked for the whole system, built "like a DevOps, full-stack developer, boss, manager and employee". Done: online research, a review by role (ROADMAP "Review by role"), P8 reports, error pages, security headers, `.env.example`, `docs/DEPLOYMENT.md`.
+- P8: migrations 15 and 16 applied to the dev project; DB tests `012_reports.sql` 19/19 PASS; unit tests 35/35; lint, typecheck and build pass. Screen `/reports`, CSV download `/reports/export`. See `docs/features/FEATURE-009-REPORTS.md`.
+- A second agent (ruflo verifier) reviewed the reports code; its 3 low findings were fixed.
+- UI polish pushed as `aa208e2` (colours from setmiindia.com).
+- Permissions `reports.view` and `reports.export` exist but nobody has them yet except admins: give them in Admin > Users.
+
+### Not done / owner must do
+- Nothing is deployed. Deployment, DNS and a production Supabase project need the owner's explicit yes (see `docs/DEPLOYMENT.md`, day-one checklist).
+- Dashboard settings: disable public sign-up, enable leaked password protection.
+- Click through every screen in a browser (sign-in needed); try a scanner and printers.
+- Open: GST/invoice rules, returns and credit notes, purchase orders, stock valuation, CSP header, `remove_demo_data.sql` does not remove bills.
+
+
+## 2026-10-25: P6 pushed; P7 billing built behind an ON/OFF switch (Claude Sonnet 5.5)
 
 ### Done (verified by command output)
 - Brand colours now follow setmiindia.com (read from its CSS on 2026-10-25): primary #005a84, hover #0a5075, page background #f2f5f7, text #3a3a3a/#4B4F58, accent red #b50505, font Inter. Tokens live in `src/app/globals.css` (change colours only there).

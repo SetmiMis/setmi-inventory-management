@@ -157,3 +157,10 @@ Tests 006-009 (and 003/004 in places) assume an EMPTY database: they count rows.
 - `admin_set_user_*` success path as a real admin (only the denial path is tested).
 - Real Supabase Auth login flow (no app code exists yet).
 - Re-run after every migration change.
+
+## P8 report checks (2026-10-25)
+- `supabase/tests/012_reports.sql`: 19 lines, all PASS (rolled back): refused without `reports.view`, rows only of own places, stock and on-the-way quantities, low-stock shortfall, sales per day (voided bills excluded, cash/UPI split), sales by item, slow stock (also when the only sale was voided), clear message when `stock.view` or `bills.view` is missing, date and day limits, other place sees nothing, anonymous refused, admin sees all.
+- `tests/csv.test.ts`: 4 tests pass (header/BOM/CRLF, quoting, formula neutralising, Hindi text). Unit tests total 35/35.
+- Local production build (`next start`): the five security headers are present on `/login`; `/reports` and `/reports/export` redirect to `/login` when not signed in.
+- Independent review by the ruflo verifier agent: no authorization or injection problem; 3 low findings, all fixed (see FEATURE-009 section 4).
+- NOT tested: the screens behind login in a browser, the CSV opened in Excel, large data volumes.

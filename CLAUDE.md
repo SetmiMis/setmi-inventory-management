@@ -11,7 +11,7 @@ Also read `AGENTS.md`: this Next.js version differs from older versions, and its
 - Documentation describes actual code only, never intended code as done.
 
 ## Scope
-- Current module: Item Master only (not built yet). Do not start other modules (stock receiving, outward, locations, transfers, ledger, billing, reports) without explicit approval.
+- Built so far (see `docs/HANDOVER.md`): Item Master, barcodes, Excel import, locations, stock ledger, receiving, transfers, billing (ON/OFF switch), reports. The owner has asked for the whole system to be built; still ask before tax/GST, deployment, DNS or new paid services.
 - Stock quantity and warehouse location are NOT Item Master fields.
 - Keep existing Item Master field meanings (see `docs/DECISIONS.md`).
 

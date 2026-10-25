@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeftRight, Boxes, MapPin, Package, PackageCheck, Receipt, ScanLine, ShieldCheck, Truck, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, BarChart3, Boxes, MapPin, Package, PackageCheck, Receipt, ScanLine, ShieldCheck, Truck, type LucideIcon } from "lucide-react";
 import { can, requireUser } from "@/lib/auth";
 import { cardClass } from "@/lib/ui";
 
@@ -16,6 +16,7 @@ export default async function HomePage() {
     { href: "/receipts", label: "Receipts", hint: "Goods coming in from suppliers", icon: PackageCheck, show: can(user, "receipts.view") || can(user, "receipts.create") || can(user, "receipts.post") },
     { href: "/transfers", label: "Transfers", hint: "Move stock between places", icon: ArrowLeftRight, show: can(user, "transfers.view") || can(user, "transfers.create") || can(user, "transfers.send") || can(user, "transfers.receive") },
     { href: "/bills", label: "Bills", hint: "Shop bills of the day", icon: Receipt, show: can(user, "bills.view") || can(user, "bills.create") || can(user, "bills.void") },
+    { href: "/reports", label: "Reports", hint: "Stock, low stock, sales, slow stock", icon: BarChart3, show: can(user, "reports.view") },
     { href: "/suppliers", label: "Suppliers", hint: "People you buy from", icon: Truck, show: can(user, "suppliers.view") || can(user, "suppliers.manage") },
     { href: "/locations", label: "Locations", hint: "Warehouses and shops", icon: MapPin, show: can(user, "locations.manage") },
   ].filter((s) => s.show);

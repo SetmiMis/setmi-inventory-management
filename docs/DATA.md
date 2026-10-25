@@ -85,3 +85,7 @@ Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search 
 
 ## Planned (not designed in detail)
 `stock_movements` (append-only ledger), `stock_balances`, suppliers, goods receipts, transfers, bills. See `docs/ROADMAP.md`.
+
+## Migrations 15 and 16 (applied 2026-10-25): reports
+- Permissions `reports.view`, `reports.export`.
+- Functions (security invoker, read-only, max 20,000 rows): `report_stock_by_place(location)`, `report_low_stock(location)`, `report_sales_by_day(from, to, location)`, `report_sales_by_item(from, to, location)`, `report_dead_stock(days, location)`. Each refuses without `reports.view`; stock reports also need `stock.view`, sales reports `bills.view`; rows follow the existing row rules. Tests `supabase/tests/012_reports.sql` (19 lines). Details: FEATURE-009.

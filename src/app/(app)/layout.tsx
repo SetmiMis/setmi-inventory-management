@@ -38,6 +38,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
     nav.push({ href: "/bills", label: "Bills", icon: "bills" });
   if (can(user, "suppliers.view") || can(user, "suppliers.manage"))
     nav.push({ href: "/suppliers", label: "Suppliers", icon: "suppliers" });
+  if (can(user, "reports.view")) nav.push({ href: "/reports", label: "Reports", icon: "reports" });
   if (can(user, "locations.manage") || myLocations.length > 0)
     nav.push({ href: "/locations", label: "Locations", icon: "locations" });
   if (user.isActive && user.isAdmin) {
