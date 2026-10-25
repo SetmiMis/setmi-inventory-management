@@ -7,7 +7,6 @@ import { primaryButton } from "@/lib/ui";
 
 // Parts of the dashboard design that the system does not have yet. Only these fixed names are accepted.
 const NAMES: Record<string, MessageKey> = {
-  racks: "nm_racks",
   customers: "nm_customers",
   "import-shipments": "nm_import",
   "quality-check": "nm_qc",

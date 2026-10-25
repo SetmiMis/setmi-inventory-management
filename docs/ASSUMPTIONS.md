@@ -35,3 +35,11 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - Reorder: the sheet Apps Script rule is unknown; we use Max Level = average daily use x lead time x safety factor (sheet formula) and order = Max Level - (stock + on order + on the way). Please share the script.
 - Average period: 30 days by default (30/60/90 on screen). Which one do you want as default?
 - Should transfers sent from a warehouse to a shop count as the warehouse consumption? (now: yes)
+
+## Racks, shelves and bins (added 2026-10-25, needs the owner's confirmation)
+- Racks are **master data only**: they say where a product is kept. They do **not** change the stock ledger; stock is still counted per warehouse or shop (decisions D-0xx about the ledger stay as they are).
+- A bin's "current stock" is the warehouse stock of the products placed in it. A product sits in **at most one bin per warehouse/shop**. Several products can share a bin; their quantities are added together as "units" (so mixing pieces and metres in one bin gives a meaningless sum; keep one kind of unit per bin).
+- Moving stock from one bin to another inside the same warehouse is just moving the product's assignment (remove it from one bin, add it to the other). No stock movement is recorded.
+- A bin is never deleted (its code must stay unique and traceable); it can be **blocked**. Taking a product out of a bin is allowed (it is not stock history).
+- The code is made from the place code + rack + level + bin, for example `DEMO-WH-A-01-01`. A single digit is padded (1 becomes 01).
+- Question for the owner: do you want stock counted per bin later (receiving into a bin, transfers between bins)? That is a bigger change to the ledger and needs its own plan.

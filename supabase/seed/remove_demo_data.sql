@@ -37,6 +37,9 @@ delete from public.stock_balances
 delete from public.reorder_levels
  where item_id in (select id from public.items where internal_item_code like 'DEMO-%')
     or location_id in (select id from public.locations where code like 'DEMO-%');
+-- racks and bins of DEMO places (and the products placed in them)
+delete from public.item_bins where location_id in (select id from public.locations where code like 'DEMO-%');
+delete from public.storage_bins where location_id in (select id from public.locations where code like 'DEMO-%');
 delete from public.user_locations where location_id in (select id from public.locations where code like 'DEMO-%');
 delete from public.item_barcodes where item_id in (select id from public.items where internal_item_code like 'DEMO-%');
 delete from public.items where internal_item_code like 'DEMO-%';
