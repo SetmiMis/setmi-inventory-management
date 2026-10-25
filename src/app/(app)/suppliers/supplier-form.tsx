@@ -8,6 +8,7 @@ export type SupplierValues = {
   id: string; updatedAt: string; name: string; supplierType: "LOCAL" | "IMPORT";
   contactPerson: string | null; phone: string | null; email: string | null; address: string | null;
   country: string | null; gstin: string | null; notes: string | null;
+  city: string | null; website: string | null; paymentTerms: string | null; currency: string;
 };
 
 function Message({ state }: { state: SupplierState }) {
@@ -37,6 +38,22 @@ export function SupplierForm({ supplier }: { supplier?: SupplierValues }) {
         <div>
           <label htmlFor="country" className={labelClass}>Country (for imports)</label>
           <input id="country" name="country" maxLength={60} defaultValue={f("country")} className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor="city" className={labelClass}>City</label>
+          <input id="city" name="city" maxLength={60} defaultValue={f("city")} className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor="website" className={labelClass}>Website</label>
+          <input id="website" name="website" maxLength={200} defaultValue={f("website")} className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor="paymentTerms" className={labelClass}>Payment terms (for example 30 Days)</label>
+          <input id="paymentTerms" name="paymentTerms" maxLength={60} defaultValue={f("paymentTerms")} className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor="currency" className={labelClass}>Currency</label>
+          <input id="currency" name="currency" maxLength={3} defaultValue={supplier?.currency ?? "INR"} className={`${inputClass} uppercase`} />
         </div>
         <div>
           <label htmlFor="contactPerson" className={labelClass}>Contact person</label>

@@ -28,3 +28,23 @@ test("name and type rules", () => {
   assert.equal(supplierSchema.safeParse({ ...ok, supplierType: "OTHER" }).success, false);
   assert.equal(supplierSchema.safeParse({ ...ok, supplierType: "IMPORT", country: "China" }).success, true);
 });
+
+test("city, website, payment terms and currency: optional, currency defaults to INR", () => {
+  const r = supplierSchema.safeParse({ ...ok, city: " Delhi ", website: "", paymentTerms: "30 Days", currency: "" });
+  assert.equal(r.success, true);
+  if (r.success) {
+    assert.equal(r.data.city, "Delhi");
+    assert.equal(r.data.website, null);
+    assert.equal(r.data.paymentTerms, "30 Days");
+    assert.equal(r.data.currency, "INR");
+  }
+  // the old form (no new fields at all) still works
+  assert.equal(supplierSchema.safeParse(ok).success, true);
+});
+
+test("currency is three letters, upper-cased; long city is refused", () => {
+  const usd = supplierSchema.safeParse({ ...ok, currency: "usd" });
+  assert.equal(usd.success && usd.data.currency, "USD");
+  assert.equal(supplierSchema.safeParse({ ...ok, currency: "rupee" }).success, false);
+  assert.equal(supplierSchema.safeParse({ ...ok, city: "c".repeat(61) }).success, false);
+});

@@ -28,6 +28,7 @@ export default async function SupplierPage({ params }: { params: Promise<{ id: s
           supplier={{
             id: s.id, updatedAt: s.updated_at, name: s.name, supplierType: s.supplier_type, contactPerson: s.contact_person,
             phone: s.phone, email: s.email, address: s.address, country: s.country, gstin: s.gstin, notes: s.notes,
+            city: s.city, website: s.website, paymentTerms: s.payment_terms, currency: s.currency,
           }}
         />
       ) : (

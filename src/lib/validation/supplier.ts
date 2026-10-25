@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const blankToNull = (v: unknown) => (typeof v === "string" && v.trim() === "" ? null : v);
+const blankToNull = (v: unknown) => (v === undefined || (typeof v === "string" && v.trim() === "") ? null : v);
 const optionalText = (max: number, label: string) =>
   z.preprocess(blankToNull, z.string().trim().max(max, `${label} is too long (max ${max}).`).nullable());
 
@@ -19,6 +19,14 @@ export const supplierSchema = z.object({
     z.string().regex(/^[0-9A-Z]{15}$/, "GSTIN must be 15 letters/digits.").nullable(),
   ),
   notes: optionalText(1000, "Notes"),
+  city: optionalText(60, "City"),
+  website: optionalText(200, "Website"),
+  paymentTerms: optionalText(60, "Payment terms"),
+  // Three capital letters (INR, USD, EUR...). Empty means INR.
+  currency: z.preprocess(
+    (v) => (typeof v !== "string" || v.trim() === "" ? "INR" : v.trim().toUpperCase()),
+    z.string().regex(/^[A-Z]{3}$/, "Currency must be 3 letters, for example INR or USD."),
+  ),
 });
 
 export function supplierFromForm(fd: FormData) {
@@ -32,5 +40,9 @@ export function supplierFromForm(fd: FormData) {
     country: fd.get("country"),
     gstin: fd.get("gstin"),
     notes: fd.get("notes"),
+    city: fd.get("city"),
+    website: fd.get("website"),
+    paymentTerms: fd.get("paymentTerms"),
+    currency: fd.get("currency"),
   });
 }

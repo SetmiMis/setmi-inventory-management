@@ -21,6 +21,7 @@ export async function saveSupplier(_prev: SupplierState, fd: FormData): Promise<
   const row = {
     name: v.name, supplier_type: v.supplierType, contact_person: v.contactPerson, phone: v.phone, email: v.email,
     address: v.address, country: v.country, gstin: v.gstin, notes: v.notes,
+    city: v.city, website: v.website, payment_terms: v.paymentTerms, currency: v.currency,
   };
   const supabase = await createClient();
 
@@ -55,4 +56,16 @@ export async function setSupplierActive(_prev: SupplierState, fd: FormData): Pro
   revalidatePath("/suppliers");
   revalidatePath(`/suppliers/${id.data}`);
   return { ok: true, message: active ? "Supplier restored." : "Supplier archived." };
+}
+
+// Archive or restore from a plain form button (the list page and its side panel). Suppliers are never deleted:
+// receipts and orders keep pointing at them.
+export async function toggleSupplierActive(fd: FormData): Promise<void> {
+  await requirePermission("suppliers.manage");
+  const id = z.uuid().safeParse(fd.get("id"));
+  if (!id.success) return;
+  const supabase = await createClient();
+  await supabase.from("suppliers").update({ is_active: fd.get("active") === "1" }).eq("id", id.data);
+  revalidatePath("/suppliers");
+  redirect(`/suppliers?sel=${id.data}`);
 }
