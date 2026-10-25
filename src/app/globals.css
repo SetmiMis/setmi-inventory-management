@@ -2,50 +2,50 @@
 
 /* Design tokens. Light by default, dark follows the computer's setting. */
 :root {
-  /* Look copied from the owner's ERP repo (SetmiMis/erp): indigo/violet SaaS palette, soft cards, mesh background. */
-  --background: #f8fafc;
-  --foreground: #1e293b;
+  /* Teal look of the owner's dashboard mock (same teal as the login page). */
+  --background: #f3f8fa;
+  --foreground: #12263a;
   --surface: #ffffff;
-  --surface-muted: #f1f5f9;
-  --line: #e2e8f0;
+  --surface-muted: #eef4f7;
+  --line: #e1e9ef;
   --line-strong: #7c8ca1;
-  --muted: #475569;
-  --brand: #4f46e5;
-  --brand-text: #4f46e5;
-  --brand-strong: #3730a3;
-  --brand-soft: #eef2ff;
+  --muted: #4d6073;
+  --brand: #0b7d70;
+  --brand-text: #0b7d70;
+  --brand-strong: #075f54;
+  --brand-soft: #e3f4f0;
   --danger: #b3261e;
-  --sidebar: #1e1b4b;
-  --sidebar-text: #c7d2fe;
-  --sidebar-active: #312e81;
-  --ring: rgba(79, 70, 229, 0.3);
-  --header-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #06b6d4 100%);
-  --mesh:
-    radial-gradient(at 15% 10%, rgba(79, 70, 229, 0.10) 0px, transparent 55%),
-    radial-gradient(at 85% 0%, rgba(139, 92, 246, 0.10) 0px, transparent 50%),
-    radial-gradient(at 90% 85%, rgba(6, 182, 212, 0.08) 0px, transparent 50%),
-    radial-gradient(at 5% 90%, rgba(16, 185, 129, 0.06) 0px, transparent 45%);
+  --sidebar: #ffffff;
+  --sidebar-text: #12263a;
+  --sidebar-active: #0b7d70;
+  --ring: rgba(11, 125, 112, 0.3);
+  --header-gradient: linear-gradient(135deg, #0b7d70 0%, #12b5c9 100%);
+  --mesh: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b1020;
-    --foreground: #e6eaf5;
-    --surface: #131a2e;
-    --surface-muted: #1b2440;
-    --line: #2a3556;
-    --line-strong: #5b6a8c;
-    --muted: #a3b0cc;
-    /* Buttons keep a dark enough fill for white text; links and text use the lighter indigo. */
-    --brand: #5558e3;
-    --brand-text: #a5b4fc;
-    --brand-strong: #6d70f0;
-    --brand-soft: #1e2447;
+/* Dark theme: chosen with the Light / Dark switch in the top bar (see ThemeToggle); default is light. */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  & {
+    --background: #0b1620;
+    --foreground: #e6eef3;
+    --surface: #111f2b;
+    --surface-muted: #182b3a;
+    --line: #25394a;
+    --line-strong: #5d7a90;
+    --muted: #9db3c2;
+    /* Buttons keep a dark enough fill for white text; links and text use the lighter teal. */
+    --brand: #0c8577;
+    --brand-text: #5fd3c3;
+    --brand-strong: #12a090;
+    --brand-soft: #123a3a;
     --danger: #f87171;
-    --sidebar: #0f1330;
-    --sidebar-active: #252c5c;
-    --ring: rgba(129, 140, 248, 0.45);
-    --mesh: none;
+    --sidebar: #0e1b26;
+    --sidebar-text: #e6eef3;
+    --sidebar-active: #0c8577;
+    --ring: rgba(95, 211, 195, 0.45);
   }
 }
 
@@ -228,4 +228,23 @@ main[class*="bg-white"] table tbody tr:hover {
 }
 .login-rise {
   animation: login-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Thin scrollbars that follow the theme (the default white ones look wrong in dark mode). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+/* Compact tables inside the dashboard cards. */
+main table.dash-table th,
+main table.dash-table td {
+  padding: 0.4rem 0.4rem;
+  font-size: 0.8125rem;
+}
+main table.dash-table td .badge-nowrap,
+main table.dash-table td span.inline-flex {
+  white-space: nowrap;
+}
+main table.dash-table th {
+  font-size: 0.6875rem;
 }

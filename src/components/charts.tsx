@@ -163,3 +163,114 @@ export function BarList({ rows, money = false, emptyText }: { rows: BarRow[]; mo
     </MotionConfig>
   );
 }
+
+// ---- Donut (ring) chart with the total in the middle and a legend beside it ----
+export type DonutSegment = { key: string; label: string; value: number; color: string };
+
+export function DonutChart({ segments, centerValue, centerLabel, ariaLabel }: {
+  segments: DonutSegment[]; centerValue: string; centerLabel: string; ariaLabel: string;
+}) {
+  const total = segments.reduce((a, s) => a + s.value, 0);
+  const R = 70;
+  const C = 2 * Math.PI * R;
+  let offset = 0;
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+      <svg viewBox="0 0 180 180" role="img" aria-label={ariaLabel} className="h-44 w-44 shrink-0">
+        <circle cx="90" cy="90" r={R} fill="none" stroke="var(--surface-muted)" strokeWidth="22" />
+        {total > 0 && segments.filter((s) => s.value > 0).map((s) => {
+          const len = (s.value / total) * C;
+          const el = (
+            <circle
+              key={s.key} cx="90" cy="90" r={R} fill="none" stroke={s.color} strokeWidth="22"
+              strokeDasharray={`${Math.max(len - (segments.filter((x) => x.value > 0).length > 1 ? 2 : 0), 0)} ${C}`}
+              strokeDashoffset={-offset} transform="rotate(-90 90 90)"
+            />
+          );
+          offset += len;
+          return el;
+        })}
+        <text x="90" y="88" textAnchor="middle" className="fill-[var(--foreground)] text-[26px] font-bold">{centerValue}</text>
+        <text x="90" y="108" textAnchor="middle" className="fill-[var(--muted)] text-[11px]">{centerLabel}</text>
+      </svg>
+      <ul className="min-w-44 space-y-2 text-sm">
+        {segments.map((s) => (
+          <li key={s.key} className="flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2"><span aria-hidden className="h-3 w-3 rounded-full" style={{ background: s.color }} /> {s.label}</span>
+            <span className="font-semibold">
+              {s.value.toLocaleString("en-IN")} <span className="font-normal text-muted">({total > 0 ? ((s.value / total) * 100).toFixed(1) : "0.0"}%)</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// ---- Two series per day (stock in / stock out), thin paired columns ----
+export type PairPoint = { key: string; label: string; a: number; b: number };
+
+export function PairColumnChart({ data, aLabel, bLabel, aColor, bColor, ariaLabel, emptyText }: {
+  data: PairPoint[]; aLabel: string; bLabel: string; aColor: string; bColor: string; ariaLabel: string; emptyText: string;
+}) {
+  const max = niceMax(Math.max(0, ...data.flatMap((d) => [d.a, d.b])));
+  const W = 640, H = 210, L = 40, B = 24, T = 8;
+  const plotH = H - B - T;
+  const step = (W - L) / Math.max(data.length, 1);
+  const bw = Math.min(6, step / 2.6);
+  const y = (v: number) => T + plotH - (v / max) * plotH;
+  const empty = data.every((d) => d.a === 0 && d.b === 0);
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * max);
+  return (
+    <div>
+      <div className="mb-2 flex justify-end gap-4 text-xs">
+        <span className="flex items-center gap-1.5"><span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ background: aColor }} /> {aLabel}</span>
+        <span className="flex items-center gap-1.5"><span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ background: bColor }} /> {bLabel}</span>
+      </div>
+      {empty ? (
+        <p className="py-10 text-center text-sm text-muted">{emptyText}</p>
+      ) : (
+        <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={ariaLabel} className="h-auto w-full">
+          {ticks.map((t) => (
+            <g key={t}>
+              <line x1={L} x2={W} y1={y(t)} y2={y(t)} stroke="var(--line)" strokeWidth="1" />
+              <text x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-[var(--muted)] text-[10px]">{compact(t, false)}</text>
+            </g>
+          ))}
+          {data.map((d, i) => {
+            const x = L + i * step + step / 2;
+            return (
+              <g key={d.key}>
+                <title>{`${d.label}: ${aLabel} ${full(d.a, false)}, ${bLabel} ${full(d.b, false)}`}</title>
+                {d.a > 0 && <rect x={x - bw - 0.5} y={y(d.a)} width={bw} height={T + plotH - y(d.a)} rx="1.5" fill={aColor} />}
+                {d.b > 0 && <rect x={x + 0.5} y={y(d.b)} width={bw} height={T + plotH - y(d.b)} rx="1.5" fill={bColor} />}
+                {i % 5 === 0 && <text x={x} y={H - 6} textAnchor="middle" className="fill-[var(--muted)] text-[10px]">{d.label}</text>}
+              </g>
+            );
+          })}
+        </svg>
+      )}
+      {/* Same numbers for screen readers. A plain list inside a clipped box: a table here was stretched by the page table styles. */}
+      <div className="sr-only">
+        <p>{ariaLabel}</p>
+        <ul>{data.map((d) => <li key={d.key}>{d.label}: {aLabel} {d.a}, {bLabel} {d.b}</li>)}</ul>
+      </div>
+    </div>
+  );
+}
+
+// ---- A tiny trend line for the dashboard cards (decoration with real numbers, no axes) ----
+export function Sparkline({ values, color, label }: { values: number[]; color: string; label: string }) {
+  const W = 64, H = 26;
+  const max = Math.max(...values, 0);
+  if (values.length < 2 || max === 0) {
+    return <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} className="h-6 w-16 shrink-0"><line x1="0" x2={W} y1={H - 3} y2={H - 3} stroke={color} strokeOpacity="0.35" strokeWidth="2" strokeLinecap="round" /></svg>;
+  }
+  const step = W / (values.length - 1);
+  const pts = values.map((v, i) => `${(i * step).toFixed(1)},${(H - 3 - (v / max) * (H - 6)).toFixed(1)}`).join(" ");
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} className="h-6 w-16 shrink-0">
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  );
+}

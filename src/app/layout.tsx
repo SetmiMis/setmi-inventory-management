@@ -27,8 +27,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${devanagari.variable} h-full antialiased`}
     >
+      <head>
+        {/* Applies the saved Light / Dark choice before the page is drawn, so there is no flash. Fixed text, no user input. */}
+        <script dangerouslySetInnerHTML={{ __html: "try{if(localStorage.getItem('ims_theme')==='dark')document.documentElement.dataset.theme='dark'}catch(e){}" }} />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

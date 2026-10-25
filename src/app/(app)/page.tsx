@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import {
   ArrowLeftRight, ArrowUpDown, BarChart3, RefreshCw, Boxes, CheckCircle2, ChevronRight, CircleHelp, ClipboardList, MapPin, Package, PackageCheck,
   LayoutDashboard, Receipt, ScanLine, ShieldCheck, ShoppingCart, Truck, type LucideIcon,
@@ -17,6 +18,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const lang = await getLang();
   const t = (k: MessageKey) => tr(lang, k);
   const denied = (await searchParams).denied !== undefined;
+  // After sign-in people with dashboard rights land on the dashboard; the home page stays for the "no permission" message.
+  if (user.isActive && showDashboard(user) && !denied) redirect("/dashboard");
   const billingOn = await isBillingEnabled();
 
   // Big buttons named after what the person wants to DO. Only what this person may open is shown

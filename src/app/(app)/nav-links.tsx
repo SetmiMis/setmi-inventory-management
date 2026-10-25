@@ -18,6 +18,18 @@ import {
   Package,
   Receipt,
   BarChart3,
+  BookText,
+  ClipboardCheck,
+  Building2,
+  FolderTree,
+  ShipWheel,
+  ShieldCheck,
+  PackageOpen,
+  Undo2,
+  UserRound,
+  Calculator,
+  LineChart,
+  FileBarChart2,
   ReceiptText,
   Settings,
   ShoppingCart,
@@ -48,17 +60,30 @@ export const ICONS: Record<string, LucideIcon> = {
   users: Users,
   settings: Settings,
   reports: BarChart3,
+  ledger: BookText,
+  count: ClipboardCheck,
+  categories: FolderTree,
+  warehouses: Building2,
+  customers: UserRound,
+  import: ShipWheel,
+  qc: ShieldCheck,
+  picking: PackageOpen,
+  dispatch: Truck,
+  returns: Undo2,
+  reports2: FileBarChart2,
+  reports3: LineChart,
+  valuation: Calculator,
 };
 
-export type NavItem = { href: string; label: string; icon: string; group?: string };
+export type NavItem = { href: string; label: string; icon: string; group?: string; soon?: boolean };
 
 function NavList({ items, onPick }: { items: NavItem[]; onPick?: () => void }) {
   const pathname = usePathname();
   // Only the most specific match is marked (so /stock/entry does not also light up /stock).
-  const matches = (href: string) => (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`));
+  const matches = (href: string) => { const h = href.split("?")[0]; return h === "/" ? pathname === "/" : pathname === h || pathname.startsWith(`${h}/`); };
   const activeHref = items.filter((it) => matches(it.href)).sort((a, b) => b.href.length - a.href.length)[0]?.href;
   return (
-    <ul className="space-y-1">
+    <ul className="space-y-0.5">
       {items.map((it, i) => {
         const Icon = ICONS[it.icon] ?? ReceiptText;
         const active = it.href === activeHref;
@@ -67,20 +92,22 @@ function NavList({ items, onPick }: { items: NavItem[]; onPick?: () => void }) {
         return (
           <li key={it.href}>
             {heading && (
-              <p className="mb-1 mt-4 px-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--sidebar-text)] opacity-70">{heading}</p>
+              <p className="mb-1 mt-4 px-3 text-xs font-semibold uppercase tracking-wider text-muted">{heading}</p>
             )}
             <Link
               href={it.href}
               onClick={onPick}
               aria-current={active ? "page" : undefined}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
+              title={it.soon ? "Coming soon" : undefined}
+              className={`${it.soon && !active ? "opacity-60 " : ""}flex min-h-11 items-center gap-3 rounded-lg px-3 py-1.5 text-sm font-medium transition lg:min-h-9 ${
                 active
                   ? "bg-[var(--sidebar-active)] text-white shadow-sm"
-                  : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-active)] hover:text-white"
+                  : "text-[var(--sidebar-text)] hover:bg-brand-soft"
               }`}
             >
-              <Icon size={18} aria-hidden className={active ? "text-indigo-300" : ""} />
-              {it.label}
+              <Icon size={18} aria-hidden className={active ? "" : "text-muted"} />
+              <span className="min-w-0 flex-1 truncate">{it.label}</span>
+
             </Link>
           </li>
         );
@@ -115,17 +142,17 @@ export function MobileMenu({ items, openLabel = "Open menu", closeLabel = "Close
         type="button"
         onClick={() => setOpen(true)}
         aria-label={openLabel}
-        className="min-h-11 min-w-11 rounded-lg border border-line bg-surface p-2 lg:hidden"
+        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg text-muted hover:bg-surface-muted lg:hidden"
       >
         <Menu size={20} aria-hidden className="mx-auto" />
       </button>
       {open && (
         <div role="dialog" aria-modal="true" aria-label={openLabel} className="fixed inset-0 z-40 lg:hidden print:hidden">
           <button type="button" aria-label={closeLabel} onClick={() => setOpen(false)} className="absolute inset-0 bg-black/50" />
-          <aside className="absolute inset-y-0 left-0 w-64 overflow-y-auto bg-[var(--sidebar)] p-3">
+          <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] overflow-y-auto bg-[var(--sidebar)] p-3 text-[var(--sidebar-text)] shadow-2xl">
             <div className="mb-3 flex items-center justify-between px-1">
-              <Image src="/brand/setmi-logo-wide.png" alt="SETMI INDIA" width={150} height={46} className="h-auto w-[150px]" />
-              <button ref={closeRef} type="button" onClick={() => setOpen(false)} aria-label={closeLabel} className="p-3 text-white">
+              <Image src="/brand/setmi-round-192.png" alt="SETMI INDIA" width={56} height={56} className="h-14 w-14" />
+              <button ref={closeRef} type="button" onClick={() => setOpen(false)} aria-label={closeLabel} className="p-3">
                 <X size={20} aria-hidden />
               </button>
             </div>
@@ -139,7 +166,7 @@ export function MobileMenu({ items, openLabel = "Open menu", closeLabel = "Close
 
 // Phone only: a bar at the bottom with the four things used most (the first four that this person may open),
 // so staff at the counter or in the godown do not have to open the menu each time.
-const BOTTOM_PREFERENCE = ["/", "/receipts", "/stock/entry", "/billing", "/stock", "/items", "/bills", "/transfers"];
+const BOTTOM_PREFERENCE = ["/dashboard", "/", "/receipts", "/stock/entry", "/billing", "/stock", "/items", "/bills", "/transfers"];
 export function BottomBar({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
   const chosen = BOTTOM_PREFERENCE.map((h) => items.find((i) => i.href === h)).filter((i): i is NavItem => !!i).slice(0, 4);

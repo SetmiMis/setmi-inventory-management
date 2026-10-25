@@ -12,9 +12,11 @@ export function HelpButton({ label = "Help" }: { label?: string }) {
   return (
     <Link
       href={`/help#${id}`}
-      className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm font-medium shadow-sm transition hover:bg-surface-muted"
+      aria-label={label}
+      title={label}
+      className="hidden min-h-11 min-w-11 items-center justify-center rounded-lg text-muted transition hover:bg-surface-muted sm:inline-flex"
     >
-      <CircleHelp size={16} aria-hidden /> {label}
+      <CircleHelp size={22} aria-hidden />
     </Link>
   );
 }

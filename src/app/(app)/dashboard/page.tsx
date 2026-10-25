@@ -1,18 +1,20 @@
 import Link from "next/link";
 import {
-  AlertTriangle, ArrowDownRight, ArrowLeftRight, ArrowUpRight, Boxes, ChevronRight, ClipboardList, IndianRupee,
-  PackageCheck, PackageX, Receipt, Wallet, type LucideIcon,
+  ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Boxes, ChevronRight, ClipboardList, IndianRupee, PackageCheck, Receipt, Truck, type LucideIcon,
 } from "lucide-react";
 import { z } from "zod";
-import { BarList, ColumnChart } from "@/components/charts";
+import { Badge } from "@/components/badge";
+import { BarList, DonutChart, PairColumnChart, Sparkline } from "@/components/charts";
 import { CountUp, Reveal, RevealItem } from "@/components/motion";
-import { requireUser } from "@/lib/auth";
+import { can, requireUser } from "@/lib/auth";
 import { getLang, tr, type MessageKey } from "@/lib/i18n";
 import { getMyLocations } from "@/lib/location";
 import { createClient } from "@/lib/supabase/server";
 import { MOVEMENT_LABELS } from "@/lib/validation/stock";
 import { cardClass } from "@/lib/ui";
 import { friendlyDbError } from "@/lib/db-errors";
+import { PO_STATUS_LABEL, PO_STATUS_TONE } from "../purchase-orders/status";
+import { DashboardFilters, QuickAction } from "../top-bar-parts";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
@@ -23,208 +25,292 @@ const RANGE_LABEL: Record<RangeKey, MessageKey> = { today: "dash_today", "7": "d
 // The shape returned by the database function dashboard_data (sections are missing without permission).
 type Dash = {
   sales?: {
-    total: number; bills: number; discount: number; cash: number; upi: number; card: number; other: number; prev_total: number;
+    total: number; bills: number; cash: number; upi: number; card: number; other: number;
     by_day: { d: string; total: number; bills: number }[];
     top_items: { code: string; name: string; unit: string; qty: number; amount: number }[];
   };
   stock?: {
-    in_stock: number; low: number; out: number;
     low_list: { code: string; name: string; unit: string; place: string; qty: number; min: number }[];
-    by_place: { place: string; place_name: string; in_stock: number; low: number }[];
     recent: { at: string; type: string; qty: number; code: string; unit: string; from_place: string | null; to_place: string | null }[];
-    top_stocked: { code: string; name: string; unit: string; qty: number }[];
   };
   purchase?: { open: number; late: number; drafts: number };
-  receipts?: {
-    drafts: number;
-    history: { d: string; no: string; vendor: string; qty: number }[];
-    top_vendors: { name: string; receipts: number }[];
-  };
   transfers?: { incoming: number; outgoing: number };
+};
+type Spark = { items?: number[]; stock_in?: number[]; pos?: number[]; transfers?: number[]; bills?: number[] };
+// The shape returned by dashboard_extra (the numbers added for this layout).
+type Extra = {
+  catalog?: { total: number; inactive: number; new_month: number };
+  stock_value?: number;
+  status?: { ok: number; low: number; out: number };
+  by_category?: { name: string; value: number }[];
+  moves_by_day?: { d: string; in: number; out: number }[];
+  po?: { total: number; completed: number; pending: number; recent: { id: string; po_no: string; supplier: string; place: string; status: string; expected_date: string | null; qty: number }[] };
+  grn_recent?: { id: string; receipt_no: string; po_no: string | null; supplier: string; status: string; d: string; items: number; qty: number }[];
+  transfer_status?: { received: number; sent: number; draft: number; cancelled: number };
 };
 
 const isoDay = (msAgo: number) => new Date(Date.now() - msAgo).toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
 const dayLabel = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-IN", { day: "numeric", month: "short", timeZone: "UTC" });
-const num = (n: number) => Number(n ?? 0);
+const num = (n: number | undefined | null) => Number(n ?? 0);
+const inr = (n: number) => n.toLocaleString("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
+const ago = (iso: string, t: (k: MessageKey) => string) => {
+  const mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+  if (mins < 1) return t("ago_now");
+  if (mins < 60) return `${mins} ${t("ago_min")}`;
+  if (mins < 1440) return `${Math.floor(mins / 60)} ${t("ago_hour")}`;
+  return `${Math.floor(mins / 1440)} ${t("ago_day")}`;
+};
+const when = (iso: string) => new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" });
 
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const user = await requireUser();
   const lang = await getLang();
   const t = (k: MessageKey) => tr(lang, k);
   const sp = await searchParams;
-  const range: RangeKey = (Object.keys(RANGES) as RangeKey[]).includes(first(sp.range) as RangeKey) ? (first(sp.range) as RangeKey) : "7";
+  const range: RangeKey = (Object.keys(RANGES) as RangeKey[]).includes(first(sp.range) as RangeKey) ? (first(sp.range) as RangeKey) : "today";
   const days = RANGES[range];
   const to = isoDay(0);
   const from = isoDay((days - 1) * 86_400_000);
   const location = z.uuid().safeParse(first(sp.location)).data ?? null;
 
   const supabase = await createClient();
-  const [{ data, error }, myLocations] = await Promise.all([
+  const [main, extra, sparkRes, myLocations] = await Promise.all([
     supabase.rpc("dashboard_data", { p_from: from, p_to: to, p_location: location }),
+    supabase.rpc("dashboard_extra", { p_location: location }),
+    supabase.rpc("dashboard_spark", { p_location: location }),
     getMyLocations(user),
   ]);
-  const d = (data ?? {}) as Dash;
-  const hasAny = !!(d.sales || d.stock || d.purchase || d.receipts || d.transfers);
-  const link = (r: RangeKey) => `/dashboard?${new URLSearchParams({ range: r, ...(location ? { location } : {}) }).toString()}`;
+  const error = main.error ?? extra.error;
+  const spark = (sparkRes.data ?? {}) as Spark;
+  const d = (main.data ?? {}) as Dash;
+  const x = (extra.data ?? {}) as Extra;
+  const hasAny = !!(d.sales || d.stock || d.purchase || d.transfers || x.catalog || x.po || x.grn_recent);
 
-  // Sales change against the same number of days just before.
-  const total = num(d.sales?.total ?? 0);
-  const prev = num(d.sales?.prev_total ?? 0);
-  const delta = prev > 0 ? ((total - prev) / prev) * 100 : null;
-  const bills = num(d.sales?.bills ?? 0);
+  const name = user.fullName?.trim() || user.email.split("@")[0];
+  const quick = [
+    can(user, "receipts.create") && { href: "/receipts/new", label: t("act_new_receipt") },
+    can(user, "purchase.create") && { href: "/purchase-orders/new", label: t("act_new_po") },
+    can(user, "transfers.create") && { href: "/transfers/new", label: t("act_new_transfer") },
+    can(user, "stock.entry") && { href: "/stock/entry", label: t("nav_adjust") },
+    can(user, "items.create") && { href: "/items/new", label: t("act_new_item") },
+    can(user, "bills.create") && { href: "/billing", label: t("nav_billing2") },
+    can(user, "stock.view") && can(user, "items.view") && { href: "/reorder", label: t("nav_reorder") },
+  ].filter((a): a is { href: string; label: string } => !!a);
+
+  const st = x.status;
+  const statusSegments = st
+    ? [
+        { key: "ok", label: t("st_in"), value: num(st.ok), color: "#17a589" },
+        { key: "low", label: t("st_low"), value: num(st.low), color: "#f5b301" },
+        { key: "out", label: t("st_out"), value: num(st.out), color: "#e5484d" },
+        { key: "inactive", label: t("st_inactive"), value: num(x.catalog?.inactive), color: "#aab4be" },
+      ]
+    : [];
+  const trs = x.transfer_status;
+  const trSegments = trs
+    ? [
+        { key: "received", label: t("tr_received"), value: num(trs.received), color: "#17a589" },
+        { key: "sent", label: t("tr_sent"), value: num(trs.sent), color: "#1d6fe0" },
+        { key: "draft", label: t("tr_draft"), value: num(trs.draft), color: "#f5b301" },
+        { key: "cancelled", label: t("tr_cancelled"), value: num(trs.cancelled), color: "#e5484d" },
+      ]
+    : [];
 
   return (
-    <main className="space-y-6">
+    <main className="space-y-5">
+      {/* Title and filters */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1>{t("dash_title")}</h1>
-          <p className="mt-1 text-sm text-muted">{t("dash_subtitle")}</p>
+          <h1 className="!text-3xl !font-bold">{t("dash_title")}</h1>
+          <p className="mt-1 text-sm text-muted">{t("dash_welcome").replace("{name}", name)}</p>
         </div>
-        {/* Filters: one row, above everything they change. */}
-        <div className="flex flex-wrap items-center gap-2">
-          <nav className="inline-flex overflow-hidden rounded-lg border border-line bg-surface shadow-sm" aria-label="Date range">
-            {(Object.keys(RANGES) as RangeKey[]).map((r) => (
-              <Link
-                key={r}
-                href={link(r)}
-                aria-current={r === range ? "page" : undefined}
-                className={`px-3 py-1.5 text-sm font-medium ${r === range ? "bg-brand text-white" : "hover:bg-surface-muted"}`}
-              >
-                {t(RANGE_LABEL[r])}
-              </Link>
-            ))}
-          </nav>
-          {myLocations.length > 1 && (
-            <form method="get" className="flex items-center gap-2">
-              <input type="hidden" name="range" value={range} />
-              <label htmlFor="location" className="sr-only">{t("dash_place")}</label>
-              <select id="location" name="location" defaultValue={location ?? ""} className="rounded-lg border border-line bg-surface px-2 py-1.5 text-sm shadow-sm">
-                <option value="">{t("dash_place_all")}</option>
-                {myLocations.map((l) => <option key={l.id} value={l.id}>{l.name} ({l.code})</option>)}
-              </select>
-              <button type="submit" className="rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-strong">OK</button>
-            </form>
-          )}
+        <div className="flex flex-wrap items-center gap-3">
+          <DashboardFilters
+            range={range}
+            ranges={(Object.keys(RANGES) as RangeKey[]).map((r) => ({ value: r, label: t(RANGE_LABEL[r]) }))}
+            location={location ?? ""}
+            locations={myLocations}
+            allLabel={t("dash_place_all")}
+            warehouseLabel={t("dash_warehouse")}
+          />
+          <QuickAction label={t("dash_quick")} actions={quick} />
         </div>
       </div>
 
       {error && <p role="alert" className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700">{friendlyDbError(error)}</p>}
       {!error && !hasAny && <p role="status" className="rounded-xl border border-amber-400 bg-amber-50 p-4 text-sm text-amber-900">{t("dash_no_sections")}</p>}
 
+      {/* The five numbers */}
       {hasAny && (
-        <Reveal className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {d.sales && (
-            <RevealItem className="sm:col-span-2">
-              <Link href="/bills" className={`${cardClass} block h-full p-5 transition hover:border-brand hover:shadow-md`}>
-                <p className="flex items-center gap-2 text-sm text-muted"><IndianRupee size={16} aria-hidden /> {t("tile_sales")} · {t(RANGE_LABEL[range])}</p>
-                <p className="mt-2 text-5xl font-semibold tracking-tight"><CountUp value={total} money /></p>
-                <p className="mt-2 text-sm">
-                  {delta === null ? (
-                    total > 0 ? <span className="text-muted">{t("tile_new")}</span> : <span className="text-muted">&nbsp;</span>
-                  ) : (
-                    <span className={`inline-flex items-center gap-1 font-medium ${delta >= 0 ? "text-green-700 dark:text-green-400" : "text-red-600"}`}>
-                      {delta >= 0 ? <ArrowUpRight size={16} aria-hidden /> : <ArrowDownRight size={16} aria-hidden />}
-                      {delta >= 0 ? "+" : ""}{delta.toFixed(1)}%
-                    </span>
-                  )}{" "}
-                  {delta !== null && <span className="text-muted">{t("tile_vs_prev")}</span>}
-                </p>
-              </Link>
-            </RevealItem>
+        <Reveal className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+          {x.catalog && (
+            <Kpi icon={Boxes} tint="teal" label={t("kpi_products")} href="/items" value={<CountUp value={num(x.catalog.total)} />} spark={spark.items} sparkColor="#17a589"
+              sub={<span className="inline-flex items-center gap-1 font-medium text-green-700 dark:text-green-400"><ArrowUpRight size={14} aria-hidden /> +{num(x.catalog.new_month)} {t("kpi_new_month")}</span>} />
           )}
-          {d.sales && <Tile icon={Receipt} label={t("tile_bills")} href="/bills" value={<CountUp value={bills} />} />}
-          {d.sales && <Tile icon={Wallet} label={t("tile_avg")} href="/bills" value={<CountUp value={bills ? total / bills : 0} money />} />}
-          {d.stock && <Tile icon={AlertTriangle} label={t("tile_low")} href="/reports?r=low" value={<CountUp value={num(d.stock.low)} />} warn={num(d.stock.low) > 0} />}
-          {d.stock && <Tile icon={PackageX} label={t("tile_out")} href="/reports?r=low" value={<CountUp value={num(d.stock.out)} />} warn={num(d.stock.out) > 0} />}
-          {d.stock && <Tile icon={Boxes} label={t("tile_in_stock")} href="/stock" value={<CountUp value={num(d.stock.in_stock)} />} />}
-          {d.purchase && (
-            <Tile icon={ClipboardList} label={t("tile_open_po")} href="/purchase-orders?status=SENT" value={<CountUp value={num(d.purchase.open)} />}
-              sub={num(d.purchase.late) > 0 ? `${num(d.purchase.late)} ${t("tile_late")}` : undefined} warn={num(d.purchase.late) > 0} />
+          {x.stock_value !== undefined && (
+            <Kpi icon={IndianRupee} tint="green" label={t("kpi_value")} href="/stock" value={<CountUp value={num(x.stock_value)} money />} spark={spark.stock_in} sparkColor="#17a589"
+              sub={<span className="text-muted">{t("kpi_value_note")}</span>} />
+          )}
+          {x.po && (
+            <Kpi icon={ClipboardList} tint="orange" label={t("kpi_po")} href="/purchase-orders" value={<CountUp value={num(x.po.total)} />} spark={spark.pos} sparkColor="#e08a1e"
+              sub={<span className="text-muted">{num(x.po.pending)} {t("kpi_pending")} | {num(x.po.completed)} {t("kpi_received")}</span>} />
           )}
           {d.transfers && (
-            <Tile icon={ArrowLeftRight} label={t("tile_incoming")} href="/transfers" value={<CountUp value={num(d.transfers.incoming)} />}
-              sub={num(d.transfers.outgoing) > 0 ? `${num(d.transfers.outgoing)} ${t("tile_outgoing")}` : undefined} />
+            <Kpi icon={Truck} tint="blue" label={t("kpi_transfers")} href="/transfers" value={<CountUp value={num(d.transfers.incoming) + num(d.transfers.outgoing)} />} spark={spark.transfers} sparkColor="#1d6fe0"
+              sub={<span className="text-muted">{num(d.transfers.incoming)} {t("kpi_in")} | {num(d.transfers.outgoing)} {t("kpi_out")}</span>} />
           )}
-          {d.receipts && <Tile icon={PackageCheck} label={t("tile_receipts")} href="/receipts?status=DRAFT" value={<CountUp value={num(d.receipts.drafts)} />} />}
+          {d.sales && (
+            <Kpi icon={Receipt} tint="green" label={t("kpi_bills")} href="/bills" value={<CountUp value={num(d.sales.bills)} />} spark={spark.bills} sparkColor="#7c5cd6"
+              sub={<span className="text-muted">{inr(num(d.sales.total))}</span>} />
+          )}
         </Reveal>
       )}
 
-      {d.sales && (
-        <div className="grid gap-4 lg:grid-cols-3">
-          <section className={`${cardClass} lg:col-span-2`}>
-            <h2 className="mb-3 text-base">{t("chart_sales")}</h2>
-            <ColumnChart
-              data={d.sales.by_day.map((x) => ({ key: x.d, label: dayLabel(x.d), value: num(x.total), detail: `${num(x.bills)} ${t("unit_bills")}` }))}
-              money
-              ariaLabel={t("chart_sales")}
-              tableLabel={t("chart_table")}
-              valueLabel={t("chart_sales")}
-              emptyText={t("chart_sales_empty")}
-            />
-          </section>
-          <section className={cardClass}>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-base">{t("chart_top")}</h2>
-              <Link href={`/reports?r=sales-item&from=${from}&to=${to}`} className="text-sm">{t("see_all")}</Link>
-            </div>
-            <BarList
-              rows={d.sales.top_items.map((x) => ({ key: x.code, label: x.name, sub: `${x.code} · ${num(x.qty)} ${x.unit}`, value: num(x.amount) }))}
-              money
-              emptyText={t("chart_top_empty")}
-            />
-          </section>
+      {/* Stock status, movement, top categories */}
+      {(x.status || x.moves_by_day || x.by_category) && (
+        <div className="grid gap-4 lg:grid-cols-12">
+          {x.status && (
+            <section className={`${cardClass} lg:col-span-4`}>
+              <CardHead title={t("card_status")} href="/stock" all={t("view_details")} />
+              <DonutChart
+                segments={statusSegments}
+                centerValue={num(x.catalog?.total).toLocaleString("en-IN")}
+                centerLabel={t("card_status_center")}
+                ariaLabel={t("card_status")}
+              />
+            </section>
+          )}
+          {x.moves_by_day && (
+            <section className={`${cardClass} lg:col-span-5`}>
+              <CardHead title={t("card_moves")} href="/stock/movements" all={t("view_report")} />
+              <PairColumnChart
+                data={x.moves_by_day.map((m) => ({ key: m.d, label: dayLabel(m.d), a: num(m.in), b: num(m.out) }))}
+                aLabel={t("mv_in")} bLabel={t("mv_out")} aColor="#17a589" bColor="#1d6fe0"
+                ariaLabel={t("card_moves")} emptyText={t("chart_sales_empty")}
+              />
+            </section>
+          )}
+          {x.by_category && (
+            <section className={`${cardClass} lg:col-span-3`}>
+              <CardHead title={t("card_cats")} href="/items" all={t("view_all")} />
+              <BarList
+                rows={x.by_category.map((c) => ({ key: c.name, label: c.name, value: num(c.value), display: inr(num(c.value)) }))}
+                emptyText={t("empty_generic")}
+              />
+            </section>
+          )}
         </div>
       )}
 
-      {(d.sales || d.stock) && (
-        <div className="grid gap-4 lg:grid-cols-3">
-          {d.sales && (
+      {/* Recent purchase orders and goods inward */}
+      {(x.po || x.grn_recent) && (
+        <div className="grid gap-4 lg:grid-cols-2">
+          {x.po && (
             <section className={cardClass}>
-              <h2 className="mb-3 text-base">{t("chart_pay")}</h2>
-              <BarList
-                rows={[
-                  { key: "cash", label: "Cash", value: num(d.sales.cash) },
-                  { key: "upi", label: "UPI", value: num(d.sales.upi) },
-                  { key: "card", label: "Card", value: num(d.sales.card) },
-                  { key: "other", label: "Other", value: num(d.sales.other) },
-                ].filter((r) => r.value > 0)}
-                money
-                emptyText={t("chart_pay_empty")}
+              <CardHead title={t("card_po")} href="/purchase-orders" all={t("view_all")} />
+              {x.po.recent.length === 0 ? <Empty text={t("empty_generic")} /> : (
+                <div className="overflow-x-auto">
+                  <table className="dash-table w-full text-left text-sm">
+                    <thead><tr><th>{t("col_po")}</th><th>{t("col_supplier")}</th><th>{t("col_place")}</th><th className="text-right">{t("col_qty")}</th><th>{t("col_status")}</th><th>{t("col_eta")}</th></tr></thead>
+                    <tbody>
+                      {x.po.recent.map((o) => (
+                        <tr key={o.id}>
+                          <td><Link href={`/purchase-orders/${o.id}`}>{o.po_no}</Link></td>
+                          <td>{o.supplier}</td><td>{o.place}</td>
+                          <td className="text-right font-mono">{num(o.qty).toLocaleString("en-IN")}</td>
+                          <td><Badge tone={PO_STATUS_TONE[o.status] ?? "gray"}>{PO_STATUS_LABEL[o.status] ?? o.status}</Badge></td>
+                          <td className="whitespace-nowrap">{o.expected_date ?? "-"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          )}
+          {x.grn_recent && (
+            <section className={cardClass}>
+              <CardHead title={t("card_grn")} href="/receipts" all={t("view_all")} />
+              {x.grn_recent.length === 0 ? <Empty text={t("empty_generic")} /> : (
+                <div className="overflow-x-auto">
+                  <table className="dash-table w-full text-left text-sm">
+                    <thead><tr><th>{t("col_grn")}</th><th>{t("col_po")}</th><th>{t("col_supplier")}</th><th className="text-right">{t("col_items")}</th><th className="text-right">{t("col_qty")}</th><th>{t("col_status")}</th><th>{t("col_date")}</th></tr></thead>
+                    <tbody>
+                      {x.grn_recent.map((g) => (
+                        <tr key={g.id}>
+                          <td><Link href={`/receipts/${g.id}`}>{g.receipt_no}</Link></td>
+                          <td>{g.po_no ?? "-"}</td><td>{g.supplier}</td>
+                          <td className="text-right">{num(g.items)}</td>
+                          <td className="text-right font-mono">{num(g.qty).toLocaleString("en-IN")}</td>
+                          <td><Badge tone={g.status === "POSTED" ? "green" : g.status === "DRAFT" ? "amber" : "gray"}>{g.status === "POSTED" ? "Completed" : g.status === "DRAFT" ? "Draft" : "Cancelled"}</Badge></td>
+                          <td className="whitespace-nowrap">{g.d}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          )}
+        </div>
+      )}
+
+      {/* Low stock, transfers donut, recent activity */}
+      {(d.stock || x.transfer_status) && (
+        <div className="grid gap-4 lg:grid-cols-12">
+          {d.stock && (
+            <section className={`${cardClass} lg:col-span-12 xl:col-span-5`}>
+              <CardHead title={t("card_low")} href="/reports?r=low" all={t("view_all")} />
+              {d.stock.low_list.length === 0 ? <Empty text={t("list_low_empty")} /> : (
+                <div className="overflow-x-auto">
+                  <table className="dash-table w-full text-left text-sm">
+                    <thead><tr><th>{t("col_sku")}</th><th>{t("col_product")}</th><th className="text-right">{t("col_current")}</th><th className="text-right">{t("col_reorder")}</th><th>{t("col_status")}</th></tr></thead>
+                    <tbody>
+                      {d.stock.low_list.map((l) => (
+                        <tr key={`${l.place}-${l.code}`}>
+                          <td className="max-w-[8rem] truncate font-medium" title={l.code}>{l.code}</td>
+                          <td className="max-w-[5.5rem] truncate" title={`${l.name} (${l.place})`}>{l.name}</td>
+                          <td className={`text-right font-mono ${num(l.qty) === 0 ? "text-red-600" : ""}`}>{num(l.qty)}</td>
+                          <td className="text-right font-mono">{num(l.min)}</td>
+                          <td><Badge tone={num(l.qty) === 0 ? "red" : "amber"}>{num(l.qty) === 0 ? t("st_out") : t("st_low")}</Badge></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          )}
+          {x.transfer_status && (
+            <section className={`${cardClass} lg:col-span-5 xl:col-span-3`}>
+              <CardHead title={t("card_transfers")} href="/transfers" all={t("view_all")} />
+              <DonutChart
+                segments={trSegments}
+                centerValue={trSegments.reduce((a, s) => a + s.value, 0).toLocaleString("en-IN")}
+                centerLabel={t("tr_orders")}
+                ariaLabel={t("card_transfers")}
               />
             </section>
           )}
           {d.stock && (
-            <section className={cardClass}>
-              <h2 className="mb-3 text-base">{t("chart_place")}</h2>
-              <BarList
-                rows={d.stock.by_place.filter((p) => num(p.low) > 0).map((p) => ({ key: p.place, label: p.place_name, sub: p.place, value: num(p.low), display: String(num(p.low)) }))}
-                emptyText={t("chart_place_empty")}
-              />
-            </section>
-          )}
-          {d.stock && (
-            <section className={cardClass}>
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-base">{t("list_low")}</h2>
-                <Link href="/reports?r=low" className="text-sm">{t("see_all")}</Link>
-              </div>
-              {d.stock.low_list.length === 0 ? (
-                <p className="py-6 text-center text-sm text-muted">{t("list_low_empty")}</p>
-              ) : (
-                <ul className="divide-y divide-line text-sm">
-                  {d.stock.low_list.map((x) => (
-                    <li key={`${x.place}-${x.code}`} className="flex items-center justify-between gap-3 py-2">
-                      <span className="min-w-0">
-                        <span className="block truncate font-medium">{x.name}</span>
-                        <span className="block text-xs text-muted">{x.code} · {x.place}</span>
-                      </span>
-                      <span className="shrink-0 text-right">
-                        <span className={`inline-flex items-center gap-1 font-semibold ${num(x.qty) === 0 ? "text-red-600" : ""}`}>
-                          {num(x.qty) === 0 && <PackageX size={14} aria-hidden />}{num(x.qty)} / {num(x.min)} {x.unit}
+            <section className={`${cardClass} lg:col-span-7 xl:col-span-4`}>
+              <CardHead title={t("card_activity")} href="/stock/movements" all={t("view_all")} />
+              {d.stock.recent.length === 0 ? <Empty text={t("list_recent_empty")} /> : (
+                <ul className="space-y-3">
+                  {d.stock.recent.slice(0, 6).map((m, i) => {
+                    const incoming = m.from_place === null && m.to_place !== null;
+                    const Icon: LucideIcon = m.type === "TRANSFER" ? ArrowLeftRight : incoming ? ArrowDownLeft : m.to_place === null ? ArrowUpRight : PackageCheck;
+                    return (
+                      <li key={i} className="flex items-start gap-3">
+                        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-soft text-[var(--brand-text)]"><Icon size={18} aria-hidden /></span>
+                        <span className="min-w-0 flex-1 text-sm">
+                          <span className="block font-medium">{MOVEMENT_LABELS[m.type] ?? m.type}: {m.code}</span>
+                          <span className="block text-xs text-muted">{num(m.qty)} {m.unit} · {m.from_place ?? "·"} → {m.to_place ?? "·"}</span>
                         </span>
-                      </span>
-                    </li>
-                  ))}
+                        <span className="shrink-0 whitespace-nowrap text-xs text-muted" title={when(m.at)}>{ago(m.at, t)}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </section>
@@ -232,99 +318,43 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </div>
       )}
 
-      {(d.stock || d.receipts) && (
-        <div className="grid gap-4 lg:grid-cols-3">
-          {d.stock && (
-            <section className={cardClass}>
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-base">{t("chart_stocked")}</h2>
-                <Link href="/reports?r=stock" className="text-sm">{t("see_all")}</Link>
-              </div>
-              <BarList
-                rows={d.stock.top_stocked.map((x) => ({ key: x.code, label: x.name, sub: x.code, value: num(x.qty), display: `${num(x.qty).toLocaleString("en-IN", { maximumFractionDigits: 3 })} ${x.unit}` }))}
-                emptyText={t("chart_stocked_empty")}
-              />
-            </section>
-          )}
-          {d.receipts && (
-            <section className={cardClass}>
-              <h2 className="mb-3 text-base">{t("chart_vendors")}</h2>
-              <BarList
-                rows={d.receipts.top_vendors.map((x) => ({ key: x.name, label: x.name, value: num(x.receipts), display: `${num(x.receipts)} ${t("unit_receipts")}` }))}
-                emptyText={t("chart_vendors_empty")}
-              />
-            </section>
-          )}
-          {d.receipts && (
-            <section className={cardClass}>
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-base">{t("list_receive")}</h2>
-                <Link href="/receipts" className="text-sm">{t("see_all")}</Link>
-              </div>
-              {d.receipts.history.length === 0 ? (
-                <p className="py-6 text-center text-sm text-muted">{t("list_receive_empty")}</p>
-              ) : (
-                <ul className="divide-y divide-line text-sm">
-                  {d.receipts.history.map((h) => (
-                    <li key={h.no} className="flex items-center justify-between gap-3 py-2">
-                      <span className="min-w-0">
-                        <span className="block truncate font-medium">{h.vendor}</span>
-                        <span className="block text-xs text-muted">{h.no} · {h.d}</span>
-                      </span>
-                      <span className="shrink-0 font-mono">{num(h.qty).toLocaleString("en-IN", { maximumFractionDigits: 3 })}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          )}
-        </div>
-      )}
-
-      {d.stock && (
-        <section className={cardClass}>
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-base">{t("list_recent")}</h2>
-            <Link href="/stock/movements" className="inline-flex items-center gap-0.5 text-sm">{t("see_all")} <ChevronRight size={14} aria-hidden /></Link>
-          </div>
-          {d.stock.recent.length === 0 ? (
-            <p className="py-4 text-center text-sm text-muted">{t("list_recent_empty")}</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <tbody>
-                  {d.stock.recent.map((m, i) => (
-                    <tr key={i} className="border-b border-line">
-                      <td className="whitespace-nowrap text-muted">{new Date(m.at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" })}</td>
-                      <td className="font-medium">{m.code}</td>
-                      <td>{MOVEMENT_LABELS[m.type] ?? m.type}</td>
-                      <td className="text-muted">{m.from_place ?? "·"} → {m.to_place ?? "·"}</td>
-                      <td className="text-right font-mono">{num(m.qty)} {m.unit}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-      )}
     </main>
   );
 }
 
-function Tile({ icon: Icon, label, value, href, sub, warn = false }: { icon: LucideIcon; label: string; value: React.ReactNode; href: string; sub?: string; warn?: boolean }) {
+function CardHead({ title, href, all }: { title: string; href: string; all: string }) {
+  return (
+    <div className="mb-3 flex items-center justify-between gap-3">
+      <h2 className="text-lg font-bold">{title}</h2>
+      <Link href={href} className="inline-flex shrink-0 items-center gap-0.5 text-xs font-semibold">{all} <ChevronRight size={13} aria-hidden /></Link>
+    </div>
+  );
+}
+
+function Empty({ text }: { text: string }) {
+  return <p className="py-8 text-center text-sm text-muted">{text}</p>;
+}
+
+const TINTS = {
+  teal: "bg-[#e0f5f0] text-[#0b7d70]",
+  green: "bg-[#e3f6ec] text-[#16824f]",
+  orange: "bg-[#fdf0e1] text-[#c2670a]",
+  blue: "bg-[#e5effd] text-[#1d62c9]",
+} as const;
+
+function Kpi({ icon: Icon, tint, label, value, sub, href, spark, sparkColor }: { icon: LucideIcon; tint: keyof typeof TINTS; label: string; value: React.ReactNode; sub: React.ReactNode; href: string; spark?: number[]; sparkColor: string }) {
   return (
     <RevealItem>
-      <Link href={href} className={`${cardClass} flex h-full flex-col justify-between gap-2 p-5 transition hover:border-brand hover:shadow-md`}>
-        <p className="flex items-center gap-2 text-sm text-muted">
-          <Icon size={16} className={warn ? "text-amber-600" : ""} aria-hidden /> {label}
-        </p>
-        <p className="text-3xl font-semibold tracking-tight">{value}</p>
-        {sub ? (
-          <p className={`inline-flex items-center gap-1 text-xs font-medium ${warn ? "text-amber-700 dark:text-amber-400" : "text-muted"}`}>
-            {warn && <AlertTriangle size={12} aria-hidden />}{sub}
-          </p>
-        ) : <p className="text-xs">&nbsp;</p>}
+      <Link href={href} className={`${cardClass} flex h-full items-center gap-3 p-4 transition hover:border-[var(--brand)] hover:shadow-md`}>
+        <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${TINTS[tint]}`}><Icon size={24} aria-hidden /></span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm leading-tight text-muted">{label}</span>
+          <span className="flex flex-wrap items-end justify-between gap-x-2">
+            <span className="text-[26px] font-bold leading-9 tracking-tight">{value}</span>
+            <Sparkline values={spark ?? []} color={sparkColor} label={label} />
+          </span>
+          <span className="mt-0.5 block text-xs leading-tight">{sub}</span>
+        </span>
       </Link>
     </RevealItem>
   );

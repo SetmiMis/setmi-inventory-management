@@ -99,12 +99,12 @@ export function CommandPalette({ entries, canSearchItems, labels }: { entries: P
       <button
         type="button"
         onClick={openIt}
-        className="inline-flex min-h-10 min-w-0 items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm text-muted shadow-sm transition hover:bg-surface-muted"
+        className="inline-flex min-h-11 w-full max-w-2xl min-w-0 items-center gap-2.5 rounded-xl border border-line bg-surface-muted px-3.5 text-sm text-muted transition hover:border-[var(--line-strong)]"
         aria-label={labels.button}
       >
         <Search size={16} aria-hidden />
-        <span className="hidden sm:inline">{labels.button}</span>
-        <kbd className="hidden rounded border border-line bg-surface-muted px-1.5 py-0.5 text-[11px] md:inline">Ctrl K</kbd>
+        <span className="hidden truncate sm:inline">{labels.button}</span>
+        <kbd className="ml-auto hidden whitespace-nowrap rounded border border-line bg-surface px-1.5 py-0.5 text-[11px] 2xl:inline">Ctrl K</kbd>
       </button>
 
       {open && (
