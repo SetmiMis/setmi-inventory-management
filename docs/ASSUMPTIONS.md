@@ -21,3 +21,8 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 | A-013 | `Sr No` is display only | VERIFIED (owner's brief) | none |
 | A-014 | Archive only, no real delete | VERIFIED (owner: "haa") | none |
 | A-015 | Users are not decided yet | OPEN | Owner, before auth task |
+
+## P9 rules to confirm with the owner (2026-10-25)
+- Over-receiving against a purchase order is refused (no tolerance). Is a small excess (for example 5 percent) normal for your suppliers?
+- A sent purchase order cannot be edited. Is cancel and re-make acceptable?
+- Who may send orders: only people with `purchase.approve`. Should a manager approve large orders first (an amount limit)?

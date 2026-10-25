@@ -1,6 +1,22 @@
 # HANDOVER
 
 Newest entry on top. Read this first, update it last.
+
+## 2026-10-25 (night): P9 purchase orders built from ideas in the owner ERP repo (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- Read `SetmiMis/erp` (public): see `docs/REFERENCE-ERP-REPO.md` for what was taken, what was left and why.
+- P9: migrations 17 to 20 applied to the dev project (20 = fixes from the independent review). Purchase orders (draft, sent, partial, completed, cancelled), receipts against an order, close-short with a reason, A4 print, "Late" tag. DB tests `013_purchase_orders.sql` 37/37 PASS; old `009_receiving.sql` 32/32 still PASS; typecheck, lint, build pass; unit tests 35/35. Details: `docs/features/FEATURE-010-PURCHASE-ORDERS.md`.
+- New permissions `purchase.view`, `purchase.create`, `purchase.approve` (admins have everything; give the others in Admin > Users).
+- The test run found a real bug in the price guard (fixed by migration 18).
+- Commit `124cb10` (P8) is the last pushed commit; P9 is NOT committed yet.
+
+### Not done / owner must do
+- Click through Purchase orders and Receipts-against-order in a browser (sign-in needed).
+- Answer the three questions at the end of `docs/ASSUMPTIONS.md` (over-delivery tolerance, edit after send, approval limit).
+- QC on receiving, customers, batch/lot, BOM/production were left out on purpose (see the reference file).
+
+
 ## 2026-10-25 (late): P8 reports built; UI polish pushed; deployment plan written (Claude Sonnet 5.5)
 
 ### Done (verified by command output)

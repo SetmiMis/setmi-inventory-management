@@ -164,3 +164,11 @@ Format: context, options, choice, reason, date, model.
 - **Why:** cheap protection against clickjacking, MIME sniffing and downgrade; verified with `curl -I` on a local production build.
 - **Revisit if:** a phone-camera scanner is added (Permissions-Policy blocks the camera) or a CSP is added.
 - **Date / model:** 2026-10-25, Claude Sonnet 5.5
+
+## D-028: Purchase orders linked to receipts, ideas taken from the owner ERP repo (P9)
+- **Owner:** "take from the ERP repo what you can use".
+- **Choice:** PO flow draft -> sent -> partial -> completed / cancelled enforced by triggers; receipts can be made against an order; over-receiving is refused; prices behind `receipts.cost`; numbers from sequences; two read-only helpers so warehouse staff need no purchase permission.
+- **Why:** closes the "purchase orders" gap, and shows the manager what is still due; avoids the repo own mistakes (last-id numbering, stock changes without reversal).
+- **Trade-offs:** no tolerance for over-delivery; a sent order cannot be edited (cancel and re-make); no QC step yet.
+- **Revisit if:** the owner wants over-delivery tolerance, QC on receiving, tax on orders or supplier e-mails.
+- **Date / model:** 2026-10-25, Claude Sonnet 5.5

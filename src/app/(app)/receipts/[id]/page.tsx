@@ -16,7 +16,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
   const supabase = await createClient();
   const { data: r } = await supabase
     .from("goods_receipts")
-    .select("id, receipt_no, supplier_id, receipt_date, supplier_invoice_no, notes, status, posted_at, suppliers(name), locations(code, name)")
+    .select("id, receipt_no, supplier_id, receipt_date, supplier_invoice_no, notes, status, posted_at, purchase_order_id, suppliers(name), locations(code, name)")
     .eq("id", id.data)
     .maybeSingle();
   if (!r) notFound();
@@ -36,6 +36,12 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
   const place = r.locations as unknown as { code: string; name: string } | null;
   const isDraft = r.status === "DRAFT";
   const canEditDraft = isDraft && can(user, "receipts.create");
+  // The order number is shown when this person may see purchase orders; otherwise only that there is one.
+  let poNo: string | null = null;
+  if (r.purchase_order_id) {
+    const { data: po } = await supabase.from("purchase_orders").select("po_no").eq("id", r.purchase_order_id).maybeSingle();
+    poNo = po?.po_no ?? null;
+  }
 
   let editorLines: EditorLine[] = [];
   let supplierOptions: { id: string; name: string }[] = [];
@@ -71,6 +77,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
           placeName={`${place?.name} (${place?.code})`}
           canPost={can(user, "receipts.post")}
           canCost={canCost}
+          purchaseOrder={r.purchase_order_id ? { id: r.purchase_order_id, poNo: poNo ?? "(order)" } : null}
         />
       ) : (
         <>
@@ -79,6 +86,9 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
             <div><dt className="font-medium">Receipt date</dt><dd>{r.receipt_date}</dd></div>
             <div><dt className="font-medium">Supplier invoice</dt><dd>{r.supplier_invoice_no ?? ""}</dd></div>
             <div><dt className="font-medium">Received into</dt><dd>{place?.name} ({place?.code})</dd></div>
+            {r.purchase_order_id && (
+              <div><dt className="font-medium">Purchase order</dt><dd>{poNo ? <Link href={`/purchase-orders/${r.purchase_order_id}`}>{poNo}</Link> : "Yes (you cannot see orders)"}</dd></div>
+            )}
             {r.posted_at && <div><dt className="font-medium">Posted</dt><dd>{new Date(r.posted_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</dd></div>}
             {r.notes && <div className="sm:col-span-2"><dt className="font-medium">Notes</dt><dd>{r.notes}</dd></div>}
           </dl>

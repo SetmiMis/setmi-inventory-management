@@ -18,13 +18,16 @@ export type EditorInitial = {
 };
 
 export function ReceiptEditor({
-  initial, suppliers, placeName, canPost, canCost,
+  initial, suppliers, placeName, canPost, canCost, purchaseOrder = null,
 }: {
   initial: EditorInitial;
   suppliers: { id: string; name: string }[];
   placeName: string;
   canPost: boolean;
   canCost: boolean;
+  // Set when this receipt is made against a purchase order: the supplier is fixed and the server limits each
+  // quantity to what is still open on the order.
+  purchaseOrder?: { id: string; poNo: string } | null;
 }) {
   const router = useRouter();
   const [supplierId, setSupplierId] = useState(initial.supplierId);
@@ -71,7 +74,7 @@ export function ReceiptEditor({
   }
 
   const payload = () => ({
-    id: initial.receiptId, supplierId, receiptDate: date, invoiceNo, notes,
+    id: initial.receiptId, supplierId, receiptDate: date, invoiceNo, notes, purchaseOrderId: purchaseOrder?.id ?? null,
     lines: lines.map((l) => ({
       itemId: l.itemId, quantity: parseQuantity(l.quantity) ?? 0,
       unitCost: canCost && l.unitCost.trim() !== "" ? Number(l.unitCost) : null,
@@ -121,10 +124,11 @@ export function ReceiptEditor({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="supplier" className={labelClass}>Supplier *</label>
-          <select id="supplier" value={supplierId} onChange={(e) => setSupplierId(e.target.value)} className={inputClass}>
+          <select id="supplier" value={supplierId} onChange={(e) => setSupplierId(e.target.value)} disabled={!!purchaseOrder} className={inputClass}>
             <option value="">(choose)</option>
             {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
+          {purchaseOrder && <p className="mt-1 text-xs text-muted">Against purchase order {purchaseOrder.poNo}. You can receive at most what is still open.</p>}
         </div>
         <div>
           <label htmlFor="date" className={labelClass}>Receipt date *</label>

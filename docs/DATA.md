@@ -89,3 +89,12 @@ Indexes: unique code indexes; trigram (pg_trgm) indexes for partial-word search 
 ## Migrations 15 and 16 (applied 2026-10-25): reports
 - Permissions `reports.view`, `reports.export`.
 - Functions (security invoker, read-only, max 20,000 rows): `report_stock_by_place(location)`, `report_low_stock(location)`, `report_sales_by_day(from, to, location)`, `report_sales_by_item(from, to, location)`, `report_dead_stock(days, location)`. Each refuses without `reports.view`; stock reports also need `stock.view`, sales reports `bills.view`; rows follow the existing row rules. Tests `supabase/tests/012_reports.sql` (19 lines). Details: FEATURE-009.
+
+## Migrations 17, 18, 19 (applied 2026-10-25): purchase orders
+- Enum `po_status`; permissions `purchase.view`, `purchase.create`, `purchase.approve`.
+- `purchase_orders` (PO-000001 from a sequence, supplier, place, dates, notes, status, who/when for send and close), `purchase_order_lines` (quantity, received_qty, one line per item), `purchase_order_costs` (prices, read only with `receipts.cost`). `goods_receipts.purchase_order_id` (optional).
+- Triggers: forward-only status, sent orders frozen, no deletes. Read rules need a purchase permission plus access to the place. Writes only through `save/send/cancel/close_purchase_order`; `save_goods_receipt` and `post_goods_receipt` were extended (receipts against an order, quantities checked and updated under a lock).
+- Migration 18 fixes the price guard so a draft can replace its lines. Migration 19 adds `receivable_purchase_orders()` and `purchase_order_open_lines(id)` (read-only, no prices) for warehouse staff.
+- Tests `supabase/tests/013_purchase_orders.sql` (37 lines); the older `009_receiving.sql` (32 lines) still passes. Details: FEATURE-010.
+
+- Migration 20 (review fixes): the suppliers read rule also admits `purchase.*`; `purchase_order_open_lines` answers only for SENT or PARTIAL orders. Tests `supabase/tests/014_po_review_fixes.sql` (4 lines, PASS).

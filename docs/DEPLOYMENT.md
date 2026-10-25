@@ -11,7 +11,7 @@
 | Option | Good | Bad |
 |---|---|---|
 | A. Use the current project as production | No copy work | The demo data and test users live there; mistakes during development hit real data |
-| B. Create a second (production) project, apply the 16 migrations, keep the current one for testing | Clean separation; safe testing | May cost money on the Supabase plan (needs the owner's yes); one more place to keep migrations in step |
+| B. Create a second (production) project, apply the 20 migrations, keep the current one for testing | Clean separation; safe testing | May cost money on the Supabase plan (needs the owner's yes); one more place to keep migrations in step |
 Recommendation: **B** once real stock is entered. Until then A is fine.
 
 ## 3. Environment variables (Vercel > Project > Settings > Environment Variables)

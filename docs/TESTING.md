@@ -164,3 +164,12 @@ Tests 006-009 (and 003/004 in places) assume an EMPTY database: they count rows.
 - Local production build (`next start`): the five security headers are present on `/login`; `/reports` and `/reports/export` redirect to `/login` when not signed in.
 - Independent review by the ruflo verifier agent: no authorization or injection problem; 3 low findings, all fixed (see FEATURE-009 section 4).
 - NOT tested: the screens behind login in a browser, the CSV opened in Excel, large data volumes.
+
+## P9 purchase order checks (2026-10-25)
+- `supabase/tests/013_purchase_orders.sql`: 37 lines, all PASS (rolled back): draft save and number, prices hidden without `receipts.cost`, other place sees nothing, permission rules for save/send, decimals and duplicate lines refused, editing without the cost right keeps prices, send once only, sent order frozen (also directly in SQL), no delete, status cannot go back, receipt against an order (too much, wrong item, wrong supplier refused), posting updates received quantity and status (PARTIAL then COMPLETED), completed order takes no more receipts, two drafts cannot over-receive, cancel and close rules, receipt without an order still works, audit rows, anonymous refused.
+- The first run found a real bug (the price guard refused replacing the lines of a draft); fixed by migration 18 and re-run.
+- Regression: `supabase/tests/009_receiving.sql` 32/32 PASS after changing the two receipt functions.
+- `typecheck`, `lint`, `build` pass; unit tests 35/35.
+- NOT tested: the purchase order and receipt screens in a browser, printing the order, the two helper functions through the app.
+
+- `supabase/tests/014_po_review_fixes.sql` (migration 20): 4 lines, all PASS. Independent review of P9 by the ruflo verifier: no money/stock defect; two low/medium findings fixed, two minor ones noted (FEATURE-010 section 6).

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeftRight, BarChart3, Boxes, MapPin, Package, PackageCheck, Receipt, ScanLine, ShieldCheck, Truck, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, BarChart3, ClipboardList, Boxes, MapPin, Package, PackageCheck, Receipt, ScanLine, ShieldCheck, Truck, type LucideIcon } from "lucide-react";
 import { can, requireUser } from "@/lib/auth";
 import { cardClass } from "@/lib/ui";
 
@@ -13,6 +13,7 @@ export default async function HomePage() {
     { href: "/items", label: "Items", hint: "Find, add or edit items", icon: Package, show: can(user, "items.view") },
     { href: "/stock", label: "Stock", hint: "What is where, counts, low stock", icon: Boxes, show: can(user, "stock.view") },
     { href: "/stock/scan", label: "Scan count", hint: "Count stock with a scanner", icon: ScanLine, show: can(user, "stock.adjust") },
+    { href: "/purchase-orders", label: "Purchase orders", hint: "Order goods from suppliers, track what arrived", icon: ClipboardList, show: can(user, "purchase.view") || can(user, "purchase.create") || can(user, "purchase.approve") },
     { href: "/receipts", label: "Receipts", hint: "Goods coming in from suppliers", icon: PackageCheck, show: can(user, "receipts.view") || can(user, "receipts.create") || can(user, "receipts.post") },
     { href: "/transfers", label: "Transfers", hint: "Move stock between places", icon: ArrowLeftRight, show: can(user, "transfers.view") || can(user, "transfers.create") || can(user, "transfers.send") || can(user, "transfers.receive") },
     { href: "/bills", label: "Bills", hint: "Shop bills of the day", icon: Receipt, show: can(user, "bills.view") || can(user, "bills.create") || can(user, "bills.void") },

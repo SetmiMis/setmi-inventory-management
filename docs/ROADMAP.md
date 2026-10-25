@@ -61,9 +61,9 @@ Each phase: lint, typecheck, build, plus database tests for permission and stock
 Seen from each seat, with what exists and what is still missing.
 | Seat | Needs | Status |
 |---|---|---|
-| Owner / boss | Daily and weekly numbers, trust that stock is right, control of who can do what | Reports (P8) done; permission toggles, audit log, counts done. Missing: stock valuation, ABC analysis, purchase orders, supplier returns |
-| Manager | Reorder what is low, approve transfers, see differences after counts | Low-stock and slow-stock reports done; transfers with shortage done. Missing: purchase orders from the low-stock list, approval step for large adjustments |
+| Owner / boss | Daily and weekly numbers, trust that stock is right, control of who can do what | Reports (P8) done; permission toggles, audit log, counts done. Purchase orders done (P9). Missing: stock valuation, ABC analysis, supplier returns, QC on receiving |
+| Manager | Reorder what is low, approve transfers, see differences after counts | Low-stock and slow-stock reports done; transfers with shortage done. Purchase orders done (P9). Missing: create an order straight from the low-stock list, amount-limit approval, approval step for large adjustments |
 | Shop staff | Fast scan billing, no mistakes, a printed receipt | Billing done (switch OFF until Zoho is retired); needs a real-hardware test. Missing: sales return with credit note, customer list |
 | Warehouse staff | Receive against a supplier invoice, scan-count, send transfers | Done. Missing: put-away places (bins); batch/serial numbers if ever needed |
 | DevOps | Repeatable release, rollback, secrets safe, monitoring | `docs/DEPLOYMENT.md`, security headers, `.env.example`, rollback notes done. Missing: CI pipeline, error tracking, CSP, a production Supabase project |
-Suggested order after P8: browser test by the owner, then GST and returns (needs the accountant), purchase orders, then deployment.
+Suggested order after P8: browser test by the owner, then GST and returns (needs the accountant), QC on receiving, then deployment.

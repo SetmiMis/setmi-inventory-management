@@ -54,6 +54,7 @@ const saveSchema = z.object({
   id: z.uuid().nullable(),
   supplierId: z.uuid(),
   receiptDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  purchaseOrderId: z.uuid().nullable().optional(),
   invoiceNo: z.string().trim().max(60),
   notes: z.string().trim().max(1000),
   lines: z.array(z.object({
@@ -89,7 +90,7 @@ export async function saveReceipt(input: unknown): Promise<SaveReceiptResult> {
 
   const { data, error } = await supabase.rpc("save_goods_receipt", {
     p_id: v.id,
-    p_header: { supplier_id: v.supplierId, location_id: locationId, receipt_date: v.receiptDate, supplier_invoice_no: v.invoiceNo, notes: v.notes },
+    p_header: { supplier_id: v.supplierId, location_id: locationId, receipt_date: v.receiptDate, supplier_invoice_no: v.invoiceNo, notes: v.notes, purchase_order_id: v.purchaseOrderId ?? null },
     p_lines: v.lines.map((l) => ({ item_id: l.itemId, quantity: l.quantity, unit_cost: l.unitCost })),
   });
   if (error) return { ok: false, message: friendlyDbError(error) };
