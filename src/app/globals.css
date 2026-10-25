@@ -1,26 +1,170 @@
 @import "tailwindcss";
 
+/* Design tokens. Light by default, dark follows the computer's setting. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f2f5f7;
+  --foreground: #1f2933;
+  --surface: #ffffff;
+  --surface-muted: #eaeff3;
+  --line: #d9e0e6;
+  --muted: #5b6672;
+  --brand: #005a84;
+  --brand-strong: #0a5075;
+  --brand-soft: #e3f0f6;
+  --sidebar: #062f45;
+  --sidebar-text: #a9c3d2;
+  --sidebar-active: #0b4663;
+  --ring: rgba(0, 90, 132, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a1620;
+    --foreground: #e6eef3;
+    --surface: #112331;
+    --surface-muted: #173044;
+    --line: #25435a;
+    --muted: #93aab9;
+    --brand: #4fb0dc;
+    --brand-strong: #7cc6e8;
+    --brand-soft: #14384d;
+    --sidebar: #051e2d;
+    --sidebar-active: #0d3a54;
+    --ring: rgba(79, 176, 220, 0.4);
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Older screens use neutral/blue shades directly. Re-point them to the new palette so every
+   page picks up the new look at once (and follows dark mode). */
+:root {
+  --color-neutral-300: var(--line);
+  --color-neutral-400: var(--line);
+  --color-neutral-200: var(--line);
+  --color-neutral-500: var(--muted);
+  --color-blue-700: var(--brand);
+  --color-red-600: #b50505;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Focus that is easy to see with keyboard or scanner use. */
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--ring);
+  outline: none;
+}
+
+/* Page content: headings and tables look good without touching every screen. */
+main h1 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+main h2 {
+  font-weight: 600;
+}
+main table {
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+main table thead tr {
+  background: var(--surface-muted);
+}
+main table th {
+  padding: 0.65rem 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+main table td {
+  padding: 0.6rem 0.9rem;
+}
+main table tbody tr {
+  transition: background-color 0.12s;
+}
+main table tbody tr:hover {
+  background: var(--brand-soft);
+}
+main table tbody tr:last-child td {
+  border-bottom: 0;
+}
+main table a {
+  text-decoration: none;
+  font-weight: 600;
+}
+main table a:hover {
+  text-decoration: underline;
+}
+
+/* Receipt and label pages set their own white paper: keep plain tables there, also on screen. */
+main[class*="bg-white"] table {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+main[class*="bg-white"] table th,
+main[class*="bg-white"] table td {
+  padding: 0.1rem 0.25rem;
+  color: inherit;
+}
+main[class*="bg-white"] table thead tr {
+  background: transparent;
+}
+main[class*="bg-white"] table tbody tr:hover {
+  background: transparent;
+}
+
+/* The 80 mm receipt and label sheets must stay plain: undo the table styling there. */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  main table {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+  main table th,
+  main table td {
+    padding: 0.1rem 0.25rem;
+    color: inherit;
+  }
+  main table thead tr {
+    background: transparent;
+  }
+  main table tbody tr:hover {
+    background: transparent;
+  }
 }

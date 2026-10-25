@@ -5,6 +5,9 @@ Newest entry on top. Read this first, update it last.
 ## 2026-10-25 (newest): P6 pushed; P7 billing built behind an ON/OFF switch (Claude Sonnet 5.5)
 
 ### Done (verified by command output)
+- Brand colours now follow setmiindia.com (read from its CSS on 2026-10-25): primary #005a84, hover #0a5075, page background #f2f5f7, text #3a3a3a/#4B4F58, accent red #b50505, font Inter. Tokens live in `src/app/globals.css` (change colours only there).
+- UI polish (uncommitted): new look with sidebar + top bar, design tokens in `src/app/globals.css` (light and dark), shared classes in `src/lib/ui.ts`, `src/components/badge.tsx`, `nav-links.tsx`, icons from `lucide-react` (new dependency, see DEPENDENCIES.md). Legacy neutral/blue Tailwind shades are re-pointed to the new palette in globals.css, so older screens change colour without edits. Checked: typecheck, lint, build, 31 unit tests, login page in the browser. NOT checked: screens behind login (owner must sign in), mobile menu, dark mode on inner pages, printing. Billing/receipt print pages keep plain white paper.
+- P7 committed and pushed as `beb401f` (`git ls-remote` = local HEAD, repo anonymous check 404 = private). Owner will click through all screens in the browser; printer size: no fixed choice (print at any size). Owner to enable Supabase "leaked password protection". Next: P8 reports (plan to be approved first).
 - P6 committed and pushed as `981259d` (`git ls-remote` = local HEAD at that time).
 - P7 per `docs/features/FEATURE-008-BILLING.md`: migrations 13 and 14 applied; DB tests 37/37; unit tests 31/31; lint/typecheck/build pass. After the tests the real database still has `billing_enabled = false` and 0 bills.
 - Owner instruction: billing is done in Zoho now, so billing is built but switchable; tax left out for now (D-025).

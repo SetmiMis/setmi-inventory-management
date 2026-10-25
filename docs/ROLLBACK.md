@@ -3,7 +3,7 @@
 ## Current known-good points
 | What | Value | Notes |
 |---|---|---|
-| Last commit pushed to GitHub (`origin/main`) | `981259d` (P6: transfers) | Verified with `git ls-remote origin` on 2026-10-25. Previous known-good: `83f8d1c` (P5), `065e20f`, `2fab60a` (P4), `e2eb995` (P3) |
+| Last commit pushed to GitHub (`origin/main`) | `beb401f` (P7: billing with ON/OFF switch) | Verified with `git ls-remote origin` on 2026-10-25. Previous known-good: `981259d` (P6), `83f8d1c` (P5), `065e20f`, `2fab60a` (P4), `e2eb995` (P3) |
 | Database state matching it | migrations 001 to 012 | all applied to the dev Supabase project |
 
 Undo migrations 11-12 (transfers) only if no transfer was ever sent: sent transfers leave movements that point at the in-transit place. If only drafts exist: drop the transfer functions, `stock_transfer_lines`, `stock_transfers`, the sequence and the four permission rows, then the in-transit place and its triggers; the two new enum values cannot be removed from the enums (harmless if unused). Take a backup first.

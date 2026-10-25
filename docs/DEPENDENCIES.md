@@ -31,3 +31,5 @@ From `package.json` (all added by the official `create-next-app` scaffold on 202
 Added 2026-10-24 (P2c, owner approved): **read-excel-file ^9.3.12** (MIT) to read the owner's `.xlsx` for the item import. Chosen after `npm audit` of three candidates (xlsx: 1 high with no fix; exceljs: 2 moderate; this one: 0). Read only, server side only. `npm audit` for the project after adding: 0 vulnerabilities. Review again before each release.
 
 Not installed yet: Excel library for import (choose carefully; some spreadsheet parsers have had security issues), test runner.
+
+Added 2026-10-25 (UI polish, owner said "use the best UI/UX libraries and icons"): **lucide-react ^1.61.0** (ISC licence), icon set used as React components; `npm install` reported 0 vulnerabilities. Everything else in the new look is plain Tailwind CSS (already installed), so no component framework was added. This keeps the bundle small and the code easy for a beginner to read.

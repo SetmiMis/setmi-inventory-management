@@ -5,12 +5,15 @@ import { getCurrentLocation, getMyLocations } from "@/lib/location";
 import { isBillingEnabled } from "@/lib/settings";
 import { logout } from "./actions";
 import { LocationSwitcher } from "./location-switcher";
+import { MobileMenu, NavLinks, type NavItem } from "./nav-links";
+import { LogOut, MapPin, UserCircle, Warehouse } from "lucide-react";
+import { secondaryButton } from "@/lib/ui";
 
 // Every page in this group needs a signed-in user. Reading the session is a request-time
 // read, so with Cache Components it must sit inside <Suspense>.
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<p className="p-6 text-sm text-neutral-500">Loading...</p>}>
+    <Suspense fallback={<p className="p-6 text-sm text-muted">Loading...</p>}>
       <Shell>{children}</Shell>
     </Suspense>
   );
@@ -22,85 +25,76 @@ async function Shell({ children }: { children: React.ReactNode }) {
   const current = await getCurrentLocation(user);
   const billingOn = await isBillingEnabled();
 
-  return (
-    <div className="mx-auto max-w-5xl px-4 py-4">
-      <header className="mb-6 print:hidden flex flex-wrap items-center justify-between gap-3 border-b border-neutral-300 pb-3">
-        <nav className="flex items-center gap-4 text-sm">
-          <Link href="/" className="font-semibold">
-            SETMI INDIA IMS
-          </Link>
-          {can(user, "items.view") && (
-            <Link href="/items" className="text-blue-700 underline">
-              Items
-            </Link>
-          )}
-          {(can(user, "receipts.view") || can(user, "receipts.create") || can(user, "receipts.post")) && (
-            <Link href="/receipts" className="text-blue-700 underline">
-              Receipts
-            </Link>
-          )}
-          {billingOn && can(user, "bills.create") && (
-            <Link href="/billing" className="text-blue-700 underline">
-              Billing
-            </Link>
-          )}
-          {(can(user, "bills.view") || can(user, "bills.create") || can(user, "bills.void")) && (
-            <Link href="/bills" className="text-blue-700 underline">
-              Bills
-            </Link>
-          )}
-          {(can(user, "transfers.view") || can(user, "transfers.create") || can(user, "transfers.send") || can(user, "transfers.receive")) && (
-            <Link href="/transfers" className="text-blue-700 underline">
-              Transfers
-            </Link>
-          )}
-          {(can(user, "suppliers.view") || can(user, "suppliers.manage")) && (
-            <Link href="/suppliers" className="text-blue-700 underline">
-              Suppliers
-            </Link>
-          )}
-          {can(user, "stock.view") && (
-            <Link href="/stock" className="text-blue-700 underline">
-              Stock
-            </Link>
-          )}
-          {(can(user, "locations.manage") || myLocations.length > 0) && (
-            <Link href="/locations" className="text-blue-700 underline">
-              Locations
-            </Link>
-          )}
-          {user.isActive && user.isAdmin && (
-            <>
-              <Link href="/admin/users" className="text-blue-700 underline">
-                Users
-              </Link>
-              <Link href="/admin/settings" className="text-blue-700 underline">
-                Settings
-              </Link>
-            </>
-          )}
-        </nav>
-        {myLocations.length > 1 && current ? (
-          <LocationSwitcher locations={myLocations} currentId={current.id} />
-        ) : current ? (
-          <span className="text-sm text-neutral-500">Working in {current.name} ({current.code})</span>
-        ) : null}
-        <form action={logout} className="flex items-center gap-3 text-sm">
-          <span className="text-neutral-500">{user.email}</span>
-          <button type="submit" className="rounded border border-neutral-400 px-3 py-1">
-            Sign out
-          </button>
-        </form>
-      </header>
+  // Which links this person may see. Same rules as before; only the look changed.
+  const nav: NavItem[] = [{ href: "/", label: "Home", icon: "home" }];
+  if (can(user, "items.view")) nav.push({ href: "/items", label: "Items", icon: "items" });
+  if (can(user, "stock.view")) nav.push({ href: "/stock", label: "Stock", icon: "stock" });
+  if (can(user, "receipts.view") || can(user, "receipts.create") || can(user, "receipts.post"))
+    nav.push({ href: "/receipts", label: "Receipts", icon: "receipts" });
+  if (can(user, "transfers.view") || can(user, "transfers.create") || can(user, "transfers.send") || can(user, "transfers.receive"))
+    nav.push({ href: "/transfers", label: "Transfers", icon: "transfers" });
+  if (billingOn && can(user, "bills.create")) nav.push({ href: "/billing", label: "Billing", icon: "billing" });
+  if (can(user, "bills.view") || can(user, "bills.create") || can(user, "bills.void"))
+    nav.push({ href: "/bills", label: "Bills", icon: "bills" });
+  if (can(user, "suppliers.view") || can(user, "suppliers.manage"))
+    nav.push({ href: "/suppliers", label: "Suppliers", icon: "suppliers" });
+  if (can(user, "locations.manage") || myLocations.length > 0)
+    nav.push({ href: "/locations", label: "Locations", icon: "locations" });
+  if (user.isActive && user.isAdmin) {
+    nav.push({ href: "/admin/users", label: "Users", icon: "users" });
+    nav.push({ href: "/admin/settings", label: "Settings", icon: "settings" });
+  }
 
-      {/* Central guard: an inactive account never reaches any page content. */}
-      {user.isActive ? (
-        children
-      ) : (
-        <p role="status" className="rounded border border-amber-500 p-4">
-          Your account is created but not active yet. Please ask an administrator to activate it.
-        </p>
-      )}
+  return (
+    <div className="min-h-screen lg:flex">
+      <aside className="hidden w-60 shrink-0 flex-col bg-[var(--sidebar)] p-4 lg:sticky lg:top-0 lg:flex lg:h-screen print:hidden">
+        <Link href="/" className="mb-6 flex items-center gap-3 px-1">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand text-white shadow">
+            <Warehouse size={20} aria-hidden />
+          </span>
+          <span className="leading-tight">
+            <span className="block text-sm font-semibold tracking-wide text-white">SETMI INDIA</span>
+            <span className="block text-xs text-[var(--sidebar-text)]">Inventory</span>
+          </span>
+        </Link>
+        <div className="flex-1 overflow-y-auto">
+          <NavLinks items={nav} />
+        </div>
+      </aside>
+
+      <div className="min-w-0 flex-1">
+        <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface/90 px-4 py-3 backdrop-blur print:hidden">
+          <div className="flex items-center gap-3">
+            <MobileMenu items={nav} />
+            {myLocations.length > 1 && current ? (
+              <LocationSwitcher locations={myLocations} currentId={current.id} />
+            ) : current ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1 text-sm font-medium text-brand">
+                <MapPin size={14} aria-hidden /> {current.name} ({current.code})
+              </span>
+            ) : null}
+          </div>
+          <form action={logout} className="flex items-center gap-3 text-sm">
+            <span className="hidden items-center gap-1.5 text-muted sm:inline-flex">
+              <UserCircle size={18} aria-hidden /> {user.email}
+            </span>
+            <button type="submit" className={secondaryButton}>
+              <LogOut size={16} aria-hidden /> Sign out
+            </button>
+          </form>
+        </header>
+
+        <div className="mx-auto max-w-6xl px-4 py-6 print:p-0">
+          {/* Central guard: an inactive account never reaches any page content. */}
+          {user.isActive ? (
+            children
+          ) : (
+            <p role="status" className="rounded-xl border border-amber-400 bg-amber-50 p-4 text-amber-900">
+              Your account is created but not active yet. Please ask an administrator to activate it.
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

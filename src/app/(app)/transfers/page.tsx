@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Badge } from "@/components/badge";
 import { can, requireAnyPermission } from "@/lib/auth";
 import { getCurrentLocation } from "@/lib/location";
 import { createClient } from "@/lib/supabase/server";
@@ -63,9 +64,9 @@ export default async function TransfersPage({ searchParams }: { searchParams: Pr
                   <td className="py-2 pr-3"><Link href={`/transfers/${r.id}`} className="font-medium text-blue-700 underline">{r.transfer_no}</Link></td>
                   <td className="pr-3">{r.from_name} ({r.from_code})</td><td className="pr-3">{r.to_name} ({r.to_code})</td>
                   <td className="pr-3 text-right">{r.stock_transfer_lines?.[0]?.count ?? 0}</td>
-                  <td className={r.status === "SENT" ? "font-medium text-amber-600" : r.status === "RECEIVED" ? "text-green-700" : "text-neutral-500"}>
+                  <td><Badge tone={r.status === "SENT" ? "amber" : r.status === "RECEIVED" ? "green" : "gray"}>
                     {LABEL[r.status]}{r.has_shortage ? " (shortage)" : ""}
-                  </td>
+                  </Badge></td>
                 </tr>
               ))}
             </tbody>

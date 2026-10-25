@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Badge } from "@/components/badge";
 import { can, requireAnyPermission } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { inputClass, primaryButton, secondaryButton } from "@/lib/ui";
@@ -59,7 +60,7 @@ export default async function ReceiptsPage({ searchParams }: { searchParams: Pro
                   <td className="py-2 pr-3"><Link href={`/receipts/${r.id}`} className="font-medium text-blue-700 underline">{r.receipt_no}</Link></td>
                   <td className="pr-3">{r.receipt_date}</td><td className="pr-3">{r.suppliers?.name}</td><td className="pr-3">{r.supplier_invoice_no ?? ""}</td>
                   <td className="pr-3">{r.locations?.code}</td><td className="pr-3 text-right">{r.goods_receipt_lines?.[0]?.count ?? 0}</td>
-                  <td className={r.status === "POSTED" ? "text-green-700" : r.status === "CANCELLED" ? "text-neutral-500" : "text-amber-600"}>{r.status === "DRAFT" ? "Draft" : r.status === "POSTED" ? "Posted" : "Cancelled"}</td>
+                  <td><Badge tone={r.status === "POSTED" ? "green" : r.status === "CANCELLED" ? "gray" : "amber"}>{r.status === "DRAFT" ? "Draft" : r.status === "POSTED" ? "Posted" : "Cancelled"}</Badge></td>
                 </tr>
               ))}
             </tbody>

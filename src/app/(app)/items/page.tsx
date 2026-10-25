@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { Badge } from "@/components/badge";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { can, requirePermission } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { sanitizeSearch } from "@/lib/validation/item";
+import { FileSpreadsheet, Plus, Search, Tags } from "lucide-react";
 import { inputClass, primaryButton, secondaryButton } from "@/lib/ui";
 
 const PAGE_SIZE = 25;
@@ -82,18 +84,18 @@ export default async function ItemsPage({ searchParams }: { searchParams: Promis
         <h1 className="text-xl font-semibold">Items</h1>
         <div className="flex gap-2">
           {can(user, "categories.manage") && (
-            <Link href="/items/categories" className={secondaryButton}>Categories</Link>
+            <Link href="/items/categories" className={secondaryButton}><Tags size={16} aria-hidden /> Categories</Link>
           )}
           {can(user, "items.import") && (
-            <Link href="/items/import" className={secondaryButton}>Import Excel</Link>
+            <Link href="/items/import" className={secondaryButton}><FileSpreadsheet size={16} aria-hidden /> Import Excel</Link>
           )}
           {can(user, "items.create") && (
-            <Link href="/items/new" className={primaryButton}>New item</Link>
+            <Link href="/items/new" className={primaryButton}><Plus size={16} aria-hidden /> New item</Link>
           )}
         </div>
       </div>
 
-      <form method="get" className="grid gap-3 rounded border border-neutral-300 p-3 sm:grid-cols-5">
+      <form method="get" className="grid gap-3 rounded-xl border border-line bg-surface p-3 shadow-sm sm:grid-cols-5">
         <input name="q" defaultValue={q} placeholder="Search code, name, or scan a barcode" aria-label="Search" autoFocus
           className={`${inputClass} !mt-0 sm:col-span-2`} />
         <select name="category" defaultValue={categoryId} aria-label="Category" className={`${inputClass} !mt-0`}>
@@ -112,7 +114,7 @@ export default async function ItemsPage({ searchParams }: { searchParams: Promis
           <option value="archived">Archived</option>
           <option value="all">All</option>
         </select>
-        <button type="submit" className={`${primaryButton} sm:col-span-5 sm:w-32`}>Search</button>
+        <button type="submit" className={`${primaryButton} sm:col-span-5 sm:w-32`}><Search size={16} aria-hidden /> Search</button>
       </form>
 
       {error ? (
@@ -149,7 +151,7 @@ export default async function ItemsPage({ searchParams }: { searchParams: Promis
                   <td className="pr-3">{it.purchase_source}</td>
                   <td className="pr-3">{it.unit}</td>
                   <td className="pr-3 text-right font-mono">{it.selling_price ?? ""}</td>
-                  <td>{it.is_active ? "Active" : "Archived"}</td>
+                  <td><Badge tone={it.is_active ? "green" : "gray"}>{it.is_active ? "Active" : "Archived"}</Badge></td>
                 </tr>
               ))}
             </tbody>

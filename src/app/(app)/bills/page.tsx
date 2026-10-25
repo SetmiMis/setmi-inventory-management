@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Badge } from "@/components/badge";
 import { can, requireAnyPermission } from "@/lib/auth";
 import { getCurrentLocation } from "@/lib/location";
 import { isBillingEnabled } from "@/lib/settings";
@@ -72,7 +73,7 @@ export default async function BillsPage({ searchParams }: { searchParams: Promis
                         <td className="pr-3">{new Date(r.created_at).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit" })}</td>
                         <td className="pr-3">{r.customer_name ?? ""}</td><td className="pr-3">{r.payment_mode}</td>
                         <td className="pr-3 text-right font-mono">{Number(r.total).toFixed(2)}</td>
-                        <td className={r.status === "VOIDED" ? "text-neutral-500 line-through" : ""}>{r.status === "VOIDED" ? "Voided" : "Done"}</td>
+                        <td><Badge tone={r.status === "VOIDED" ? "red" : "green"}>{r.status === "VOIDED" ? "Voided" : "Done"}</Badge></td>
                       </tr>
                     ))}
                   </tbody>

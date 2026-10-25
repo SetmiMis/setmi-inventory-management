@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Badge } from "@/components/badge";
 import { can, requirePermission } from "@/lib/auth";
 import { getCurrentLocation } from "@/lib/location";
 import { createClient } from "@/lib/supabase/server";
@@ -99,7 +100,7 @@ export default async function StockPage({ searchParams }: { searchParams: Promis
                     {canLevels ? <LevelForm itemId={r.item_id} min={r.min_qty === null ? null : Number(r.min_qty)} max={r.max_qty === null ? null : Number(r.max_qty)} />
                       : r.min_qty === null ? "-" : `${Number(r.min_qty)} / ${r.max_qty === null ? "-" : Number(r.max_qty)}`}
                   </td>
-                  <td>{r.is_low ? <span className="font-medium text-red-600">Low</span> : Number(r.quantity) === 0 ? <span className="text-neutral-500">None</span> : "OK"}</td>
+                  <td>{r.is_low ? <Badge tone="red">Low</Badge> : Number(r.quantity) === 0 ? <Badge tone="gray">None</Badge> : <Badge tone="green">OK</Badge>}</td>
                 </tr>
               ))}
             </tbody>
