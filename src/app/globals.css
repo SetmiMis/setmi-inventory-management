@@ -168,3 +168,9 @@ main[class*="bg-white"] table tbody tr:hover {
     background: transparent;
   }
 }
+
+/* The Help section you jumped to is highlighted so it is easy to find. */
+.help-section:target {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--ring);
+}

@@ -2,6 +2,16 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-25 (later): usability pass, easy for anyone to use (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- Help page `/help` (Hinglish, 16 sections), context Help button on every screen, Help in the menu, home page rebuilt around jobs, admin first-time checklist from real data, clear message when a page is not allowed (`/?denied=1`). Details: `docs/features/FEATURE-011-EASY-TO-USE.md`.
+- `typecheck`, `lint`, `build` pass; unit tests 35/35. P9 is pushed as `c6d77b7`; this usability work is NOT committed yet.
+
+### Not done / owner must do
+- Look at the new home page and Help page after signing in; watch one new person do a job with only the app and tell me where they get stuck.
+- Answer the language question at the end of `docs/ASSUMPTIONS.md`.
+
 ## 2026-10-25 (night): P9 purchase orders built from ideas in the owner ERP repo (Claude Sonnet 5.5)
 
 ### Done (verified by command output)
@@ -9,7 +19,7 @@ Newest entry on top. Read this first, update it last.
 - P9: migrations 17 to 20 applied to the dev project (20 = fixes from the independent review). Purchase orders (draft, sent, partial, completed, cancelled), receipts against an order, close-short with a reason, A4 print, "Late" tag. DB tests `013_purchase_orders.sql` 37/37 PASS; old `009_receiving.sql` 32/32 still PASS; typecheck, lint, build pass; unit tests 35/35. Details: `docs/features/FEATURE-010-PURCHASE-ORDERS.md`.
 - New permissions `purchase.view`, `purchase.create`, `purchase.approve` (admins have everything; give the others in Admin > Users).
 - The test run found a real bug in the price guard (fixed by migration 18).
-- Commit `124cb10` (P8) is the last pushed commit; P9 is NOT committed yet.
+- P9 pushed as `c6d77b7` (previous: `124cb10` P8).
 
 ### Not done / owner must do
 - Click through Purchase orders and Receipts-against-order in a browser (sign-in needed).

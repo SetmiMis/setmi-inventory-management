@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   ArrowLeftRight,
   Boxes,
+  CircleHelp,
   ClipboardList,
   Home,
   MapPin,
@@ -29,6 +30,7 @@ const ICONS: Record<string, LucideIcon> = {
   home: Home,
   items: Package,
   stock: Boxes,
+  help: CircleHelp,
   purchase: ClipboardList,
   receipts: PackageCheck,
   transfers: ArrowLeftRight,

@@ -5,6 +5,7 @@ import { getCurrentLocation, getMyLocations } from "@/lib/location";
 import { isBillingEnabled } from "@/lib/settings";
 import { logout } from "./actions";
 import { LocationSwitcher } from "./location-switcher";
+import { HelpButton } from "./help-button";
 import { MobileMenu, NavLinks, type NavItem } from "./nav-links";
 import { LogOut, MapPin, UserCircle, Warehouse } from "lucide-react";
 import { secondaryButton } from "@/lib/ui";
@@ -47,6 +48,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
     nav.push({ href: "/admin/users", label: "Users", icon: "users" });
     nav.push({ href: "/admin/settings", label: "Settings", icon: "settings" });
   }
+  nav.push({ href: "/help", label: "Help", icon: "help" });
 
   return (
     <div className="min-h-screen lg:flex">
@@ -81,6 +83,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
             <span className="hidden items-center gap-1.5 text-muted sm:inline-flex">
               <UserCircle size={18} aria-hidden /> {user.email}
             </span>
+            <HelpButton />
             <button type="submit" className={secondaryButton}>
               <LogOut size={16} aria-hidden /> Sign out
             </button>

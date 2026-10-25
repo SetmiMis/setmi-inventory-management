@@ -172,3 +172,11 @@ Format: context, options, choice, reason, date, model.
 - **Trade-offs:** no tolerance for over-delivery; a sent order cannot be edited (cancel and re-make); no QC step yet.
 - **Revisit if:** the owner wants over-delivery tolerance, QC on receiving, tax on orders or supplier e-mails.
 - **Date / model:** 2026-10-25, Claude Sonnet 5.5
+
+## D-029: Usability pass: Help page, job-based home, permission message
+- **Owner:** "make it so easy that anyone can use it".
+- **Choice:** a Hinglish Help page with a context Help button on every screen; home built from jobs; an admin first-time checklist driven by real data; a visible message instead of a silent redirect when a page is not allowed.
+- **Why:** the users are not technical; training should not be needed for the basic jobs.
+- **Trade-offs:** the Help text is in the code and must be kept in step with the screens; screens stay in English.
+- **Revisit if:** a real new user gets stuck (watch them once), or the owner wants Hindi screens.
+- **Date / model:** 2026-10-25, Claude Sonnet 5.5

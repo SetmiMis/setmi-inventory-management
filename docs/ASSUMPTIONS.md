@@ -26,3 +26,7 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - Over-receiving against a purchase order is refused (no tolerance). Is a small excess (for example 5 percent) normal for your suppliers?
 - A sent purchase order cannot be edited. Is cancel and re-make acceptable?
 - Who may send orders: only people with `purchase.approve`. Should a manager approve large orders first (an amount limit)?
+
+## Usability pass: to confirm with the owner (2026-10-25)
+- Language: Help is in Roman Hindi with English product words, screens are English. Do the staff want Hindi (Devanagari) or only English on screens?
+- Who are the first real users and which jobs do they do most? The home page order can then be adjusted per role.

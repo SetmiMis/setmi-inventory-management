@@ -173,3 +173,7 @@ Tests 006-009 (and 003/004 in places) assume an EMPTY database: they count rows.
 - NOT tested: the purchase order and receipt screens in a browser, printing the order, the two helper functions through the app.
 
 - `supabase/tests/014_po_review_fixes.sql` (migration 20): 4 lines, all PASS. Independent review of P9 by the ruflo verifier: no money/stock defect; two low/medium findings fixed, two minor ones noted (FEATURE-010 section 6).
+
+## Usability pass checks (2026-10-25)
+- `typecheck`, `lint`, `build` pass; unit tests 35/35. The Help text was compared with the real button names in the code.
+- NOT tested: the Help page, the Help button and the new home page on screen behind login; the "no permission" message with a real restricted user; a first-time person using the app.

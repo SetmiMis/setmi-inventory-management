@@ -51,14 +51,14 @@ export async function requireUser(): Promise<CurrentUser> {
 
 export async function requireAdmin(): Promise<CurrentUser> {
   const user = await requireUser();
-  if (!user.isActive || !user.isAdmin) redirect("/");
+  if (!user.isActive || !user.isAdmin) redirect("/?denied=1");
   return user;
 }
 
 export async function requirePermission(key: string): Promise<CurrentUser> {
   const user = await requireUser();
   const allowed = user.isActive && (user.isAdmin || user.permissions.includes(key));
-  if (!allowed) redirect("/");
+  if (!allowed) redirect("/?denied=1");
   return user;
 }
 
@@ -66,7 +66,7 @@ export async function requirePermission(key: string): Promise<CurrentUser> {
 export async function requireAnyPermission(...keys: string[]): Promise<CurrentUser> {
   const user = await requireUser();
   const allowed = user.isActive && (user.isAdmin || keys.some((k) => user.permissions.includes(k)));
-  if (!allowed) redirect("/");
+  if (!allowed) redirect("/?denied=1");
   return user;
 }
 
