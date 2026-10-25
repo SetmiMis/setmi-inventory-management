@@ -11,6 +11,11 @@ export type LocationValues = {
   name: string;
   type: "WAREHOUSE" | "SHOP";
   address: string | null;
+  city: string | null;
+  capacity: number | null;
+  contactPerson: string | null;
+  phone: string | null;
+  email: string | null;
 };
 
 function Message({ state }: { state: LocationState }) {
@@ -42,6 +47,26 @@ export function LocationForm({ location }: { location?: LocationValues }) {
         <div className="sm:col-span-2">
           <label htmlFor="name" className={labelClass}>Name *</label>
           <input id="name" name="name" required maxLength={100} defaultValue={location?.name} className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor="city" className={labelClass}>City</label>
+          <input id="city" name="city" maxLength={60} defaultValue={location?.city ?? ""} className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor="capacity" className={labelClass}>Capacity (product slots / bins, optional)</label>
+          <input id="capacity" name="capacity" type="number" min={0} max={10000000} step={1} inputMode="numeric" defaultValue={location?.capacity ?? ""} className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor="contactPerson" className={labelClass}>Contact person</label>
+          <input id="contactPerson" name="contactPerson" maxLength={100} defaultValue={location?.contactPerson ?? ""} className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor="phone" className={labelClass}>Phone</label>
+          <input id="phone" name="phone" maxLength={30} defaultValue={location?.phone ?? ""} className={inputClass} />
+        </div>
+        <div className="sm:col-span-2">
+          <label htmlFor="email" className={labelClass}>Email</label>
+          <input id="email" name="email" type="email" maxLength={150} defaultValue={location?.email ?? ""} className={inputClass} />
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="address" className={labelClass}>Address</label>

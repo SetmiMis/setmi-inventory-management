@@ -25,7 +25,7 @@ export async function saveLocation(_prev: LocationState, fd: FormData): Promise<
   if (!rawId) {
     const { data, error } = await supabase
       .from("locations")
-      .insert({ code: v.code, name: v.name, type: v.type, address: v.address })
+      .insert({ code: v.code, name: v.name, type: v.type, address: v.address, city: v.city, capacity: v.capacity, contact_person: v.contactPerson, phone: v.phone, email: v.email })
       .select("id")
       .single();
     if (error) return fail(friendlyDbError(error));
@@ -39,7 +39,7 @@ export async function saveLocation(_prev: LocationState, fd: FormData): Promise<
 
   const { data, error } = await supabase
     .from("locations")
-    .update({ code: v.code, name: v.name, type: v.type, address: v.address })
+    .update({ code: v.code, name: v.name, type: v.type, address: v.address, city: v.city, capacity: v.capacity, contact_person: v.contactPerson, phone: v.phone, email: v.email })
     .eq("id", id.data)
     .eq("updated_at", expected.data)
     .select("id");
@@ -67,4 +67,16 @@ export async function setLocationActive(_prev: LocationState, fd: FormData): Pro
   revalidatePath("/locations");
   revalidatePath(`/locations/${id.data}`);
   return { ok: true, message: active ? "Location restored." : "Location archived." };
+}
+
+// Archive or restore from a plain form button (the list page and its side panel). Places are never deleted:
+// the stock history points at them. The database may refuse to archive a place that still holds stock.
+export async function toggleLocationActive(fd: FormData): Promise<void> {
+  await requirePermission("locations.manage");
+  const id = z.uuid().safeParse(fd.get("id"));
+  if (!id.success) return;
+  const supabase = await createClient();
+  await supabase.from("locations").update({ is_active: fd.get("active") === "1" }).eq("id", id.data);
+  revalidatePath("/locations");
+  redirect(`/locations?sel=${id.data}`);
 }

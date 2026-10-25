@@ -274,3 +274,44 @@ export function Sparkline({ values, color, label }: { values: number[]; color: s
     </svg>
   );
 }
+
+// ---- A few coloured columns, one per place, with the number above each (Stock by Warehouse) ----
+export type ColoredBar = { key: string; label: string; value: number; color: string };
+
+export function ColoredColumns({ data, ariaLabel, emptyText }: { data: ColoredBar[]; ariaLabel: string; emptyText: string }) {
+  const max = niceMax(Math.max(0, ...data.map((d) => d.value)));
+  if (data.length === 0 || data.every((d) => d.value === 0)) return <p className="py-10 text-center text-sm text-muted">{emptyText}</p>;
+  const W = 520, H = 220, L = 38, B = 26, T = 20;
+  const plotH = H - B - T;
+  const step = (W - L) / data.length;
+  const bw = Math.min(64, step * 0.6);
+  const y = (v: number) => T + plotH - (v / max) * plotH;
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * max);
+  return (
+    <div>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={ariaLabel} className="h-auto w-full">
+        {ticks.map((t) => (
+          <g key={t}>
+            <line x1={L} x2={W} y1={y(t)} y2={y(t)} stroke="var(--line)" strokeWidth="1" />
+            <text x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-[var(--muted)] text-[10px]">{compact(t, false)}</text>
+          </g>
+        ))}
+        {data.map((d, i) => {
+          const x = L + i * step + (step - bw) / 2;
+          return (
+            <g key={d.key}>
+              <title>{`${d.label}: ${full(d.value, false)}`}</title>
+              {d.value > 0 && <rect x={x} y={y(d.value)} width={bw} height={T + plotH - y(d.value)} rx="3" fill={d.color} />}
+              <text x={x + bw / 2} y={y(d.value) - 5} textAnchor="middle" className="fill-[var(--foreground)] text-[11px] font-semibold">{full(d.value, false)}</text>
+              <text x={x + bw / 2} y={H - 8} textAnchor="middle" className="fill-[var(--muted)] text-[10px]">{d.label}</text>
+            </g>
+          );
+        })}
+      </svg>
+      <div className="sr-only">
+        <p>{ariaLabel}</p>
+        <ul>{data.map((d) => <li key={d.key}>{d.label}: {d.value}</li>)}</ul>
+      </div>
+    </div>
+  );
+}

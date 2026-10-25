@@ -30,3 +30,21 @@ test("type and name rules", () => {
   assert.equal(locationSchema.safeParse({ ...ok, name: "n".repeat(101) }).success, false);
   assert.equal(locationSchema.safeParse({ ...ok, address: "a".repeat(501) }).success, false);
 });
+
+test("city, capacity and contact details are optional; capacity is a whole number from 0", () => {
+  const r = locationSchema.safeParse({ ...ok, city: " Delhi ", capacity: "30", contactPerson: "", phone: "+91 98765 43210", email: "" });
+  assert.equal(r.success, true);
+  if (r.success) {
+    assert.equal(r.data.city, "Delhi");
+    assert.equal(r.data.capacity, 30);
+    assert.equal(r.data.contactPerson, null);
+    assert.equal(r.data.email, null);
+  }
+  // the old form (no new fields) still works and capacity stays empty
+  const old = locationSchema.safeParse(ok);
+  assert.equal(old.success && old.data.capacity, null);
+  assert.equal(locationSchema.safeParse({ ...ok, capacity: "-1" }).success, false);
+  assert.equal(locationSchema.safeParse({ ...ok, capacity: "2.5" }).success, false);
+  assert.equal(locationSchema.safeParse({ ...ok, capacity: "abc" }).success, false);
+  assert.equal(locationSchema.safeParse({ ...ok, capacity: "0" }).success && true, true);
+});

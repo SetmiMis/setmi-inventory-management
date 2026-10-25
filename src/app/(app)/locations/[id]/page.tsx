@@ -13,7 +13,7 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
   const supabase = await createClient();
   const { data: loc } = await supabase
     .from("locations")
-    .select("id, code, name, type, address, is_active, updated_at")
+    .select("id, code, name, type, address, city, capacity, contact_person, phone, email, is_active, updated_at")
     .eq("id", id.data)
     .maybeSingle();
   if (!loc) notFound();
@@ -44,7 +44,7 @@ export default async function LocationPage({ params }: { params: Promise<{ id: s
 
       {canManage ? (
         <LocationForm
-          location={{ id: loc.id, updatedAt: loc.updated_at, code: loc.code, name: loc.name, type: loc.type, address: loc.address }}
+          location={{ id: loc.id, updatedAt: loc.updated_at, code: loc.code, name: loc.name, type: loc.type, address: loc.address, city: loc.city, capacity: loc.capacity, contactPerson: loc.contact_person, phone: loc.phone, email: loc.email }}
         />
       ) : (
         <dl className="grid gap-2 text-sm sm:grid-cols-2">

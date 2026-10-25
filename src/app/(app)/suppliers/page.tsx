@@ -282,8 +282,8 @@ async function Panel({ id, tab, keep, canManage }: { id: string; tab: string; ke
             {field("City", s.city)}
             {field("Contact Person", s.contact_person)}
             {field("Phone", s.phone && <span className="inline-flex items-center gap-1.5"><Phone size={13} aria-hidden /> {s.phone}</span>)}
-            {field("Email", s.email && <a href={`mailto:${s.email}`} className="inline-flex items-center gap-1.5"><Mail size={13} aria-hidden /> {s.email}</a>)}
-            {field("Website", site && <a href={site} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5"><Globe size={13} aria-hidden /> {s.website}</a>)}
+            {field("Email", s.email && <a href={`mailto:${s.email}`} className="inline-flex min-w-0 items-start gap-1.5 break-all"><Mail size={13} aria-hidden className="mt-0.5 shrink-0" /> {s.email}</a>)}
+            {field("Website", site && <a href={site} target="_blank" rel="noopener noreferrer" className="inline-flex min-w-0 items-start gap-1.5 break-all"><Globe size={13} aria-hidden className="mt-0.5 shrink-0" /> {s.website}</a>)}
             {field("GST / Tax ID", s.gstin)}
             {field("Payment Terms", s.payment_terms)}
             {field("Currency", s.currency)}
