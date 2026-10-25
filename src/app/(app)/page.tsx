@@ -105,7 +105,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
               href={x.href}
               className={`${cardClass} group flex h-full items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:border-brand hover:shadow-md`}
             >
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand transition group-hover:bg-brand group-hover:text-white">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-[var(--brand-text)] transition group-hover:bg-brand group-hover:text-white">
                 <x.icon size={24} aria-hidden />
               </span>
               <span>
@@ -125,7 +125,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       )}
 
       <section className={`${cardClass} flex flex-wrap items-center gap-4`}>
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand"><CircleHelp size={24} aria-hidden /></span>
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-[var(--brand-text)]"><CircleHelp size={24} aria-hidden /></span>
         <div className="flex-1">
           <h2 className="text-base">{t("home_help_title")}</h2>
           <p className="text-sm text-muted">{t("home_help_text")}</p>
@@ -135,7 +135,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
       <section className={cardClass}>
         <h2 className="mb-2 flex items-center gap-2 text-sm">
-          <ShieldCheck size={18} className="text-brand" aria-hidden /> {t("home_perm_title")}
+          <ShieldCheck size={18} className="text-[var(--brand-text)]" aria-hidden /> {t("home_perm_title")}
         </h2>
         {user.isAdmin ? (
           <p className="text-sm">{t("home_perm_admin")}</p>

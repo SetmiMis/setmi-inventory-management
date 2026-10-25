@@ -4,7 +4,7 @@ const TONES = {
   amber: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
   red: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
   gray: "bg-surface-muted text-muted",
-  brand: "bg-brand-soft text-brand",
+  brand: "bg-brand-soft text-[var(--brand-text)]",
 } as const;
 
 export function Badge({ tone, children }: { tone: keyof typeof TONES; children: React.ReactNode }) {

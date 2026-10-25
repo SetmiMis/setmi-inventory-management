@@ -2,44 +2,50 @@
 
 /* Design tokens. Light by default, dark follows the computer's setting. */
 :root {
-  --background: #eef8ff;
-  --foreground: #1f2933;
+  /* Look copied from the owner's ERP repo (SetmiMis/erp): indigo/violet SaaS palette, soft cards, mesh background. */
+  --background: #f8fafc;
+  --foreground: #1e293b;
   --surface: #ffffff;
-  --surface-muted: #e2f0fb;
-  --line: #cfe3f1;
-  --line-strong: #7f9fb5;
-  --muted: #4f6272;
-  --brand: #005a84;
-  --brand-text: #005a84;
+  --surface-muted: #f1f5f9;
+  --line: #e2e8f0;
+  --line-strong: #7c8ca1;
+  --muted: #475569;
+  --brand: #4f46e5;
+  --brand-text: #4f46e5;
+  --brand-strong: #3730a3;
+  --brand-soft: #eef2ff;
   --danger: #b3261e;
-  /* Same blue sweep as the Setmi India website header. */
-  --header-gradient: linear-gradient(45deg, #4c9fc4 0%, #013556 100%);
-  --brand-strong: #0a5075;
-  --brand-soft: #d9ecf8;
-  --sidebar: #062f45;
-  --sidebar-text: #a9c3d2;
-  --sidebar-active: #0b4663;
-  --ring: rgba(0, 90, 132, 0.3);
+  --sidebar: #1e1b4b;
+  --sidebar-text: #c7d2fe;
+  --sidebar-active: #312e81;
+  --ring: rgba(79, 70, 229, 0.3);
+  --header-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #06b6d4 100%);
+  --mesh:
+    radial-gradient(at 15% 10%, rgba(79, 70, 229, 0.10) 0px, transparent 55%),
+    radial-gradient(at 85% 0%, rgba(139, 92, 246, 0.10) 0px, transparent 50%),
+    radial-gradient(at 90% 85%, rgba(6, 182, 212, 0.08) 0px, transparent 50%),
+    radial-gradient(at 5% 90%, rgba(16, 185, 129, 0.06) 0px, transparent 45%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a1620;
-    --foreground: #e6eef3;
-    --surface: #112331;
-    --surface-muted: #173044;
-    --line: #25435a;
-    --line-strong: #5d7f96;
-    --muted: #93aab9;
-    /* Buttons keep a dark enough fill for white text (4.6:1); links and text use the lighter blue. */
-    --brand: #1f7fae;
-    --brand-text: #7cc6e8;
+    --background: #0b1020;
+    --foreground: #e6eaf5;
+    --surface: #131a2e;
+    --surface-muted: #1b2440;
+    --line: #2a3556;
+    --line-strong: #5b6a8c;
+    --muted: #a3b0cc;
+    /* Buttons keep a dark enough fill for white text; links and text use the lighter indigo. */
+    --brand: #5558e3;
+    --brand-text: #a5b4fc;
+    --brand-strong: #6d70f0;
+    --brand-soft: #1e2447;
     --danger: #f87171;
-    --brand-strong: #2b92c4;
-    --brand-soft: #14384d;
-    --sidebar: #051e2d;
-    --sidebar-active: #0d3a54;
-    --ring: rgba(79, 176, 220, 0.4);
+    --sidebar: #0f1330;
+    --sidebar-active: #252c5c;
+    --ring: rgba(129, 140, 248, 0.45);
+    --mesh: none;
   }
 }
 
@@ -69,7 +75,9 @@
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
+  background-image: var(--mesh);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans), var(--font-devanagari), system-ui, sans-serif;
 }

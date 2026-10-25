@@ -9,7 +9,8 @@ import { logout } from "./actions";
 import { LocationSwitcher } from "./location-switcher";
 import { CommandPalette, type PaletteEntry } from "./command-palette";
 import { HelpButton } from "./help-button";
-import { BottomBar, MobileMenu, NavLinks, type NavItem } from "./nav-links";
+import { BottomBar, MobileMenu, type NavItem } from "./nav-links";
+import { TopNav } from "./top-nav";
 import { LanguageSwitch } from "@/components/language-switch";
 import { LogOut, MapPin, UserCircle } from "lucide-react";
 import { secondaryButton } from "@/lib/ui";
@@ -82,45 +83,47 @@ async function Shell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen lg:flex">
-      <aside className="hidden w-60 shrink-0 flex-col bg-[var(--sidebar)] p-4 lg:sticky lg:top-0 lg:flex lg:h-screen print:hidden">
-        <Link href="/" className="mb-4 block px-1" aria-label="SETMI INDIA, home">
-          <Image src="/brand/setmi-logo-wide.png" alt="SETMI INDIA" width={176} height={54} priority className="h-auto w-full max-w-[176px]" />
-          <span className="mt-1 block px-1 text-[11px] font-medium uppercase tracking-widest text-[var(--sidebar-text)]">Inventory</span>
-        </Link>
-        <div className="flex-1 overflow-y-auto">
-          <NavLinks items={nav} />
-        </div>
-      </aside>
-
-      <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface/90 px-4 py-3 backdrop-blur print:hidden">
-          <div className="flex items-center gap-3">
-            <MobileMenu items={nav} openLabel={tr(lang, "top_menu_open")} closeLabel={tr(lang, "top_menu_close")} />
-            {myLocations.length > 1 && current ? (
-              <LocationSwitcher locations={myLocations} currentId={current.id} label={tr(lang, "top_working_in")} />
-            ) : current ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1 text-sm font-medium text-brand">
-                <MapPin size={14} aria-hidden /> {current.name} ({current.code})
+    <div className="min-h-screen">
+      <div className="min-w-0">
+        <header className="sticky top-0 z-30 border-b border-line bg-surface/90 backdrop-blur print:hidden">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2.5">
+            <div className="flex items-center gap-3">
+              <MobileMenu items={nav} openLabel={tr(lang, "top_menu_open")} closeLabel={tr(lang, "top_menu_close")} />
+              <Link href="/" className="flex items-center gap-2.5" aria-label="SETMI INDIA, home">
+                <Image src="/brand/setmi-badge-96.png" alt="" width={36} height={36} priority className="h-9 w-9 rounded-full" />
+                <span className="leading-tight">
+                  <span className="block text-sm font-bold">SETMI INDIA</span>
+                  <span className="block text-[11px] font-medium uppercase tracking-widest text-muted">Inventory</span>
+                </span>
+              </Link>
+              {myLocations.length > 1 && current ? (
+                <LocationSwitcher locations={myLocations} currentId={current.id} label={tr(lang, "top_working_in")} />
+              ) : current ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1 text-sm font-medium text-[var(--brand-text)]">
+                  <MapPin size={14} aria-hidden /> {current.name} ({current.code})
+                </span>
+              ) : null}
+            </div>
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              <CommandPalette entries={paletteEntries} canSearchItems={can(user, "items.view")} labels={paletteLabels} />
+              <LanguageSwitch lang={lang} label={tr(lang, "top_language")} />
+              <span className="hidden items-center gap-1.5 text-muted xl:inline-flex">
+                <UserCircle size={18} aria-hidden /> {user.email}
               </span>
-            ) : null}
-            <CommandPalette entries={paletteEntries} canSearchItems={can(user, "items.view")} labels={paletteLabels} />
+              <HelpButton label={tr(lang, "top_help")} />
+              <form action={logout}>
+                <button type="submit" className={secondaryButton}>
+                  <LogOut size={16} aria-hidden /> {tr(lang, "top_signout")}
+                </button>
+              </form>
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-3 text-sm">
-            <LanguageSwitch lang={lang} label={tr(lang, "top_language")} />
-            <span className="hidden items-center gap-1.5 text-muted md:inline-flex">
-              <UserCircle size={18} aria-hidden /> {user.email}
-            </span>
-            <HelpButton label={tr(lang, "top_help")} />
-            <form action={logout}>
-              <button type="submit" className={secondaryButton}>
-                <LogOut size={16} aria-hidden /> {tr(lang, "top_signout")}
-              </button>
-            </form>
+          <div className="mx-auto hidden max-w-7xl border-t border-line px-4 py-1.5 lg:block">
+            <TopNav items={nav} />
           </div>
         </header>
 
-        <div className="mx-auto max-w-6xl px-4 py-6 pb-24 lg:pb-6 print:p-0">
+        <div className="mx-auto max-w-7xl px-4 py-6 pb-24 lg:pb-6 print:p-0">
           {/* Central guard: an inactive account never reaches any page content. */}
           {user.isActive ? (
             children

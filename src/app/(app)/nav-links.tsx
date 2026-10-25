@@ -30,7 +30,7 @@ import { useEffect, useRef, useState } from "react";
 
 // The server (layout) decides which links this person may see and sends only names.
 // Icons are picked here, so no component has to cross from server to client.
-const ICONS: Record<string, LucideIcon> = {
+export const ICONS: Record<string, LucideIcon> = {
   home: Home,
   items: Package,
   stock: Boxes,
@@ -79,7 +79,7 @@ function NavList({ items, onPick }: { items: NavItem[]; onPick?: () => void }) {
                   : "text-[var(--sidebar-text)] hover:bg-[var(--sidebar-active)] hover:text-white"
               }`}
             >
-              <Icon size={18} aria-hidden className={active ? "text-sky-300" : ""} />
+              <Icon size={18} aria-hidden className={active ? "text-indigo-300" : ""} />
               {it.label}
             </Link>
           </li>
@@ -156,7 +156,7 @@ export function BottomBar({ items }: { items: NavItem[] }) {
             key={it.href}
             href={it.href}
             aria-current={active ? "page" : undefined}
-            className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 px-1 text-xs font-medium ${active ? "text-brand" : "text-muted"}`}
+            className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 px-1 text-xs font-medium ${active ? "text-[var(--brand-text)]" : "text-muted"}`}
           >
             <Icon size={20} aria-hidden />
             <span className="max-w-full truncate">{it.label}</span>

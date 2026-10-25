@@ -212,3 +212,10 @@ Format: context, options, choice, reason, date, model.
 - **Trade-offs:** the search shows only items (not yet suppliers or documents); recent pages are stored in the browser only; the bottom bar is fixed to four links.
 - **Revisit if:** staff ask for bulk actions, saved filters or document-number search.
 - **Date / model:** 2026-10-25, Claude Sonnet 5.5
+
+## D-034: Inventory screens follow the owner's ERP repo look (indigo, top menu)
+- **Context:** owner asked (2026-10-25) to take the inventory UI/UX of `SetmiMis/erp` and build the same, inventory only. That repo is Bootstrap 5 with an indigo/violet palette, a top bar with drop-down menus (Masters, Purchase, Stock), a page header with an icon, a filter card, a table card, status badges (Out of Stock / Low Stock / In Stock) and "Showing 1-50 of N". The owner chose "full copy, indigo colours too" (this replaces the brand-blue #005A84 look of D-033 / FEATURE-015).
+- **Choice:** same look rebuilt in Tailwind (no Bootstrap, no copied code, the repo's Apache-2.0 notice is not triggered): indigo tokens and mesh background in `globals.css`, a sticky top bar with drop-down groups (`top-nav.tsx`) replacing the sidebar on desktop, In/Out columns on the stock ledger, status labels and "Showing x-y of z" on Stock and Ledger. Phone menu, bottom bar, Ctrl+K search, English/Hindi and all permissions are unchanged. The Setmi badge logo stays in the top bar.
+- **Trade-offs:** the website-blue brand (#005A84) is no longer the app colour; the wide white logo is not used in the app any more (the round badge is). A "Balance" column like the ERP ledger is NOT added: our ledger stores no running balance and computing one per row is a larger change.
+- **Revisit if:** the owner wants the brand blue back (change the tokens at the top of `globals.css`, one place).
+- **Date / model:** 2026-10-25, Claude Sonnet 5.5

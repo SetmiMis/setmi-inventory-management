@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BookText } from "lucide-react";
 import { requirePermission } from "@/lib/auth";
 import { getCurrentLocation } from "@/lib/location";
 import { createClient } from "@/lib/supabase/server";
@@ -47,7 +48,7 @@ export default async function MovementsPage({ searchParams }: { searchParams: Pr
   return (
     <main className="space-y-4">
       <p className="text-sm"><Link href="/stock" className="text-blue-700 underline">Stock</Link> / History</p>
-      <h1 className="text-xl font-semibold">Stock history of {loc.name}</h1>
+      <h1 className="flex items-center gap-2"><BookText size={24} className="text-[var(--brand-text)]" aria-hidden /> Stock ledger of {loc.name}</h1>
       {error ? (
         <p role="alert" className="text-red-600">Could not load history.</p>
       ) : rows.length === 0 ? (
@@ -58,7 +59,7 @@ export default async function MovementsPage({ searchParams }: { searchParams: Pr
             <thead>
               <tr className="border-b border-neutral-300">
                 <th className="py-2 pr-3">When</th><th className="pr-3">Item</th><th className="pr-3">What</th>
-                <th className="pr-3 text-right">Change</th><th className="pr-3">With</th><th>Reason</th>
+                <th className="pr-3 text-right">In</th><th className="pr-3 text-right">Out</th><th className="pr-3">With</th><th>Reason</th>
               </tr>
             </thead>
             <tbody>
@@ -74,9 +75,8 @@ export default async function MovementsPage({ searchParams }: { searchParams: Pr
                     <td className="py-2 pr-3 whitespace-nowrap">{when(m.created_at)}</td>
                     <td className="pr-3">{m.items?.internal_item_code}<span className="block text-xs text-neutral-500">{m.items?.item_name}</span></td>
                     <td className="pr-3">{MOVEMENT_LABELS[m.movement_type] ?? m.movement_type}</td>
-                    <td className={`pr-3 text-right font-mono ${incoming ? "text-green-700" : "text-red-600"}`}>
-                      {incoming ? "+" : "-"}{Number(m.quantity)} {m.items?.unit}
-                    </td>
+                    <td className="pr-3 text-right font-mono font-semibold text-green-700">{incoming ? `+${Number(m.quantity)} ${m.items?.unit ?? ""}` : "-"}</td>
+                    <td className="pr-3 text-right font-mono font-semibold text-red-600">{incoming ? "-" : `-${Number(m.quantity)} ${m.items?.unit ?? ""}`}</td>
                     <td className="pr-3">{other}</td>
                     <td>{m.reason ?? m.reference ?? ""}</td>
                   </tr>
@@ -87,7 +87,7 @@ export default async function MovementsPage({ searchParams }: { searchParams: Pr
         </div>
       )}
       <nav className="flex items-center gap-3 text-sm" aria-label="Pagination">
-        <span>{total} movement{total === 1 ? "" : "s"}. Page {page} of {lastPage}.</span>
+        <span className="text-muted">Showing {total === 0 ? 0 : from + 1}-{Math.min(from + PAGE_SIZE, total)} of {total} movement{total === 1 ? "" : "s"}</span>
         {page > 1 && <Link href={`/stock/movements?page=${page - 1}`} className={secondaryButton}>Previous</Link>}
         {page < lastPage && <Link href={`/stock/movements?page=${page + 1}`} className={secondaryButton}>Next</Link>}
       </nav>

@@ -7,7 +7,7 @@ import { LoginForm } from "./login-form";
 // Reading the language cookie is a request-time read, so with Cache Components it sits inside <Suspense>.
 export default function LoginPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[var(--sidebar)] via-[#06405e] to-[#0a6a9a] px-4">
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[var(--sidebar)] via-[#3730a3] to-[#7c3aed] px-4">
       <Suspense fallback={null}>
         <LoginCard />
       </Suspense>

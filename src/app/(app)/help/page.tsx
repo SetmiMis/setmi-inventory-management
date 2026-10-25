@@ -13,13 +13,13 @@ export default async function HelpPage() {
   return (
     <main className="space-y-6">
       <div>
-        <h1 className="flex items-center gap-2"><CircleHelp size={26} className="text-brand" aria-hidden /> {tr(lang, "help_title")}</h1>
+        <h1 className="flex items-center gap-2"><CircleHelp size={26} className="text-[var(--brand-text)]" aria-hidden /> {tr(lang, "help_title")}</h1>
         <p className="mt-1 text-sm text-muted">{tr(lang, "help_intro")}</p>
       </div>
 
       <nav aria-label={tr(lang, "help_title")} className={`${cardClass} flex flex-wrap gap-2`}>
         {sections.map((s) => (
-          <a key={s.id} href={`#${s.id}`} className="rounded-full bg-brand-soft px-3 py-1 text-sm font-medium text-brand hover:underline">
+          <a key={s.id} href={`#${s.id}`} className="rounded-full bg-brand-soft px-3 py-1 text-sm font-medium text-[var(--brand-text)] hover:underline">
             {s.short}
           </a>
         ))}

@@ -462,3 +462,6 @@ Task 002: finalize Item Master requirements (spec only, no code). Open questions
 
 ## 2026-10-25 audit session (hack / DevOps / UI-UX)
 Read `docs/SECURITY-AUDIT-2026-10-25.md`. Migration 28 (security hardening) applied to the dev project, test `supabase/tests/018_security_hardening.sql` (10 PASS). CI workflow added at `.github/workflows/ci.yml` (never run yet). UI fixes: dark-mode contrast tokens, 44 px inline inputs, Enter returns to scan box, confirm on stock-count save, phone-menu keyboard handling, red cancel/void buttons. All of this is UNCOMMITTED, waiting for the owner's OK. Open items: discount permission, shortage approval, CSP, Supabase dashboard settings, rest of the UI list, matching the website look (owner link https://system-master-mu.vercel.app/).
+
+## 2026-10-25 ERP-look pass (D-034)
+Owner asked to copy the inventory UI/UX of `github.com/SetmiMis/erp`, full copy with indigo colours. Done: indigo tokens, top bar with drop-down menu (desktop), Stock and Stock ledger screens restyled, login gradient. Checked on screen: login page only (light). NOT seen: anything behind login (no test login available to Claude), dark mode, phone width. typecheck, lint, 42 tests and build pass. UNCOMMITTED. Other screens only pick up colours and table styling through `globals.css`; their layouts were not redone one by one.

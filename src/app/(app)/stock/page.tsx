@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { Boxes } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { can, requirePermission } from "@/lib/auth";
 import { getCurrentLocation } from "@/lib/location";
 import { createClient } from "@/lib/supabase/server";
 import { sanitizeSearch } from "@/lib/validation/item";
-import { inputClass, primaryButton, secondaryButton } from "@/lib/ui";
+import { cardClass, inputClass, primaryButton, secondaryButton } from "@/lib/ui";
 import { LevelForm } from "./level-form";
 
 const PAGE_SIZE = 50;
@@ -58,7 +59,7 @@ export default async function StockPage({ searchParams }: { searchParams: Promis
     <main className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold">Stock in {loc.name}</h1>
+          <h1 className="flex items-center gap-2"><Boxes size={24} className="text-[var(--brand-text)]" aria-hidden /> Current stock in {loc.name}</h1>
           <p className="text-sm text-neutral-500">{loc.type === "SHOP" ? "Shop" : "Warehouse"} {loc.code}. Change the place from the header.</p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -70,7 +71,7 @@ export default async function StockPage({ searchParams }: { searchParams: Promis
         </div>
       </div>
 
-      <form method="get" className="flex flex-wrap items-center gap-3">
+      <form method="get" className={`${cardClass} flex flex-wrap items-end gap-3`}>
         <input name="q" defaultValue={q} placeholder="Search code or name" aria-label="Search" className={`${inputClass} !mt-0 max-w-xs`} />
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" name="low" value="1" defaultChecked={lowOnly} /> Low stock only
@@ -102,7 +103,7 @@ export default async function StockPage({ searchParams }: { searchParams: Promis
                     {canLevels ? <LevelForm itemId={r.item_id} min={r.min_qty === null ? null : Number(r.min_qty)} max={r.max_qty === null ? null : Number(r.max_qty)} />
                       : r.min_qty === null ? "-" : `${Number(r.min_qty)} / ${r.max_qty === null ? "-" : Number(r.max_qty)}`}
                   </td>
-                  <td>{r.is_low ? <Badge tone="red">Low</Badge> : Number(r.quantity) === 0 ? <Badge tone="gray">None</Badge> : <Badge tone="green">OK</Badge>}</td>
+                  <td>{r.is_low ? <Badge tone="amber">Low stock</Badge> : Number(r.quantity) === 0 ? <Badge tone="gray">Out of stock</Badge> : <Badge tone="green">In stock</Badge>}</td>
                 </tr>
               ))}
             </tbody>
@@ -111,7 +112,7 @@ export default async function StockPage({ searchParams }: { searchParams: Promis
       )}
 
       <nav className="flex items-center gap-3 text-sm" aria-label="Pagination">
-        <span>{total} item{total === 1 ? "" : "s"}. Page {page} of {lastPage}.</span>
+        <span className="text-muted">Showing {total === 0 ? 0 : from + 1}-{Math.min(from + PAGE_SIZE, total)} of {total} item{total === 1 ? "" : "s"}</span>
         {page > 1 && <Link href={link(page - 1)} className={secondaryButton}>Previous</Link>}
         {page < lastPage && <Link href={link(page + 1)} className={secondaryButton}>Next</Link>}
       </nav>

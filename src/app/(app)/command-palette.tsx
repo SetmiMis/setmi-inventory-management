@@ -144,7 +144,7 @@ export function CommandPalette({ entries, canSearchItems, labels }: { entries: P
                         aria-selected={i === active}
                         onMouseMove={() => setCursor(i)}
                         onClick={() => go(r)}
-                        className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm ${i === active ? "bg-brand-soft text-brand" : ""}`}
+                        className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm ${i === active ? "bg-brand-soft text-[var(--brand-text)]" : ""}`}
                       >
                         <Icon size={16} aria-hidden className="shrink-0" />
                         <span className="min-w-0 flex-1">
