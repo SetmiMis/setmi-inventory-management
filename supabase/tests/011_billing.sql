@@ -208,8 +208,15 @@ begin
   reset role;
   perform set_config('request.jwt.claims', '{}', true);
   set local role anon;
-  select count(*) into cnt from public.bills;
-  res := res || 'B18 anonymous sees no bills (' || cnt || '): ' || case when cnt = 0 then 'PASS' else 'FAIL' end || E'\n';
+  begin
+    select count(*) into cnt from public.bills;
+    res := res || 'B18 anonymous sees no bills (' || cnt || '): ' || case when cnt = 0 then 'PASS' else 'FAIL' end || E'
+';
+  exception when insufficient_privilege then
+    -- since migration 28 the anonymous role has no table rights at all, which is stricter than seeing nothing
+    res := res || 'B18 anonymous has no access to bills at all: PASS' || E'
+';
+  end;
   reset role;
   select count(*) into cnt from public.audit_log where entity = 'bills';
   select count(*) into nb from public.audit_log where entity = 'app_settings' and action = 'UPDATE';

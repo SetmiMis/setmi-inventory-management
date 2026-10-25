@@ -2,6 +2,7 @@ import Link from "next/link";
 import { can, requirePermission } from "@/lib/auth";
 import { getCurrentLocation } from "@/lib/location";
 import { isBillingEnabled } from "@/lib/settings";
+import { createClient } from "@/lib/supabase/server";
 import { BillingScreen } from "./billing-screen";
 
 export default async function BillingPage() {
@@ -23,6 +24,10 @@ export default async function BillingPage() {
     return <p role="status" className="rounded border border-amber-500 p-3 text-sm">You are working in a warehouse ({loc.name}). Switch to a shop in the header to make a bill.</p>;
   }
 
+  // Active customers the person may pick (the database decides who may read the list; an empty list hides the picker).
+  const supabase = await createClient();
+  const { data: customers } = await supabase.from("customers").select("id, code, name, phone").eq("is_active", true).order("name").limit(500);
+
   return (
     <main className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -30,7 +35,7 @@ export default async function BillingPage() {
         <Link href="/bills" className="text-sm text-blue-700 underline">Today&apos;s bills</Link>
       </div>
       <p className="text-sm text-neutral-500">No tax is calculated: this is a simple bill, not a tax invoice. Stock goes down when you complete the bill.</p>
-      <BillingScreen placeName={loc.name} canOverridePrice={can(user, "bills.override_price")} />
+      <BillingScreen placeName={loc.name} canOverridePrice={can(user, "bills.override_price")} customers={customers ?? []} />
     </main>
   );
 }

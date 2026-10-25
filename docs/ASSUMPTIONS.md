@@ -43,3 +43,10 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - A bin is never deleted (its code must stay unique and traceable); it can be **blocked**. Taking a product out of a bin is allowed (it is not stock history).
 - The code is made from the place code + rack + level + bin, for example `DEMO-WH-A-01-01`. A single digit is padded (1 becomes 01).
 - Question for the owner: do you want stock counted per bin later (receiving into a bin, transfers between bins)? That is a bigger change to the ledger and needs its own plan.
+
+## Customers (added 2026-10-25, needs the owner's confirmation)
+- A customer is master data (code CUST-001..., type, contact, city, state, optional GST number, credit limit, payment terms). The **GST number is only stored**; no tax is calculated anywhere (GST waits for the accountant).
+- **Credit limit and payment terms are notes for the staff.** There is no credit sale, receivable or payment tracking, so nothing is enforced and "Outstanding" from the mock is not shown.
+- A bill may point at a customer (optional). The database fills an empty customer name or phone on the bill from the customer; a typed name wins. Old bills have no customer. Orders and sales per customer count only COMPLETED bills (voided bills do not count) that the person may see (their own places).
+- Customers are never deleted (bills point at them); they are switched off (Deactivate). A switched-off customer cannot be put on a new bill.
+- Permissions: new `customers.view` and `customers.manage`. Anybody who may make or see bills can read the customer list (to pick one); only `customers.manage` can add or change customers. Give these to staff on the Users & Roles page.

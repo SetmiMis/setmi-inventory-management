@@ -66,6 +66,7 @@ export async function searchBillItems(input: { q: string }): Promise<BillItem[]>
 
 const billSchema = z.object({
   paymentMode: z.enum(["CASH", "UPI", "CARD", "OTHER"]),
+  customerId: z.uuid().nullable().optional(),
   customerName: z.string().trim().max(100),
   customerPhone: z.string().trim().max(30),
   discount: z.number().min(0).max(99999999),
@@ -92,7 +93,7 @@ export async function createBill(input: unknown): Promise<CreateBillResult> {
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("create_bill", {
-    p_header: { location_id: loc.id, payment_mode: v.paymentMode, customer_name: v.customerName, customer_phone: v.customerPhone, discount: String(v.discount) },
+    p_header: { location_id: loc.id, payment_mode: v.paymentMode, customer_id: v.customerId ?? null, customer_name: v.customerName, customer_phone: v.customerPhone, discount: String(v.discount) },
     p_lines: v.lines.map((l) => ({ item_id: l.itemId, quantity: l.quantity, unit_price: l.unitPrice })),
   });
   if (error) return { ok: false, message: friendlyDbError(error) };

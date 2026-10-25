@@ -10,11 +10,14 @@ import { inputClass, labelClass, primaryButton, secondaryButton } from "@/lib/ui
 
 type Line = { itemId: string; code: string; name: string; unit: string; decimals: number; listPrice: number | null; priceText: string; qty: string; available: number | null };
 
-export function BillingScreen({ placeName, canOverridePrice }: { placeName: string; canOverridePrice: boolean }) {
+export type BillCustomer = { id: string; code: string; name: string; phone: string | null };
+
+export function BillingScreen({ placeName, canOverridePrice, customers = [] }: { placeName: string; canOverridePrice: boolean; customers?: BillCustomer[] }) {
   const router = useRouter();
   const [lines, setLines] = useState<Line[]>([]);
   const [discount, setDiscount] = useState("");
   const [mode, setMode] = useState("CASH");
+  const [customerId, setCustomerId] = useState("");
   const [cname, setCname] = useState("");
   const [cphone, setCphone] = useState("");
   const [feedback, setFeedback] = useState<{ ok: boolean; text: string } | null>(null);
@@ -78,7 +81,7 @@ export function BillingScreen({ placeName, canOverridePrice }: { placeName: stri
     start(async () => {
       setProblems([]);
       const r = await createBill({
-        paymentMode: mode, customerName: cname, customerPhone: cphone, discount: disc ?? 0,
+        paymentMode: mode, customerId: customerId || null, customerName: cname, customerPhone: cphone, discount: disc ?? 0,
         lines: lines.map((l) => ({
           itemId: l.itemId, quantity: parseQuantity(l.qty) as number,
           unitPrice: l.listPrice !== null && priceOf(l) === l.listPrice ? null : (priceOf(l) as number),
@@ -157,6 +160,26 @@ export function BillingScreen({ placeName, canOverridePrice }: { placeName: stri
             {PAYMENT_MODES.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
           </select>
         </div>
+        {customers.length > 0 && (
+          <div className="sm:col-span-2">
+            <label htmlFor="customer" className={labelClass}>Customer from your list (optional)</label>
+            <select
+              id="customer"
+              value={customerId}
+              onChange={(e) => {
+                const c = customers.find((x) => x.id === e.target.value);
+                setCustomerId(e.target.value);
+                // fills the two boxes below; they can still be changed for this bill
+                setCname(c ? c.name.slice(0, 100) : "");
+                setCphone(c?.phone ? c.phone.slice(0, 30) : "");
+              }}
+              className={inputClass}
+            >
+              <option value="">No customer / walk-in</option>
+              {customers.map((c) => <option key={c.id} value={c.id}>{c.code} · {c.name}</option>)}
+            </select>
+          </div>
+        )}
         <div>
           <label htmlFor="cname" className={labelClass}>Customer name (optional)</label>
           <input id="cname" value={cname} maxLength={100} onChange={(e) => setCname(e.target.value)} className={inputClass} />

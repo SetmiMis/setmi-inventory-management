@@ -46,5 +46,7 @@ delete from public.items where internal_item_code like 'DEMO-%';
 delete from public.locations where code like 'DEMO-%';
 delete from public.categories where name like 'DEMO %';
 delete from public.suppliers where name like 'DEMO %';
+-- DEMO customers that no bill points at (a customer with a bill must stay: bills are history)
+delete from public.customers where name like 'DEMO %' and id not in (select customer_id from public.bills where customer_id is not null);
 
 commit;

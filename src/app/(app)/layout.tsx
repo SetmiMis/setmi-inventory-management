@@ -59,7 +59,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
   add(can(user, "suppliers.view") || can(user, "suppliers.manage"), { href: "/suppliers", label: tr(lang, "nm_suppliers"), icon: "suppliers", group: g.master });
   add(can(user, "locations.manage") || myLocations.length > 0, { href: "/locations", label: tr(lang, "nm_warehouses"), icon: "warehouses", group: g.master });
   add(can(user, "locations.manage") || myLocations.length > 0, { href: "/locations/racks", label: tr(lang, "nm_racks"), icon: "locations", group: g.master });
-  add(seesBills, { href: "/coming-soon/customers", label: tr(lang, "nm_customers"), icon: "customers", group: g.master, soon: true });
+  add(can(user, "customers.view") || can(user, "customers.manage"), { href: "/customers", label: tr(lang, "nm_customers"), icon: "customers", group: g.master });
   // Purchase & import
   add(seesPurchase, { href: "/purchase-orders", label: tr(lang, "nm_po"), icon: "purchase", group: g.purchase });
   add(seesPurchase, { href: "/coming-soon/import-shipments", label: tr(lang, "nm_import"), icon: "import", group: g.purchase, soon: true });
