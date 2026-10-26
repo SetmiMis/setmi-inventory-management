@@ -22,6 +22,12 @@ alter table public.goods_receipt_costs enable trigger goods_receipt_costs_guard;
 alter table public.goods_receipt_lines enable trigger goods_receipt_lines_guard;
 alter table public.goods_receipts enable trigger goods_receipts_no_change;
 
+-- import shipments of those orders (items, history and charges go with them)
+delete from public.import_shipments
+ where po_id in (select id from public.purchase_orders
+                  where location_id in (select id from public.locations where code like 'DEMO-%')
+                     or supplier_id in (select id from public.suppliers where name like 'DEMO %'));
+
 -- purchase orders for a DEMO place or a DEMO supplier (lines and prices go with them)
 alter table public.purchase_orders disable trigger purchase_orders_flow_guard;
 alter table public.purchase_order_lines disable trigger purchase_order_lines_guard;

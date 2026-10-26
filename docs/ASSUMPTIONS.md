@@ -50,3 +50,14 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - A bill may point at a customer (optional). The database fills an empty customer name or phone on the bill from the customer; a typed name wins. Old bills have no customer. Orders and sales per customer count only COMPLETED bills (voided bills do not count) that the person may see (their own places).
 - Customers are never deleted (bills point at them); they are switched off (Deactivate). A switched-off customer cannot be put on a new bill.
 - Permissions: new `customers.view` and `customers.manage`. Anybody who may make or see bills can read the customer list (to pick one); only `customers.manage` can add or change customers. Give these to staff on the Users & Roles page.
+
+## Import Shipments (2026-10-26, owner answered the first three)
+- One shipment belongs to ONE purchase order (a PO may have many shipments). Only POs of an Import supplier that are Sent or Partly received can be shipped. (Owner's answer.)
+- The items on a shipment are chosen from the PO lines. The total on shipments (not cancelled) plus what is already received can never be more than the ordered quantity. (Owner's answer.)
+- Status is changed by hand with its date: Booked, Dispatched, In Transit, Arrived at Port, Customs Clearance, Delivered (steps may be skipped, never backwards); Cancelled until Delivered. "Delayed" is not stored: it is not delivered / cancelled and the ETA is before today. (Owner's answer.)
+- A shipment NEVER changes stock and never changes the purchase order. Stock grows only when a goods receipt (GRN) is posted. Marking "Delivered" does not receive anything. Please confirm this is what you want.
+- Only Booked or Dispatched shipments can be edited. After that only the status and the charges change.
+- Charges (freight, duty, clearing, insurance, port, other) are plain amounts for information. They are NOT added to the item cost on a receipt, and no tax or duty is calculated. They are visible and changeable only with `receipts.cost`.
+- Shipment number is IMP-<year>-<number>. The number keeps counting across years (it does not restart on 1 January).
+- Permissions: new `shipments.view` and `shipments.manage`. To see shipments a person also needs a purchase permission (the order stays behind its own place rules). Give these on the Users & Roles page.
+- Not built yet: document upload (Documents tab and "Upload Documents"), because there is no file storage set up; the Import button (no importer).
