@@ -140,3 +140,14 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - To see sales orders a person also needs `items.view` (item names and the item search come from the item list), like other pages. Customers can be read by people with the sales order permissions (the customer table rule was widened for this).
 - The old "Sales Orders" menu item pointed at the Bills list; the Bills list is still there under the extra "Bills" entry (Quick Action, search box, phone bar). Shop bills (Billing) are a different thing and are not sales orders.
 - Not built: pictures in the item list, "Available" check or warning when the quantity is more than the stock, order documents / print, Import button.
+
+## Picking & Packing page (2026-10-26, owner chose: stock goes out at Dispatch only)
+- Picking and packing are a RECORD only. They do NOT change stock and do not reserve it. Stock goes out when the order is dispatched (Dispatch page, not built). (Owner's answer.)
+- Start Picking works on a Confirmed order. The order then shows "In Packing" in Sales Orders. Stop picking sends it back to Confirmed and forgets the picked quantities.
+- Strict: Mark as Packed is allowed only when every item is fully picked (picked = required). A partial dispatch is not supported yet.
+- Picked quantity cannot be more than the ordered quantity, follows the unit's decimals, and cannot be more than the stock in that place today. A barcode scan adds one piece.
+- Packing: type (Box, Poly bag, Envelope, Pallet, Other) and box / packet number are required; weight, size and remarks are optional.
+- Who: `picking.manage` starts, picks, packs and stops; `picking.view` only looks. Admins have both. Staff also need `sales_orders.view` and `items.view` (the data comes from those tables). New permissions must be given on the Users & Roles page.
+- "Delayed" = not yet dispatched and the expected dispatch date has passed. Priority (High / Medium / Low) is chosen when picking starts.
+- The rack shown on a line is taken from the item's racks (Locations > Racks) in that place; an item with no rack shows none.
+- Not built: Team Members / Assign To, partial picking, picking by rack route.

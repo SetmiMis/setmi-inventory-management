@@ -73,7 +73,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
   add(can(user, "stock.adjust") || can(user, "stock.approve") || can(user, "stock.view"), { href: "/stock/count", label: tr(lang, "nm_count"), icon: "count", group: g.inventory });
   // Sales & dispatch (our sales are the bills)
   add(can(user, "sales_orders.view") || can(user, "sales_orders.create") || can(user, "sales_orders.confirm"), { href: "/sales-orders", label: tr(lang, "nm_sorders"), icon: "bills", group: g.sales });
-  add(seesBills, { href: "/coming-soon/picking-packing", label: tr(lang, "nm_picking"), icon: "picking", group: g.sales, soon: true });
+  add(can(user, "picking.view") || can(user, "picking.manage"), { href: "/picking", label: tr(lang, "nm_picking"), icon: "picking", group: g.sales });
   add(seesBills, { href: "/coming-soon/dispatch", label: tr(lang, "nm_dispatch"), icon: "dispatch", group: g.sales, soon: true });
   add(seesBills, { href: "/coming-soon/returns", label: tr(lang, "nm_returns"), icon: "returns", group: g.sales, soon: true });
   // Reports

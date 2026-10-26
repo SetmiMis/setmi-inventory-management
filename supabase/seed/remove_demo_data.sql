@@ -43,6 +43,9 @@ alter table public.purchase_order_costs enable trigger purchase_order_costs_guar
 alter table public.purchase_order_lines enable trigger purchase_order_lines_guard;
 alter table public.purchase_orders enable trigger purchase_orders_flow_guard;
 
+-- picking and packing jobs of a DEMO place (their lines go with them), before the sales orders they belong to
+delete from public.pick_pack_jobs where location_id in (select id from public.locations where code like 'DEMO-%');
+
 -- sales orders shipped from a DEMO place (lines go with them), before the DEMO customers are removed
 delete from public.sales_orders where location_id in (select id from public.locations where code like 'DEMO-%');
 
