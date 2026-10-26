@@ -5,9 +5,9 @@ import { toCsv } from "@/lib/csv";
 import { createClient } from "@/lib/supabase/server";
 import { sanitizeSearch } from "@/lib/validation/item";
 
-const TYPES = ["RECEIPT", "SALE", "SALE_RETURN", "TRANSFER", "TRANSFER_SHORTAGE", "ADJUSTMENT", "OPENING", "STOCK_OUT"];
+const TYPES = ["RECEIPT", "SALE", "SALE_RETURN", "TRANSFER", "TRANSFER_SHORTAGE", "ADJUSTMENT", "OPENING", "STOCK_OUT", "STOCK_IN"];
 const LABEL: Record<string, string> = {
-  RECEIPT: "Inward", SALE: "Sale", SALE_RETURN: "Return", TRANSFER: "Transfer", TRANSFER_SHORTAGE: "Lost in transit", ADJUSTMENT: "Adjustment", OPENING: "Opening", STOCK_OUT: "Stock out",
+  RECEIPT: "Inward", SALE: "Sale", SALE_RETURN: "Return", TRANSFER: "Transfer", TRANSFER_SHORTAGE: "Lost in transit", ADJUSTMENT: "Adjustment", OPENING: "Opening", STOCK_OUT: "Stock out", STOCK_IN: "Stock in",
 };
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 

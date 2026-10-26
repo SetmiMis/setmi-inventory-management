@@ -16,9 +16,9 @@ type SearchParams = Record<string, string | string[] | undefined>;
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 const SIZES = [15, 25, 50, 100];
 const TABS = [["overview", "Overview"], ["ledger", "Stock Ledger"], ["places", "Warehouse Stock"]] as const;
-const TYPES = ["RECEIPT", "SALE", "SALE_RETURN", "TRANSFER", "TRANSFER_SHORTAGE", "ADJUSTMENT", "OPENING", "STOCK_OUT"] as const;
+const TYPES = ["RECEIPT", "SALE", "SALE_RETURN", "TRANSFER", "TRANSFER_SHORTAGE", "ADJUSTMENT", "OPENING", "STOCK_OUT", "STOCK_IN"] as const;
 const TYPE_LABEL: Record<string, string> = {
-  RECEIPT: "Inward", SALE: "Sale", SALE_RETURN: "Return", TRANSFER: "Transfer", TRANSFER_SHORTAGE: "Lost in transit", ADJUSTMENT: "Adjustment", OPENING: "Opening", STOCK_OUT: "Stock out",
+  RECEIPT: "Inward", SALE: "Sale", SALE_RETURN: "Return", TRANSFER: "Transfer", TRANSFER_SHORTAGE: "Lost in transit", ADJUSTMENT: "Adjustment", OPENING: "Opening", STOCK_OUT: "Stock out", STOCK_IN: "Stock in",
 };
 const TYPE_STYLE: Record<string, string> = {
   RECEIPT: "bg-[#e3f6ec] text-[#16824f] dark:bg-[#123a2a] dark:text-[#6fe0a8]",
@@ -29,6 +29,7 @@ const TYPE_STYLE: Record<string, string> = {
   ADJUSTMENT: "bg-[#efe9fb] text-[#6d4fd8] dark:bg-[#3a2a66] dark:text-[#c7b4ff]",
   OPENING: "bg-[#eceff3] text-[#5b6b7c] dark:bg-[#25394a] dark:text-[#b7c6d3]",
   STOCK_OUT: "bg-[#fde8e8] text-[#c8302f] dark:bg-[#4a1c1c] dark:text-[#f5a0a0]",
+  STOCK_IN: "bg-[#e3f6ec] text-[#16824f] dark:bg-[#123a2a] dark:text-[#6fe0a8]",
 };
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 

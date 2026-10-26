@@ -43,6 +43,14 @@ alter table public.purchase_order_costs enable trigger purchase_order_costs_guar
 alter table public.purchase_order_lines enable trigger purchase_order_lines_guard;
 alter table public.purchase_orders enable trigger purchase_orders_flow_guard;
 
+-- stock adjustments (Stock In / Out entries) of a DEMO place (lines go first)
+alter table public.stock_entries disable trigger stock_entries_no_change;
+alter table public.stock_entry_lines disable trigger stock_entry_lines_no_change;
+delete from public.stock_entry_lines where entry_id in (select id from public.stock_entries where location_id in (select id from public.locations where code like 'DEMO-%'));
+delete from public.stock_entries where location_id in (select id from public.locations where code like 'DEMO-%');
+alter table public.stock_entry_lines enable trigger stock_entry_lines_no_change;
+alter table public.stock_entries enable trigger stock_entries_no_change;
+
 -- transfers that start or end at a DEMO place
 alter table public.stock_transfers disable trigger stock_transfers_flow_trg;
 alter table public.stock_transfer_lines disable trigger stock_transfer_lines_flow_trg;

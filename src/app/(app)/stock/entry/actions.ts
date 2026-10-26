@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requirePermission } from "@/lib/auth";
 import { getCurrentLocation } from "@/lib/location";
@@ -70,4 +71,23 @@ export async function saveStockEntry(input: unknown): Promise<SaveEntryResult> {
   revalidatePath("/stock");
   revalidatePath("/stock/entry");
   return { ok: true, entryNo: d.entry_no ?? "" };
+}
+
+export type DecisionState = { ok: boolean; message: string } | null;
+
+// A manager (stock.approve) approves or rejects a PENDING entry. The database checks permission, place and stock again.
+export async function decideStockEntry(_prev: DecisionState, fd: FormData): Promise<DecisionState> {
+  await requirePermission("stock.approve");
+  const id = z.uuid().safeParse(fd.get("id"));
+  const decision = z.enum(["approve", "reject"]).safeParse(fd.get("decision"));
+  if (!id.success || !decision.success) return { ok: false, message: "Invalid form data." };
+  const note = String(fd.get("note") ?? "").trim().slice(0, 300);
+  const supabase = await createClient();
+  const { error } = decision.data === "approve"
+    ? await supabase.rpc("approve_stock_entry", { p_id: id.data, p_note: note || null })
+    : await supabase.rpc("reject_stock_entry", { p_id: id.data, p_note: note });
+  if (error) return { ok: false, message: friendlyDbError(error) };
+  revalidatePath("/stock");
+  revalidatePath("/stock/entry");
+  redirect(`/stock/entry?sel=${id.data}&p=details`);
 }

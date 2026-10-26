@@ -104,3 +104,14 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - "Requested By" = who made the transfer, shown as "First L." (needs stock.view, see Stock Ledger).
 - Draft is a status of its own (the mock has only Completed, In Transit, Cancelled); there is no card for it, but it can be filtered.
 - Receiving, recalling and editing a draft happen in the right panel or the full page (/transfers/[id]); the old editor is reused.
+
+## Stock Adjustment page and approval (2026-10-26, owner chose manager approval and the existing reasons)
+- A stock adjustment (the old "Quick Stock In / Out", numbers SE-000001 ...) is now PENDING until a manager approves it. Stock changes ONLY on approval. A manager can also reject it; a reason is needed and nothing changes. (Owner's answer.)
+- Who is a manager: a person with the new permission `stock.approve` (admins have everything). **A manager's own adjustment is approved at once**, because they are the manager; there is no second person checking a manager. Please confirm this rule, or tell me if even managers need another manager (then it changes).
+- On approval the database checks the stock again for Stock Out (it may have changed since the request). If there is not enough, the approval is refused with the item and the quantity that is there.
+- Entries made before this change were applied at once and are shown as Approved. They still can never be edited or deleted: the only allowed change is Pending to Approved or Rejected, once. A mistake is fixed with an opposite adjustment.
+- Reasons stay as they were (Stock Out: sold outside, sample, damaged, own use, lost, returned to supplier, other; Stock In: found, customer return, other). The mock's "Count Correction", "Physical Count" and "Opening Stock" are done on the Physical Count page, not here. (Owner's answer: no new reasons.)
+- The cards "Increase (Qty)" and "Decrease (Qty)", the reasons donut and the 30-day trend count APPROVED adjustments only. The reasons donut is this month. All units are added together (rough number).
+- "Date" of the trend = the day the stock really moved (the approval day).
+- The place of an adjustment is the place the person works in (switch it at the top). Approving needs access to that place.
+- Not built: pictures and the Available stock column in the form; Reference stays optional free text; no Date field (it is the day it was made).
