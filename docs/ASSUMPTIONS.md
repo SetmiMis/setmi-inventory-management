@@ -127,3 +127,16 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - "Count by scanning" (/stock/scan) is the older quick count: it still changes the stock AT ONCE without a sheet and without approval. Please tell me if it should go through the same approval or be removed.
 - The old "Count stock" screen with typed numbers is replaced by this page (its code file stays in the project, unused; deleting it needs your OK).
 - Not built: Team Members, Reference No., Planned Date; counting by barcode scan inside the sheet.
+
+## Sales Orders page (2026-10-26, owner chose: no tax now, order is only a record)
+- A sales order is a RECORD of what a customer wants. It does NOT change stock and does NOT reserve stock; "Available" on the form is only today's stock of the place, for information. Stock goes out later, at Picking & Packing and Dispatch (those pages are not built yet). (Owner's answer.)
+- NO TAX on the order: Sub Total, Discount, Shipping Charges, Grand Total. Tax / GST waits for the accountant. (Owner's answer.)
+- Status: Pending (waiting for confirmation), Confirmed, In Packing, Dispatched, Cancelled. On this page Pending and Confirmed are made here; "In Packing" and "Dispatched" will be set by the Picking & Packing and Dispatch pages. Until those exist, the demo orders in those two states were set directly in the database.
+- Who: `sales_orders.create` makes and edits Pending orders and may cancel an order that is Pending or Confirmed (with an optional note); `sales_orders.confirm` confirms. They are two separate permissions, so a different person can confirm. Admins have both. An order that is being packed or dispatched cannot be cancelled here.
+- Only a Pending order can be edited (customer, channel, dates, address, items, rates, discount, shipping). After confirmation it is fixed.
+- Rate starts as the item's selling price and can be changed per order. The discount cannot be more than the items total. One line per item.
+- Order value = items total - discount + shipping charges. The place on the order is the place the person works in ("Ships from"); to use another place, switch the working place at the top.
+- Sales channels are a fixed list: Website, Amazon, Flipkart, Meesho, Direct, Other.
+- To see sales orders a person also needs `items.view` (item names and the item search come from the item list), like other pages. Customers can be read by people with the sales order permissions (the customer table rule was widened for this).
+- The old "Sales Orders" menu item pointed at the Bills list; the Bills list is still there under the extra "Bills" entry (Quick Action, search box, phone bar). Shop bills (Billing) are a different thing and are not sales orders.
+- Not built: pictures in the item list, "Available" check or warning when the quantity is more than the stock, order documents / print, Import button.

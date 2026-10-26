@@ -72,7 +72,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
   add(can(user, "stock.entry"), { href: "/stock/entry", label: tr(lang, "nm_adjust"), icon: "entry", group: g.inventory });
   add(can(user, "stock.adjust") || can(user, "stock.approve") || can(user, "stock.view"), { href: "/stock/count", label: tr(lang, "nm_count"), icon: "count", group: g.inventory });
   // Sales & dispatch (our sales are the bills)
-  add(seesBills, { href: "/bills", label: tr(lang, "nm_sorders"), icon: "bills", group: g.sales });
+  add(can(user, "sales_orders.view") || can(user, "sales_orders.create") || can(user, "sales_orders.confirm"), { href: "/sales-orders", label: tr(lang, "nm_sorders"), icon: "bills", group: g.sales });
   add(seesBills, { href: "/coming-soon/picking-packing", label: tr(lang, "nm_picking"), icon: "picking", group: g.sales, soon: true });
   add(seesBills, { href: "/coming-soon/dispatch", label: tr(lang, "nm_dispatch"), icon: "dispatch", group: g.sales, soon: true });
   add(seesBills, { href: "/coming-soon/returns", label: tr(lang, "nm_returns"), icon: "returns", group: g.sales, soon: true });
@@ -88,6 +88,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
   // Jobs that are in the system but not in the mock's menu: reachable from Quick Action, the search box and the phone bar.
   const extras: NavItem[] = [];
   if (can(user, "stock.view") && can(user, "items.view")) extras.push({ href: "/reorder", label: tr(lang, "nav_reorder"), icon: "reorder" });
+  if (seesBills) extras.push({ href: "/bills", label: tr(lang, "nav_bills"), icon: "bills" });
   if (billingOn && can(user, "bills.create")) extras.push({ href: "/billing", label: tr(lang, "nav_billing2"), icon: "billing" });
   extras.push({ href: "/help", label: tr(lang, "nav_help"), icon: "help" });
   const bottomPool = [...nav, ...extras];
