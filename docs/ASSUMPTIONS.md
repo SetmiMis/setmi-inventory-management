@@ -115,3 +115,15 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - "Date" of the trend = the day the stock really moved (the approval day).
 - The place of an adjustment is the place the person works in (switch it at the top). Approving needs access to that place.
 - Not built: pictures and the Available stock column in the form; Reference stays optional free text; no Date field (it is the day it was made).
+
+## Physical Count page (2026-10-26, owner chose manager approval and a frozen system quantity)
+- A count is a sheet for one place. When it is made, the system quantity of every product in scope is FROZEN on the sheet ("System"). Scope: Full (every product that has stock or a min/max level in the place), Cycle (one category), Location (one rack of the place). A product with no stock record and no level in the place is not on a full count. (Owner's answer: freeze.)
+- People type what they counted; progress can be saved. All items must be counted before the sheet is sent. Where the count differs from the system a reason is needed (Missing, Extra, Wrong location, Damage / expiry, Others).
+- Sent counts wait for a manager (`stock.approve`). On approval the stock changes by the DIFFERENCE (counted minus frozen quantity) of each product, as an ADJUSTMENT movement with the count number. Moves made between the freeze and the approval are kept (for example goods received meanwhile stay). If applying would make a stock negative, the approval is refused and the sheet must be counted again. (Owner's answer: manager approval.)
+- A manager can send a count back with a note; it goes back to In Progress for a recount. Pending, In Progress and Waiting Approval counts can be cancelled; nothing changes in stock. A Completed count is final; a mistake is fixed with a Stock Adjustment.
+- A manager's own count is applied at once when sent (same rule as Stock Adjustment: please confirm).
+- Variance (Qty) in the list = counted minus system, added up (up and down cancel out). The card "Total Variance (Qty)" and the donut add up the SIZE of every difference of completed counts. Variance value = difference x average cost (as on Current Stock), only with `receipts.cost`; the card counts the size of the differences.
+- Pending = made but nothing counted yet; In Progress = some counted (the card also tells how many wait for approval).
+- "Count by scanning" (/stock/scan) is the older quick count: it still changes the stock AT ONCE without a sheet and without approval. Please tell me if it should go through the same approval or be removed.
+- The old "Count stock" screen with typed numbers is replaced by this page (its code file stays in the project, unused; deleting it needs your OK).
+- Not built: Team Members, Reference No., Planned Date; counting by barcode scan inside the sheet.

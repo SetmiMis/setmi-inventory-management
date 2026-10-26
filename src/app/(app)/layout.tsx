@@ -70,7 +70,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
   add(can(user, "stock.view"), { href: "/stock/movements", label: tr(lang, "nm_ledger"), icon: "ledger", group: g.inventory });
   add(seesTransfers, { href: "/transfers", label: tr(lang, "nm_transfer"), icon: "transfers", group: g.inventory });
   add(can(user, "stock.entry"), { href: "/stock/entry", label: tr(lang, "nm_adjust"), icon: "entry", group: g.inventory });
-  add(can(user, "stock.adjust"), { href: "/stock/count", label: tr(lang, "nm_count"), icon: "count", group: g.inventory });
+  add(can(user, "stock.adjust") || can(user, "stock.approve") || can(user, "stock.view"), { href: "/stock/count", label: tr(lang, "nm_count"), icon: "count", group: g.inventory });
   // Sales & dispatch (our sales are the bills)
   add(seesBills, { href: "/bills", label: tr(lang, "nm_sorders"), icon: "bills", group: g.sales });
   add(seesBills, { href: "/coming-soon/picking-packing", label: tr(lang, "nm_picking"), icon: "picking", group: g.sales, soon: true });

@@ -43,6 +43,9 @@ alter table public.purchase_order_costs enable trigger purchase_order_costs_guar
 alter table public.purchase_order_lines enable trigger purchase_order_lines_guard;
 alter table public.purchase_orders enable trigger purchase_orders_flow_guard;
 
+-- physical counts of a DEMO place (their lines go with them)
+delete from public.physical_counts where location_id in (select id from public.locations where code like 'DEMO-%');
+
 -- stock adjustments (Stock In / Out entries) of a DEMO place (lines go first)
 alter table public.stock_entries disable trigger stock_entries_no_change;
 alter table public.stock_entry_lines disable trigger stock_entry_lines_no_change;
