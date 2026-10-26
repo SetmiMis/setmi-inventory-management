@@ -76,9 +76,9 @@ export function TransferEditor({
       if (!saved.ok) { setFeedback({ ok: false, text: saved.message }); setProblems(saved.problems ?? []); return; }
       if (send) {
         const r = await sendTransfer({ id: saved.id });
-        if (!r.ok) { setFeedback({ ok: false, text: `Saved as draft ${saved.transferNo}, but not sent: ${r.message}` }); router.push(`/transfers/${saved.id}`); return; }
+        if (!r.ok) { setFeedback({ ok: false, text: `Saved as draft ${saved.transferNo}, but not sent: ${r.message}` }); router.push(`/transfers?sel=${saved.id}&p=details`); return; }
       }
-      if (!transferId || send) router.push(`/transfers/${saved.id}`);
+      if (!transferId || send) router.push(`/transfers?sel=${saved.id}&p=details`);
       else { setFeedback({ ok: true, text: `Draft ${saved.transferNo} saved.` }); router.refresh(); }
     });
   }

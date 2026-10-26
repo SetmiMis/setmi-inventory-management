@@ -96,3 +96,11 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - User column: first name and the first letter of the last name ("Amit K."), from a small helper that only gives this to people who may see stock. Nothing else of a profile is shown.
 - Remarks = the reason written with the movement. Not shown: Brand, HSN, Reserved stock, Documents tab.
 - The ledger cannot be edited from this page (the database does not allow it for anybody).
+
+## Stock Transfer page (2026-10-26)
+- The transfer flow itself is NOT changed: a draft does not change stock; stock leaves the sender when it is sent (status "In Transit") and arrives only when the other place receives it ("Completed"). If less arrives, a shortage note is needed and the transfer shows a "Shortage" tag. The mock's single "Submit Stock Transfer" is therefore the editor's two buttons (save draft, send).
+- "From Warehouse" in the Create form is the place the person works in (switch it at the top of the page); the mock shows a choice. Sending from a place you do not work in is not allowed.
+- No Date or Reference No. fields: a transfer has only remarks. The Date column is the day it was made.
+- "Requested By" = who made the transfer, shown as "First L." (needs stock.view, see Stock Ledger).
+- Draft is a status of its own (the mock has only Completed, In Transit, Cancelled); there is no card for it, but it can be filtered.
+- Receiving, recalling and editing a draft happen in the right panel or the full page (/transfers/[id]); the old editor is reused.
