@@ -78,3 +78,12 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - QC number is QC-<year>-<number>; the number keeps counting across years.
 - Permissions: new `qc.view` and `qc.manage`. To see checks a person also needs permission to see the receipt (for example receipts.view); place rules of the receipt apply. Give these on the Users & Roles page.
 - Not built: Images and Documents tabs (no file storage yet), Import button, Recheck as a separate step.
+
+## Current Stock page (2026-10-26)
+- The page lists one line per product per place (a product in two places = two lines). A line exists when the product has a stock record or a min/max level in that place. A product that never had stock and has no level does not appear.
+- Status of a line: Out of stock (quantity 0 or less), Low stock (quantity below the minimum level, minimum above 0), Over stocked (quantity above the maximum level), else In stock. The old page called "below minimum" low; "out" now wins when quantity is 0.
+- "Total Stock Quantity" adds all units together (pieces, metres ...), as the mock does; it is a rough number, not a count of pieces.
+- Average cost = weighted average buying price of the POSTED goods receipts of that product that the person may see (receipts.cost needed); Stock value = quantity x average cost. Transfers and opening stock carry no price, so a product without any priced receipt has no value (blank, not 0). A person without receipts.cost sees no cost or value. This is a simple rule, not a full valuation: please confirm, or tell me which costing you want.
+- Not shown, because the system has no such data: Brand, HSN code (GST waits), Reserved / Available stock (no reservations exist: available = current), Documents tab.
+- The old /stock page tools stay reachable: Quick Stock In/Out, Count stock, Count by scanning and Stock history are in the Add Item menu and the main menu.
+- Min / Max level can still be changed from the panel, but only for the place you currently work in (switch place first).
