@@ -151,3 +151,16 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - "Delayed" = not yet dispatched and the expected dispatch date has passed. Priority (High / Medium / Low) is chosen when picking starts.
 - The rack shown on a line is taken from the item's racks (Locations > Racks) in that place; an item with no rack shows none.
 - Not built: Team Members / Assign To, partial picking, picking by rack route.
+
+## Dispatch page (2026-10-26, owner chose: stock goes out at dispatch, hand-set courier status, hand-typed AWB)
+- Mark as Dispatched TAKES THE STOCK OUT: one SALE movement per item for the packed quantity (Stock Ledger shows "Dispatched on <order>"), the order becomes Dispatched and gets the dispatch date. Only an order that is packed (Ready to Dispatch in Picking & Packing) can be dispatched, and only when the place has enough stock at that moment. (Owner's answer.)
+- A dispatch cannot be cancelled or undone. A mistake is fixed through the Returns page (not built). Courier details (courier, service, AWB, insurance, pickup reference, remarks) can be edited until the parcel is Delivered or RTO; the order, date and stock cannot.
+- Courier status is changed BY HAND (no courier connection, which would be a paid outside service). Flow: Dispatched, In Transit, Out for Delivery, Delivered, Delivery Failed, RTO. Delivered and RTO are final. Delivered, Delivery Failed and RTO keep a date (today unless a date is given; not before the dispatch date, not in the future); other statuses clear it. (Owner's answer.)
+- An RTO does NOT put the stock back. That belongs to the Returns page (not built).
+- AWB is typed by hand from the courier. The same AWB cannot be used twice for the same courier (case does not matter). "Generate AWB" and "Bulk AWB Upload" are not built. (Owner's answer for Generate AWB.)
+- Couriers are a list in the database (Blue Dart, Delhivery, Ekart, XpressBees, DTDC, India Post, Other). Anyone with `dispatch.manage` can add a courier from the form; there is no screen to rename or hide one yet.
+- Service types: Surface, Air, Express, Standard (a guess, optional). Insurance is only a yes/no note; it does not buy insurance or change money.
+- The shipping label is a plain page (customer address from the sales order, courier, AWB, box and weight from packing). It is NOT a courier-made label, tax invoice or e-way bill.
+- Dispatch date: today by default, not in the future, not before the order date. One dispatch per order.
+- Who: `dispatch.manage` dispatches, changes status, edits and adds couriers; `dispatch.view` only looks. Admins have both. Staff also need `sales_orders.view`, `picking.view` (or `picking.manage`) and `items.view` for the lists to fill. New permissions must be given on the Users & Roles page.
+- Not built: Bulk AWB Upload, Generate AWB, courier tracking links, cancel dispatch, courier list screen.
