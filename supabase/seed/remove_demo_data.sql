@@ -13,6 +13,10 @@ delete from public.stock_movements
     or to_location_id   in (select id from public.locations where code like 'DEMO-%');
 alter table public.stock_movements enable trigger stock_movements_no_change;
 
+-- quality checks of those receipts (lines go with them)
+delete from public.quality_checks
+ where receipt_id in (select id from public.goods_receipts where location_id in (select id from public.locations where code like 'DEMO-%'));
+
 -- goods receipts that belong to a DEMO place (lines and prices go with them)
 alter table public.goods_receipts disable trigger goods_receipts_no_change;
 alter table public.goods_receipt_lines disable trigger goods_receipt_lines_guard;

@@ -68,3 +68,13 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - A receipt is not linked to an import shipment (no shipment number or container on the GRN). The link can be added later if you want it.
 - "Received Today" counts receipts posted today (India time). Source (Import / Domestic) comes from the supplier's type.
 - Only people who may see purchase orders see the order number on a receipt.
+
+## Quality Check (2026-10-26, owner answered the first three)
+- A quality check is a RECORD. It never changes stock: stock was added when the GRN was posted. Rejected goods are removed from stock by the owner with Stock Adjustment. (Owner's answer; the other option, "stock only after QC passes", would change GRN posting and was NOT chosen.)
+- One posted goods receipt has at most one quality check. A check can be recorded again later (the button says Recheck); the audit log keeps the older values. (Owner's answer.)
+- The status follows the numbers and is never typed: Pending (results not recorded), Rejected (any piece rejected), Rework (none rejected, some rework), Passed (all passed). The mock's "Failed" is called "Rejected". (Owner's answer.)
+- For every item: passed + rejected + rework must equal the received quantity. A reason is needed for rejected or rework pieces. The QC date cannot be in the future.
+- Only a POSTED receipt can be checked (draft and cancelled ones cannot).
+- QC number is QC-<year>-<number>; the number keeps counting across years.
+- Permissions: new `qc.view` and `qc.manage`. To see checks a person also needs permission to see the receipt (for example receipts.view); place rules of the receipt apply. Give these on the Users & Roles page.
+- Not built: Images and Documents tabs (no file storage yet), Import button, Recheck as a separate step.
