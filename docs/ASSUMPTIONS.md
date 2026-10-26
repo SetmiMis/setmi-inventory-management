@@ -87,3 +87,12 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - Not shown, because the system has no such data: Brand, HSN code (GST waits), Reserved / Available stock (no reservations exist: available = current), Documents tab.
 - The old /stock page tools stay reachable: Quick Stock In/Out, Count stock, Count by scanning and Stock history are in the Add Item menu and the main menu.
 - Min / Max level can still be changed from the panel, but only for the place you currently work in (switch place first).
+
+## Stock Ledger page (2026-10-26)
+- One ledger line = one movement at ONE place. A transfer gives two lines (out at the sender, in at the receiver, after it is received); the system place "in transit" is not shown. So "Total Transactions" counts lines, not documents.
+- Balance = the quantity of that product in that place right after the line, built from the movements the person may see (all movements of their own places, so it is exact for those places).
+- Types: Inward = receipt, Sale, Return = a voided bill that put stock back, Transfer, Lost in transit, Adjustment (counts and corrections), Opening, Stock out. The mock's "Return" is therefore only voided bills (there is no customer return process yet).
+- Cards: Stock In and Stock Out add up all lines (all units added together, a rough number). Transfer (Qty) = the quantity sent out by transfers. Adjustment (Qty) = the size of all count corrections, up and down.
+- User column: first name and the first letter of the last name ("Amit K."), from a small helper that only gives this to people who may see stock. Nothing else of a profile is shown.
+- Remarks = the reason written with the movement. Not shown: Brand, HSN, Reserved stock, Documents tab.
+- The ledger cannot be edited from this page (the database does not allow it for anybody).
