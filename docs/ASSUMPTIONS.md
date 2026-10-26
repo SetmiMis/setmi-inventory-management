@@ -61,3 +61,10 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - Shipment number is IMP-<year>-<number>. The number keeps counting across years (it does not restart on 1 January).
 - Permissions: new `shipments.view` and `shipments.manage`. To see shipments a person also needs a purchase permission (the order stays behind its own place rules). Give these on the Users & Roles page.
 - Not built yet: document upload (Documents tab and "Upload Documents"), because there is no file storage set up; the Import button (no importer).
+
+## Goods Inward (GRN) page (2026-10-26)
+- There is no quality check (QC) in the system yet, so the mock's "Pending Inspection / Accepted / Rejected" are shown as what really exists: **Draft** (not posted, no stock effect), **Posted** (stock was added) and **Cancelled**. "Partly received" = a posted receipt whose purchase order is still waiting for more goods. When Quality Check is built, these words can change. Please confirm.
+- The GRN number keeps the existing form GRN-000001 (the mock shows GRN-2026-001). Not changed, to avoid touching old receipts.
+- A receipt is not linked to an import shipment (no shipment number or container on the GRN). The link can be added later if you want it.
+- "Received Today" counts receipts posted today (India time). Source (Import / Domestic) comes from the supplier's type.
+- Only people who may see purchase orders see the order number on a receipt.
