@@ -215,3 +215,15 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - Supplier-wise: the supplier of a product = supplier of its most recent POSTED goods receipt; a product with no receipt shows "No receipt yet". (Owner's answer.)
 - Stock Status Value chart: In Stock, Low Stock, Reserved (quantity on Confirmed / In Packing orders, value taken out of the in-stock part) and In Transit (stock between places; NOT part of the Total Stock Value card, so the chart total is a bit bigger). A Damaged value is not shown: no damaged-goods place exists (damaged returns are not put back into stock).
 - Not built: FIFO, valuation as on a past date, price update history, damaged stock value.
+
+## Users & Roles page (2026-10-27, owner chose: roles as templates, invite first, small department list)
+- ADMINISTRATORS ONLY. Every change goes through admin_* database functions that check is_admin() again; the page itself also redirects non-admins.
+- A ROLE is a named template of permissions. "Change Role" COPIES the role's permissions to the person (their old permissions are replaced). Changing a role later does NOT change people who already have it; use Change Role on each person again. The Admin role (system, cannot be edited or switched off) means "administrator with every permission". (Owner's answer.)
+- The permission sets of the 5 starting roles (Operations Manager, Sales Executive, Warehouse Staff, Purchase Executive, Accountant) are MY SUGGESTION. Please read them on the Roles tab and change them to what you really want before giving them to staff.
+- A person can still have extra or fewer permissions than their role (the "Save Access" form). The role label on the list is only a label.
+- ADD USER = an INVITE (email, role, department, places; the permissions are those of the role at that moment). The login itself is still made in the Supabase dashboard (Authentication, Users) with the SAME email; at the first sign-in the person is switched on and the role, permissions, department and places are applied. No secret key is used anywhere. (Owner's answer.) Warning: anybody who can sign up with an invited email gets that access, so keep public sign-up OFF and e-mail confirmation ON in Supabase.
+- A sign-in WITHOUT an invite is still created inactive with no permissions, as before.
+- Nobody can switch themselves off or remove their own admin right (also when giving a role).
+- Departments are a simple list (name, on/off). A department or role cannot be deleted, only switched off.
+- Access Logs = changes made to users, roles, permissions, places and invites (from the audit log), with who did them. It is NOT a record of every sign-in; the "Last Login" of each person comes from the login system.
+- Not built: 2-factor login, e-mail notification switches, phone number, creating the login from this page, deleting users.
