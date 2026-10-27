@@ -26,18 +26,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
 async function Shell({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
-  const lang = await getLang();
-  const myLocations = await getMyLocations(user);
-  const current = await getCurrentLocation(user);
-  const billingOn = await isBillingEnabled();
-
   // The bell: how many items are low on stock (the database only shows the places this person may see).
-  let lowCount = 0;
-  if (user.isActive && can(user, "stock.view")) {
+  const countLow = async () => {
+    if (!(user.isActive && can(user, "stock.view"))) return 0;
     const supabase = await createClient();
     const { count } = await supabase.from("stock_overview").select("item_id", { count: "exact", head: true }).eq("is_low", true);
-    lowCount = count ?? 0;
-  }
+    return count ?? 0;
+  };
+  // These five reads are independent: ask together, so the page waits for the slowest one, not for the sum.
+  const [lang, myLocations, current, billingOn, lowCount] = await Promise.all([
+    getLang(), getMyLocations(user), getCurrentLocation(user), isBillingEnabled(), countLow(),
+  ]);
 
   // The menu is the one in the owner's dashboard mock, item for item. Items marked `soon` are in the design but
   // not built yet: they open a "Coming soon" page (nothing is faked). Only what this person may use is shown.

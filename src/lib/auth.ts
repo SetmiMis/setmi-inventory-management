@@ -19,17 +19,12 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return null;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("email, full_name, is_active, is_admin")
-    .eq("id", auth.user.id)
-    .maybeSingle();
+  // The two reads do not depend on each other: ask together (one network wait instead of two).
+  const [{ data: profile }, { data: perms }] = await Promise.all([
+    supabase.from("profiles").select("email, full_name, is_active, is_admin").eq("id", auth.user.id).maybeSingle(),
+    supabase.from("user_permissions").select("permission_key").eq("user_id", auth.user.id),
+  ]);
   if (!profile) return null;
-
-  const { data: perms } = await supabase
-    .from("user_permissions")
-    .select("permission_key")
-    .eq("user_id", auth.user.id);
 
   return {
     id: auth.user.id,
