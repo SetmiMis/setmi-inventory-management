@@ -175,3 +175,14 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - Reasons are a fixed list: Damaged, Wrong Item, Not Working, Changed Mind, Missing Item, Others. Conditions: Good, Damaged, Used. The return date is not in the future and not before the order date.
 - Return numbers are RT-<year>-<number>. A rejected return gives its quantity back to the order, so a new return can be made for it.
 - Not built: Generate Return AWB, a place for damaged goods, a credit note or refund amount, partial approval of single lines, cancelling a return.
+
+## Inventory Reports page (2026-10-27, owner chose the rules below)
+- One stock line = one product in one place (same lines and same status words as Current Stock). "Total Items (SKU)" counts products; the Status Distribution counts stock lines, so its total is bigger.
+- Slow Moving: stock in the place and LESS THAN 5 units sold (SALE movements, i.e. dispatched orders and shop bills) in the date range (default the last 30 days). Fast Moving: at least 1 sold in the range, most first. The number 5 is my choice; tell me another number if you want. (Owner chose the sold-in-range idea.)
+- Stock Ageing: days since stock last CAME INTO that place (receipt, transfer in, return, opening, adjustment up). Groups 0-30, 31-60, 61-90, 91+ days. It is not FIFO and not by batch. (Owner's answer.)
+- Reserved = quantity on sales orders that are Confirmed or In Packing (not dispatched yet) in that place; Available = stock minus reserved. Information only: orders do not reserve stock, it leaves at Dispatch. A person who cannot see sales orders sees 0. (Owner's answer.)
+- Value = average cost x quantity, same rule as Current Stock (needs `receipts.cost`; otherwise value cards show "-" and the charts show quantity instead). Please still confirm the costing rule.
+- Stock In / Stock Out of the chart and the movement tab are per place like the Stock Ledger: a transfer counts as Out of one place and In to another; transit places are left out. Movement types: Opening, Inward, Sale, Return, Transfer, Lost in transit, Adjustment, Stock in, Stock out.
+- The Status Distribution splits lines into Out of Stock, Low Stock, Slow Moving (in stock but slow) and In Stock (the rest, including over-stocked); "Inactive" counts archived products that still have stock.
+- Batch / Serial is not built (no batch or serial tracking exists). Download is a CSV (opens in Excel), at most 5000 rows of the chosen tab with the same filters. (Owner's answer.)
+- Who: `reports.view` opens the page; `stock.view` is needed for the numbers; `receipts.cost` for money; `sales_orders.view` for Reserved. Admins have all.

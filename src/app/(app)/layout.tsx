@@ -77,7 +77,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
   add(can(user, "dispatch.view") || can(user, "dispatch.manage"), { href: "/dispatch", label: tr(lang, "nm_dispatch"), icon: "dispatch", group: g.sales });
   add(can(user, "returns.view") || can(user, "returns.manage") || can(user, "returns.approve"), { href: "/returns", label: tr(lang, "nm_returns"), icon: "returns", group: g.sales });
   // Reports
-  add(can(user, "reports.view"), { href: "/reports", label: tr(lang, "nm_rinv"), icon: "reports", group: g.reports });
+  add(can(user, "reports.view"), { href: "/reports/inventory", label: tr(lang, "nm_rinv"), icon: "reports", group: g.reports });
   add(can(user, "reports.view"), { href: "/coming-soon/purchase-reports", label: tr(lang, "nm_rpur"), icon: "reports2", group: g.reports, soon: true });
   add(can(user, "reports.view"), { href: "/reports?r=sales-day", label: tr(lang, "nm_rsales"), icon: "reports3", group: g.reports });
   add(can(user, "reports.view"), { href: "/coming-soon/stock-valuation", label: tr(lang, "nm_rval"), icon: "valuation", group: g.reports, soon: true });
