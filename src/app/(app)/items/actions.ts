@@ -84,7 +84,6 @@ export async function createProduct(fd: FormData): Promise<ProductResult> {
   const x = extra.data;
   if (!draft) {
     if (!v.categoryId) return { ok: false, message: "Category is required." };
-    if (!x.shortDescription) return { ok: false, message: "Short Description is required." };
   }
   if ((x.netWeight && !x.weightUnit) || ((x.dimL || x.dimW || x.dimH) && !x.dimUnit)) {
     return { ok: false, message: "Choose the unit for the weight / size." };
