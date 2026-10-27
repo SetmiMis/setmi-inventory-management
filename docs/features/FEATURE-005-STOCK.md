@@ -4,11 +4,11 @@
 
 ## 0. What exists now (actual code)
 - Migrations 7, 8, 9 (all applied): `20261025000007_stock.sql` (units, `stock_movements` append-only ledger, `stock_balances` kept by a trigger, `reorder_levels`, `apply_stock_count`, 4 new permissions), `...08_stock_overview.sql` (view `stock_overview`, security invoker), `...09_revoke_unit_guard_execute.sql` (advisor fix).
-- DB tests: `supabase/tests/007_stock.sql` 28/28 PASS, `008_stock_overview.sql` 4/4 PASS.
+- DB tests: `backend/supabase/tests/007_stock.sql` 28/28 PASS, `008_stock_overview.sql` 4/4 PASS.
 - Screens: `/stock` (list for the working place, search, "low stock only", min/max editor), `/stock/count` (count sheet, reason, "opening stock" tick; all-or-nothing), `/stock/movements` (history). The unit is chosen on the item form (dropdown from the units table).
 - The place is always the user's current working location read on the server; it is never taken from the form.
 - Unit tests `tests/stock.test.ts` (quantity parser). Total 25/25.
-- Demo data: `supabase/seed/demo_data.sql` (loaded into the dev project on 2026-10-25: 3 DEMO locations, 12 DEMO items incl. 2 sold per metre, 36 movements, a few items below minimum on purpose) and `supabase/seed/remove_demo_data.sql` (tested: removes only DEMO- things, append-only trigger is switched back on).
+- Demo data: `backend/supabase/seed/demo_data.sql` (loaded into the dev project on 2026-10-25: 3 DEMO locations, 12 DEMO items incl. 2 sold per metre, 36 movements, a few items below minimum on purpose) and `backend/supabase/seed/remove_demo_data.sql` (tested: removes only DEMO- things, append-only trigger is switched back on).
 - Not done: Excel import of counts (P4b), receipts (P5), transfers screen (P6, the ledger already supports them), sales (P7), a `unit` column in the Excel item import, a units admin screen (units can be added with SQL until then).
 
 ## 1. What Odoo's Inventory docs taught us, and what we do with it
@@ -32,7 +32,7 @@
 - **Permissions** (admin toggles): `stock.view`, `stock.adjust`, `stock.min_levels`, `units.manage`. A user works only in the places assigned to them.
 - **Quantities** are `numeric(14,3)`. The item's unit decides how many decimals are allowed (metres 3, pieces 0).
 - **Count screen**: all items of the current place on one sheet, type counted numbers, only changed rows are sent; one reason for the whole sheet; all-or-nothing in one transaction.
-- **Demo data**: `supabase/seed/demo_data.sql` (dev only) creates DEMO locations, DEMO items and stock. Real data comes from the Excel import (items) and the count screen (stock).
+- **Demo data**: `backend/supabase/seed/demo_data.sql` (dev only) creates DEMO locations, DEMO items and stock. Real data comes from the Excel import (items) and the count screen (stock).
 
 ## 3. Not in P4
 Receiving from suppliers (P5), transfers (P6), billing (P7), reports and CSV export (P8), automatic purchase orders, units conversion (reel <-> metre), Excel import of counts (a natural P4b), location barcodes.

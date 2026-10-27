@@ -32,7 +32,7 @@ No service-role key is used by the app and none must be added. See `.env.example
 
 ## 5. Release steps (every release)
 1. `npm run lint`, `npm run typecheck`, `npm test`, `npm run build` all pass on the commit.
-2. Database changes first: apply new migrations to the target project, run the matching test file in `supabase/tests/`, run the Supabase security advisor.
+2. Database changes first: apply new migrations to the target project, run the matching test file in `backend/supabase/tests/`, run the Supabase security advisor.
 3. Push to `main`; Vercel builds. Open the preview/production URL.
 4. Smoke test: sign in; open Items, Stock, Receipts, Transfers, Bills, Reports; make one test receipt and post it; print one label.
 5. Record the commit in `docs/ROLLBACK.md` as known-good.
@@ -53,7 +53,7 @@ Recommended once live: Vercel runtime logs (built in), Supabase logs and advisor
 - [ ] Give DNS access or add the CNAME Vercel shows
 - [ ] Create the real users, locations and permissions
 - [ ] Load real items (Excel import) and opening stock (scan count), then switch billing ON only when Zoho is switched off for that shop
-- [ ] Remove the DEMO data with `supabase/seed/remove_demo_data.sql` (void any DEMO bills first; the script does not remove bills yet)
+- [ ] Remove the DEMO data with `backend/supabase/seed/remove_demo_data.sql` (void any DEMO bills first; the script does not remove bills yet)
 
 ## 10. Hostinger steps (when the owner says "deploy")
 Prepared, NOT done. Settings that only the owner can do are marked (owner).

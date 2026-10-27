@@ -1,7 +1,7 @@
 # CLAUDE.md: SETMI INDIA Inventory Management System
 
 Read `docs/HANDOVER.md` first in every session. Update it last.
-Also read `AGENTS.md`: this Next.js version differs from older versions, and its docs are in `node_modules/next/dist/docs/`.
+Also read `AGENTS.md`: this Next.js version differs from older versions, and its docs are in `frontend/node_modules/next/dist/docs/`.
 
 ## Working style
 - The owner is a beginner. Explain in simple Hinglish.
@@ -31,4 +31,4 @@ Also read `AGENTS.md`: this Next.js version differs from older versions, and its
 - Deleting files
 
 ## Commands
-`npm run dev`, `npm run lint`, `npm run typecheck`, `npm run build`
+Run inside `frontend/`: `npm run dev`, `npm run lint`, `npm run typecheck`, `npm run build`, `npm test`. Inside `backend/`: `npm run dev`, `npm run typecheck`, `npm run build`, `npm test`.

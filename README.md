@@ -17,7 +17,7 @@ Not built (shown as "Not built yet" on screen): tax / GST calculation, e-mail no
 | Web app | Next.js 16 (App Router, Cache Components), React 19, TypeScript |
 | Styling | Tailwind CSS 4 |
 | Database / Auth / Storage | Supabase (Postgres with Row Level Security; writes only through checked database functions) |
-| Hosting (planned) | Hostinger Node.js web app, `inventory.setmiindia.com` |
+| Hosting | Not final. Now on Vercel (frontend only). Planned: frontend + backend together (owner decides later; Hostinger VPS with PM2 and Nginx is one option) |
 
 ## Prerequisites
 
@@ -25,30 +25,47 @@ Not built (shown as "Not built yet" on screen): tax / GST calculation, e-mail no
 - Git
 - A Supabase project (URL and publishable key)
 
+## Project layout (since 2026-10-27)
+
+```text
+frontend/   Next.js app (pages, forms, charts). Its own package.json. Port 3000.
+backend/    Express REST API (TypeScript) and backend/supabase/ (database migrations, SQL tests, seed). Port 4000.
+docs/       Documentation. CLAUDE.md and AGENTS.md are the rules for AI sessions.
+```
+
+The website still works on its own (its server actions talk to the database). The REST API in `backend/` is being built module by module (done so far: health check, sign-in check, products); see `docs/ARCHITECTURE.md` and `docs/HANDOVER.md`.
+
 ## Run it on your computer
 
 ```bash
-npm install
-cp .env.example .env.local     # then fill the two public Supabase values
-npm run dev                    # http://localhost:3000
+cd frontend && npm install && cp .env.example .env.local   # fill the two public Supabase values
+npm run dev                                                 # http://localhost:3000
+```
+
+```bash
+cd backend && npm install && cp .env.example .env.local     # fill the two public Supabase values
+npm run dev                                                 # http://localhost:4000/health
 ```
 
 ## Commands
 
+In `frontend/`:
+
 ```bash
-npm run dev          # dev server
-npm run lint         # ESLint
-npm run typecheck    # next typegen && tsc --noEmit
-npm run build        # production build
-npm start            # run the production build (honours the PORT variable)
-npm test             # unit tests for validation rules (Node built-in runner)
+npm run dev | lint | typecheck | build | start | test
 ```
 
-Database tests are SQL scripts in `supabase/tests/` (see `docs/TESTING.md`). Database changes are the files in `supabase/migrations/`, applied in file-name order. On Windows PowerShell, if `npm` is blocked by the execution policy, use `npm.cmd`.
+In `backend/`:
+
+```bash
+npm run dev | typecheck | build | start | test
+```
+
+Database tests are SQL scripts in `backend/supabase/tests/` (see `docs/TESTING.md`). Database changes are the files in `backend/supabase/migrations/`, applied in file-name order. On Windows PowerShell, if `npm` is blocked by the execution policy, use `npm.cmd`.
 
 ## Environment variables
 
-Only two, both public by design: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (see [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md)). They are written into the app when it is built, so they must be set BEFORE `npm run build`. The Supabase service-role key is never used. Never commit `.env*` files; they are git-ignored.
+Frontend: only two, both public by design: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Backend: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `FRONTEND_URL`, `PORT` (see `backend/.env.example` and [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md)). They are written into the app when it is built, so they must be set BEFORE `npm run build`. The Supabase service-role key is never used. Never commit `.env*` files; they are git-ignored.
 
 ## Documentation
 

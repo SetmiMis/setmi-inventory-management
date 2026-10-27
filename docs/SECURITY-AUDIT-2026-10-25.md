@@ -48,7 +48,7 @@ Code audit (read-only, by an independent reviewer): no critical or high issues. 
 - 31 "signed-in users can execute SECURITY DEFINER function" advisor warnings: accepted, each function checks permission inside (tested).
 
 ## 4. How it was checked
-- `supabase/tests/018_security_hardening.sql`: 10 PASS lines (anon blocked from tables and trigger function; active admin still reads units, permissions, settings; item update trigger still works; a stranger account sees nothing). Run on the dev project, rolled back.
+- `backend/supabase/tests/018_security_hardening.sql`: 10 PASS lines (anon blocked from tables and trigger function; active admin still reads units, permissions, settings; item update trigger still works; a stranger account sees nothing). Run on the dev project, rolled back.
 - `npm run typecheck`, `npm run lint`, `npm test` (42 of 42 pass), `npm run build` all OK after the changes.
 - Tests 015 to 017 were NOT re-run after migration 28 (it only removes anonymous rights and tightens three read policies; test 018 covers those).
 - Not seen on screen: the dark-mode colour changes, phone menu and 44 px inputs were checked by code and contrast numbers only.
