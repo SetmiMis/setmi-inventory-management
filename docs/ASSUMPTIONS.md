@@ -205,3 +205,13 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - City comes from the customer (empty city shows as "Not set"). Customer type is the customer type from the Customers page.
 - Payment Status and the Payment Wise tab are NOT built: the system has no customer payments. (Owner's answer: leave it.)
 - The old `/reports` page is unchanged; the menu item "Sales Reports" now opens this page (before, it opened the old sales-per-day report).
+
+## Stock Valuation page (2026-10-27, owner chose: average cost now, refill value for out of stock, last receipt decides the supplier)
+- Method: AVERAGE COST only = weighted average of the buying prices of POSTED goods receipts (the same rule as Current Stock and Inventory Reports); value = quantity x average cost. A product with stock but no priced receipt has no value and is counted in the yellow note. No FIFO and no "Date As On": both need cost layers the system does not keep. The accountant should confirm this costing. (Owner's answer.)
+- The page needs both `stock.view` and `receipts.cost`; without the cost permission it refuses (everything on it is money).
+- Movement type (last 30 days, SALE movements): FAST = 10 or more sold, SLOW = stock in the place and fewer than 5 sold, NORMAL = the rest. The numbers 10 and 5 are my choice; tell me other numbers if you want.
+- Age = days since stock last came into that place. Age groups 0-30, 31-60, 61-90, 91-180, 181+ days (stock with no stock-in record falls in "Unknown").
+- Fast / Slow / Low Stock Value = stock value of the lines of that kind. Out of Stock Value = refill value = minimum level x average cost of the lines that are out of stock (their own value is 0). (Owner's answer.)
+- Supplier-wise: the supplier of a product = supplier of its most recent POSTED goods receipt; a product with no receipt shows "No receipt yet". (Owner's answer.)
+- Stock Status Value chart: In Stock, Low Stock, Reserved (quantity on Confirmed / In Packing orders, value taken out of the in-stock part) and In Transit (stock between places; NOT part of the Total Stock Value card, so the chart total is a bit bigger). A Damaged value is not shown: no damaged-goods place exists (damaged returns are not put back into stock).
+- Not built: FIFO, valuation as on a past date, price update history, damaged stock value.
