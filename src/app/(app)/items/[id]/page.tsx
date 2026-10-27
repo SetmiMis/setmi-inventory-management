@@ -90,6 +90,14 @@ export default async function ItemPage({
             leadTimeDays: item.lead_time_days === null ? null : String(item.lead_time_days),
             safetyFactor: item.safety_factor === null ? null : String(Number(item.safety_factor)),
             moq: item.moq === null ? null : String(Number(item.moq)),
+            subCategory: item.sub_category, brand: item.brand, hsnCode: item.hsn_code,
+            shortDescription: item.short_description, detailedDescription: item.detailed_description,
+            productType: item.product_type, material: item.material, color: item.color,
+            netWeight: item.net_weight === null ? null : String(Number(item.net_weight)), weightUnit: item.weight_unit,
+            dimL: item.dim_l === null ? null : String(Number(item.dim_l)), dimW: item.dim_w === null ? null : String(Number(item.dim_w)), dimH: item.dim_h === null ? null : String(Number(item.dim_h)), dimUnit: item.dim_unit,
+            countryOfOrigin: item.country_of_origin, modelNo: item.model_no,
+            searchKeywords: item.search_keywords, shelfLife: item.shelf_life,
+            tags: item.tags ?? [], showInSales: item.show_in_sales, showInPurchase: item.show_in_purchase, lowStockAlert: item.low_stock_alert,
           }}
         />
       ) : (

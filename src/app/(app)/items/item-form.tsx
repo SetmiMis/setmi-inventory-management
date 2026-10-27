@@ -20,6 +20,29 @@ export type ItemValues = {
   leadTimeDays: string | null;
   safetyFactor: string | null;
   moq: string | null;
+  // Optional product details (migration 56); only the edit form shows them.
+  subCategory: string | null;
+  brand: string | null;
+  hsnCode: string | null;
+  shortDescription: string | null;
+  detailedDescription: string | null;
+  productType: string | null;
+  material: string | null;
+  color: string | null;
+  netWeight: string | null;
+  weightUnit: string | null;
+  dimL: string | null;
+  dimW: string | null;
+  dimH: string | null;
+  dimUnit: string | null;
+  countryOfOrigin: string | null;
+  modelNo: string | null;
+  searchKeywords: string | null;
+  shelfLife: string | null;
+  tags: string[];
+  showInSales: boolean;
+  showInPurchase: boolean;
+  lowStockAlert: boolean;
 };
 
 export type UnitOption = { code: string; name: string };
@@ -142,6 +165,65 @@ export function ItemForm({
           </div>
         </div>
       </fieldset>
+
+      {item && (
+        <fieldset className="rounded-xl border border-line p-4">
+          <legend className="px-1 text-sm font-medium">Product details (optional)</legend>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {([
+              ["subCategory", "Sub Category", item.subCategory, 100], ["brand", "Brand", item.brand, 100], ["hsnCode", "HSN Code (only stored, no tax)", item.hsnCode, 20],
+              ["productType", "Product Type", item.productType, 100], ["material", "Material", item.material, 100], ["color", "Color", item.color, 100],
+              ["countryOfOrigin", "Country of Origin", item.countryOfOrigin, 100], ["modelNo", "Model / Part No.", item.modelNo, 100], ["shelfLife", "Shelf Life / Warranty", item.shelfLife, 100],
+            ] as const).map(([name, label, value, max]) => (
+              <div key={name}>
+                <label htmlFor={name} className={labelClass}>{label}</label>
+                <input id={name} name={name} maxLength={max} defaultValue={value ?? ""} className={inputClass} />
+              </div>
+            ))}
+            <div>
+              <label htmlFor="netWeight" className={labelClass}>Net Weight</label>
+              <div className="flex gap-2">
+                <input id="netWeight" name="netWeight" inputMode="decimal" maxLength={12} defaultValue={item.netWeight ?? ""} className={inputClass} />
+                <select name="weightUnit" aria-label="Weight unit" defaultValue={item.weightUnit ?? "kg"} className={`${inputClass} w-24 shrink-0`}><option value="g">g</option><option value="kg">kg</option></select>
+              </div>
+            </div>
+            <div className="sm:col-span-2">
+              <label htmlFor="dimL" className={labelClass}>Dimensions (L x W x H)</label>
+              <div className="flex gap-2">
+                <input id="dimL" name="dimL" inputMode="decimal" maxLength={12} placeholder="L" defaultValue={item.dimL ?? ""} className={inputClass} />
+                <input name="dimW" aria-label="Width" inputMode="decimal" maxLength={12} placeholder="W" defaultValue={item.dimW ?? ""} className={inputClass} />
+                <input name="dimH" aria-label="Height" inputMode="decimal" maxLength={12} placeholder="H" defaultValue={item.dimH ?? ""} className={inputClass} />
+                <select name="dimUnit" aria-label="Size unit" defaultValue={item.dimUnit ?? "cm"} className={`${inputClass} w-24 shrink-0`}><option value="mm">mm</option><option value="cm">cm</option><option value="m">m</option><option value="in">in</option></select>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 space-y-4">
+            <div>
+              <label htmlFor="shortDescription" className={labelClass}>Short Description</label>
+              <textarea id="shortDescription" name="shortDescription" rows={2} maxLength={500} defaultValue={item.shortDescription ?? ""} className={inputClass} />
+            </div>
+            <div>
+              <label htmlFor="detailedDescription" className={labelClass}>Detailed Description</label>
+              <textarea id="detailedDescription" name="detailedDescription" rows={4} maxLength={2000} defaultValue={item.detailedDescription ?? ""} className={inputClass} />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label htmlFor="tags" className={labelClass}>Tags (separated by commas, up to 20)</label>
+                <input id="tags" name="tags" defaultValue={item.tags.join(", ")} className={inputClass} />
+              </div>
+              <div>
+                <label htmlFor="searchKeywords" className={labelClass}>Search Keywords</label>
+                <input id="searchKeywords" name="searchKeywords" maxLength={500} defaultValue={item.searchKeywords ?? ""} className={inputClass} />
+              </div>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-3">
+              <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="showInSales" defaultChecked={item.showInSales} /> Show in Sales Order</label>
+              <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="showInPurchase" defaultChecked={item.showInPurchase} /> Show in Purchase Order</label>
+              <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="lowStockAlert" defaultChecked={item.lowStockAlert} /> Low Stock Alert</label>
+            </div>
+          </div>
+        </fieldset>
+      )}
 
       {!editing && (
         <div className="space-y-2">

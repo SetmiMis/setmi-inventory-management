@@ -1,11 +1,13 @@
 # DEPLOYMENT (plan and checklist, nothing is deployed yet)
 
-**Status:** NOT deployed. No Vercel project, no DNS, no production database exists. The owner must say "deploy" first (rule in CLAUDE.md). This file is the DevOps plan so that when the owner says yes, it is a short, safe job.
+**Status:** NOT deployed. No hosting app, no DNS change, no production database exists. The owner must say "deploy" first (rule in CLAUDE.md). This file is the DevOps plan so that when the owner says yes, it is a short, safe job.
+
+**Owner's choice (2026-10-27): Hostinger Business Web Hosting, subdomain `inventory.setmiindia.com`, the same Supabase database.** Section 10 has the Hostinger steps. Wherever this file says "Vercel", read "the Hostinger Node.js app" (the Vercel wording stays as a fallback plan).
 
 ## 1. Target
-- App: Vercel, project from the private GitHub repo `SetmiMis/setmi-inventory-management`, branch `main`.
-- Database/Auth/Storage: Supabase. Today the only project is the development one (`setmi-inventory-management`, ref `arvdzlsimnofguwxkzev`).
-- Address: `inventory.setmiindia.com` (CNAME at the DNS provider of setmiindia.com).
+- App: Hostinger Node.js web app (hPanel > Websites > Add Website > Node.js Apps), imported from the private GitHub repo `SetmiMis/setmi-inventory-management`, branch `main`. Hostinger lists Next.js as supported and Node.js 18, 20, 22, 24 (checked on Hostinger's pages on 2026-10-27; their guides disagree on whether Business or only Cloud plans include Node.js apps, so open hPanel and confirm "Node.js Apps" is offered on the plan BEFORE planning the go-live day).
+- Database/Auth/Storage: Supabase (not Hostinger's MySQL: the app is built on Supabase Auth, Row Level Security and Storage). Today the only project is the development one (`setmi-inventory-management`, ref `arvdzlsimnofguwxkzev`).
+- Address: `inventory.setmiindia.com` (subdomain added in hPanel / DNS of setmiindia.com).
 
 ## 2. Decision for the owner: one Supabase project or two?
 | Option | Good | Bad |
@@ -52,3 +54,20 @@ Recommended once live: Vercel runtime logs (built in), Supabase logs and advisor
 - [ ] Create the real users, locations and permissions
 - [ ] Load real items (Excel import) and opening stock (scan count), then switch billing ON only when Zoho is switched off for that shop
 - [ ] Remove the DEMO data with `supabase/seed/remove_demo_data.sql` (void any DEMO bills first; the script does not remove bills yet)
+
+## 10. Hostinger steps (when the owner says "deploy")
+Prepared, NOT done. Settings that only the owner can do are marked (owner).
+1. (owner) hPanel: confirm the plan offers **Node.js Apps**. If it does not, upgrade the plan or use another host; do not buy anything before asking.
+2. (owner) Make the subdomain: hPanel > Domains > Subdomains > create `inventory` under `setmiindia.com`. If DNS of the domain is elsewhere, add the record Hostinger shows.
+3. (owner) hPanel > Websites > Add Website > Node.js Apps > Import Git repository > connect GitHub, install the Hostinger GitHub app and give it access to the PRIVATE repo `setmi-inventory-management` only. Branch `main`.
+4. Framework Next.js, Node version **24** (or 22), build command `npm run build`, start command `npm start` (Next.js reads the PORT Hostinger sets). Keep the install command `npm ci`.
+5. (owner) Environment variables, set BEFORE the first build because `NEXT_PUBLIC_*` values are written into the app at build time:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   Nothing else. No service-role key. If a value is changed later, redeploy (rebuild) so the new value is used.
+6. Attach the subdomain to the app; turn on the free SSL certificate; open `https://inventory.setmiindia.com/login`.
+7. Do section 4 (Supabase dashboard settings). **Site URL and Redirect URLs must be the new address**, or the password-reset e-mail will point to the wrong place.
+8. Smoke test (section 5 step 4). Then remove DEMO data (section 9) and create the real users.
+9. Rollback: redeploy the last good commit from the Hostinger deployments list (or revert on GitHub and push). Database changes are forward-only (see `docs/ROLLBACK.md`).
+Known limits to expect: Hostinger builds on its own servers (a build needs about 2 GB memory; if it fails with "out of memory", tell the AI); no preview URLs per branch; logs are read in hPanel. Uploads go from the browser straight to Supabase Storage, so Hostinger's body-size limit does not affect images.
+Supabase is in another country than Hostinger's server may be: check the Supabase project region (nearest to India: Mumbai / Singapore) once, because every page waits on it. Changing region means a new project, so decide before real data is entered (this is the same choice as option A / B in section 2).

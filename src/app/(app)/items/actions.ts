@@ -165,6 +165,12 @@ export async function updateItem(_prev: FormState, fd: FormData): Promise<FormSt
   const v = parsed.data;
   const mayEditSelling = can(user, "items.edit_selling_name");
   if (mayEditSelling && !v.sellingItemName) return fail("Selling Item Name is required.");
+  const extra = productExtrasFromForm(fd);
+  if (!extra.success) return fail(extra.error.issues[0].message);
+  const tags = parseTags(String(fd.get("tags") ?? "").split(","));
+  if (tags.error) return fail(tags.error);
+  const x = extra.data;
+  if ((x.netWeight && !x.weightUnit) || ((x.dimL || x.dimW || x.dimH) && !x.dimUnit)) return fail("Choose the unit for the weight / size.");
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -182,6 +188,17 @@ export async function updateItem(_prev: FormState, fd: FormData): Promise<FormSt
       lead_time_days: v.leadTimeDays ? Number(v.leadTimeDays) : null,
       safety_factor: v.safetyFactor ? Number(v.safetyFactor) : null,
       moq: v.moq ? Number(v.moq) : null,
+      sub_category: x.subCategory, brand: x.brand, hsn_code: x.hsnCode,
+      short_description: x.shortDescription, detailed_description: x.detailedDescription,
+      product_type: x.productType, material: x.material, color: x.color,
+      net_weight: x.netWeight ? Number(x.netWeight) : null, weight_unit: x.netWeight ? x.weightUnit : null,
+      dim_l: x.dimL ? Number(x.dimL) : null, dim_w: x.dimW ? Number(x.dimW) : null, dim_h: x.dimH ? Number(x.dimH) : null,
+      dim_unit: x.dimL || x.dimW || x.dimH ? x.dimUnit : null,
+      country_of_origin: x.countryOfOrigin, model_no: x.modelNo,
+      tags: tags.tags, search_keywords: x.searchKeywords, shelf_life: x.shelfLife,
+      show_in_sales: fd.get("showInSales") === "on",
+      show_in_purchase: fd.get("showInPurchase") === "on",
+      low_stock_alert: fd.get("lowStockAlert") === "on",
     })
     .eq("id", id.data)
     .eq("updated_at", expected.data)
