@@ -361,3 +361,5 @@ function SalesTrend({ points }: { points: { day: string; orders: number; value: 
     </div>
   );
 }
+
+export const metadata = { title: "Sales Reports" };

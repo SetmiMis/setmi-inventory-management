@@ -33,3 +33,5 @@ async function Screen({ searchParams }: { searchParams: Promise<SearchParams> })
     </AuthCard>
   );
 }
+
+export const metadata = { title: "Forgot password" };

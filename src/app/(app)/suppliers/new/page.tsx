@@ -12,3 +12,5 @@ export default async function NewSupplierPage() {
     </main>
   );
 }
+
+export const metadata = { title: "Add Supplier" };

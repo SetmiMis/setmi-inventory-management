@@ -34,3 +34,5 @@ export default async function NewPurchaseOrderPage() {
     </main>
   );
 }
+
+export const metadata = { title: "New Purchase Order" };

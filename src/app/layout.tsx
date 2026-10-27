@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SETMI INDIA Inventory Management System",
+  title: { default: "SETMI INDIA Inventory Management System", template: "%s | SETMI INDIA" },
   description: "Internal inventory management for SETMI INDIA",
 };
 

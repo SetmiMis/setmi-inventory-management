@@ -393,3 +393,5 @@ function Stat({ icon: Icon, label, value }: { icon: LucideIcon; label: string; v
     </div>
   );
 }
+
+export const metadata = { title: "Customers" };

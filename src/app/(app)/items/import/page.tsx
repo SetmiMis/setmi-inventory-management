@@ -26,3 +26,5 @@ export default async function ImportPage() {
     </main>
   );
 }
+
+export const metadata = { title: "Import Items" };

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   cancelReceipt, lookupReceiptItem, postReceipt, saveReceipt, searchReceiptItems,
@@ -41,6 +41,8 @@ export function ReceiptEditor({
   const [busy, startBusy] = useTransition();
   const scanRef = useRef<HTMLInputElement>(null);
   const lastScan = useRef(0);
+  // Focus the scan box when the page opens, without scrolling the page down to it.
+  useEffect(() => { scanRef.current?.focus({ preventScroll: true }); }, []);
 
   function addItem(it: ReceiptItem) {
     setLines((prev) => {
@@ -151,7 +153,7 @@ export function ReceiptEditor({
       <div className="space-y-3 rounded border border-neutral-300 p-4">
         <div>
           <label htmlFor="scan" className="block text-sm font-medium">Scan an item barcode (keep this box selected)</label>
-          <input id="scan" ref={scanRef} autoFocus autoComplete="off" inputMode="none" placeholder="Scan here" className={`${inputClass} font-mono`}
+          <input id="scan" ref={scanRef} autoComplete="off" inputMode="none" placeholder="Scan here" className={`${inputClass} font-mono`}
             onKeyDown={(e) => {
               if (e.key === "Enter") { e.preventDefault(); const el = e.currentTarget; const v = el.value; el.value = ""; void onScan(v); }
             }} />

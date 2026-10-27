@@ -86,3 +86,5 @@ export default async function ReorderPage({ searchParams }: { searchParams: Prom
     </main>
   );
 }
+
+export const metadata = { title: "Reorder" };

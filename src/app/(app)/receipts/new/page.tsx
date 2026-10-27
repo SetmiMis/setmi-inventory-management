@@ -84,3 +84,5 @@ export default async function NewReceiptPage({ searchParams }: { searchParams: P
     </main>
   );
 }
+
+export const metadata = { title: "New Goods Receipt" };

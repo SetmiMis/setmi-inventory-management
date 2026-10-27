@@ -107,3 +107,5 @@ async function LoginScreen() {
     </>
   );
 }
+
+export const metadata = { title: "Sign in" };

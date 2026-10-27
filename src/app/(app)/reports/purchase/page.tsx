@@ -371,3 +371,5 @@ function TrendChart({ points, money }: { points: { month: string; pos: number; v
     </div>
   );
 }
+
+export const metadata = { title: "Purchase Reports" };

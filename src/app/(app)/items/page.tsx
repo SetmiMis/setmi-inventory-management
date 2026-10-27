@@ -423,3 +423,5 @@ async function Panel({ itemId, tab, tabHref, closeHref, canEdit }: { itemId: str
     </aside>
   );
 }
+
+export const metadata = { title: "Products / SKU" };

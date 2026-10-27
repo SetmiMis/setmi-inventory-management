@@ -389,3 +389,5 @@ async function DetailsPanel({ selId, keep, canApprove, lang }: { selId: string |
     </div>
   );
 }
+
+export const metadata = { title: "Stock Adjustment" };

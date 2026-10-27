@@ -14,3 +14,5 @@ export default async function NewLocationPage() {
     </main>
   );
 }
+
+export const metadata = { title: "Add Location" };

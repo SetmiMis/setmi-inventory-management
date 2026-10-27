@@ -197,14 +197,14 @@ export function AddProductForm({ categories, units, brands, canEditPrice, canUpl
           <div><span className={lab}>Net Weight</span>
             <div className="flex gap-2">
               <input name="netWeight" inputMode="decimal" maxLength={12} aria-label="Net weight" className={field} />
-              <select name="weightUnit" defaultValue="kg" aria-label="Weight unit" className={`${field} w-20 shrink-0`}><option value="g">g</option><option value="kg">kg</option></select>
+              <select name="weightUnit" defaultValue="kg" aria-label="Weight unit" className={`${field} !w-20 shrink-0`}><option value="g">g</option><option value="kg">kg</option></select>
             </div></div>
           <div className="sm:col-span-2"><span className={lab}>Size (L × W × H)</span>
             <div className="flex gap-2">
               <input name="dimL" inputMode="decimal" maxLength={12} placeholder="L" aria-label="Length" className={field} />
               <input name="dimW" inputMode="decimal" maxLength={12} placeholder="W" aria-label="Width" className={field} />
               <input name="dimH" inputMode="decimal" maxLength={12} placeholder="H" aria-label="Height" className={field} />
-              <select name="dimUnit" defaultValue="cm" aria-label="Size unit" className={`${field} w-20 shrink-0`}><option value="mm">mm</option><option value="cm">cm</option><option value="m">m</option><option value="in">in</option></select>
+              <select name="dimUnit" defaultValue="cm" aria-label="Size unit" className={`${field} !w-20 shrink-0`}><option value="mm">mm</option><option value="cm">cm</option><option value="m">m</option><option value="in">in</option></select>
             </div></div>
           <label className="block"><span className={lab}>Country of Origin</span><input name="countryOfOrigin" maxLength={100} className={field} /></label>
           <label className="block"><span className={lab}>Shelf Life / Warranty</span><input name="shelfLife" maxLength={100} className={field} /></label>

@@ -39,3 +39,5 @@ export default async function BillingPage() {
     </main>
   );
 }
+
+export const metadata = { title: "Billing" };

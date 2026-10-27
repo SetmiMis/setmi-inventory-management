@@ -373,3 +373,5 @@ async function Panel({ mode, selId, tab, keep, places, canManage, defaultPlace }
     </aside>
   );
 }
+
+export const metadata = { title: "Locations (Racks)" };

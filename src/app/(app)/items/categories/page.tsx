@@ -342,3 +342,5 @@ async function Panel({ mode, selId, tab, keep }: { mode: "view" | "new" | "edit"
     </aside>
   );
 }
+
+export const metadata = { title: "Categories" };

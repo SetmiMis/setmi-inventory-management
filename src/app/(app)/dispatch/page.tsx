@@ -476,3 +476,5 @@ async function DetailsPanel({ selId, panel, canManage, keep, couriers, today, us
     </div>
   );
 }
+
+export const metadata = { title: "Dispatch" };

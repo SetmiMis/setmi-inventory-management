@@ -44,3 +44,5 @@ export default async function HelpPage() {
     </main>
   );
 }
+
+export const metadata = { title: "Help" };

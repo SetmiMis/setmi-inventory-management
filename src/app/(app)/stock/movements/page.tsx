@@ -419,3 +419,5 @@ async function Panel({ itemId, locationId, tab, keep }: { itemId: string; locati
 }
 
 const STATUS_ACTIVE = "bg-[#e3f6ec] text-[#16824f] dark:bg-[#123a2a] dark:text-[#6fe0a8]";
+
+export const metadata = { title: "Stock Ledger" };

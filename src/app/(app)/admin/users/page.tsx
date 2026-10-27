@@ -396,3 +396,5 @@ function Kpi({ icon: Icon, tint, label, value, href, sub }: { icon: LucideIcon; 
     </Link>
   );
 }
+
+export const metadata = { title: "Users & Roles" };

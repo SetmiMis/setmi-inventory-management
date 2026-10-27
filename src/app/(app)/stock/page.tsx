@@ -401,3 +401,5 @@ async function Panel({ row, tab, keep, canCost, canLevels }: { row: Row; tab: st
     </aside>
   );
 }
+
+export const metadata = { title: "Current Stock" };

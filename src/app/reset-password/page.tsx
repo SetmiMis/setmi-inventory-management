@@ -35,3 +35,5 @@ async function Screen() {
     </AuthCard>
   );
 }
+
+export const metadata = { title: "Reset password" };

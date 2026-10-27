@@ -86,3 +86,5 @@ export default async function BillsPage({ searchParams }: { searchParams: Promis
     </main>
   );
 }
+
+export const metadata = { title: "Bills" };

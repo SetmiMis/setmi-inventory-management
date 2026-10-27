@@ -184,7 +184,7 @@ export function ItemForm({
               <label htmlFor="netWeight" className={labelClass}>Net Weight</label>
               <div className="flex gap-2">
                 <input id="netWeight" name="netWeight" inputMode="decimal" maxLength={12} defaultValue={item.netWeight ?? ""} className={inputClass} />
-                <select name="weightUnit" aria-label="Weight unit" defaultValue={item.weightUnit ?? "kg"} className={`${inputClass} w-24 shrink-0`}><option value="g">g</option><option value="kg">kg</option></select>
+                <select name="weightUnit" aria-label="Weight unit" defaultValue={item.weightUnit ?? "kg"} className={`${inputClass} !w-24 shrink-0`}><option value="g">g</option><option value="kg">kg</option></select>
               </div>
             </div>
             <div className="sm:col-span-2">
@@ -193,7 +193,7 @@ export function ItemForm({
                 <input id="dimL" name="dimL" inputMode="decimal" maxLength={12} placeholder="L" defaultValue={item.dimL ?? ""} className={inputClass} />
                 <input name="dimW" aria-label="Width" inputMode="decimal" maxLength={12} placeholder="W" defaultValue={item.dimW ?? ""} className={inputClass} />
                 <input name="dimH" aria-label="Height" inputMode="decimal" maxLength={12} placeholder="H" defaultValue={item.dimH ?? ""} className={inputClass} />
-                <select name="dimUnit" aria-label="Size unit" defaultValue={item.dimUnit ?? "cm"} className={`${inputClass} w-24 shrink-0`}><option value="mm">mm</option><option value="cm">cm</option><option value="m">m</option><option value="in">in</option></select>
+                <select name="dimUnit" aria-label="Size unit" defaultValue={item.dimUnit ?? "cm"} className={`${inputClass} !w-24 shrink-0`}><option value="mm">mm</option><option value="cm">cm</option><option value="m">m</option><option value="in">in</option></select>
               </div>
             </div>
           </div>

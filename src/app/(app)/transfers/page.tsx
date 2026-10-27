@@ -375,3 +375,5 @@ async function DetailsPanel({ selId, keep, user }: { selId: string | null; keep:
     </div>
   );
 }
+
+export const metadata = { title: "Stock Transfer" };

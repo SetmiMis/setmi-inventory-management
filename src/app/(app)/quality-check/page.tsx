@@ -458,3 +458,5 @@ async function Panel({ mode, selId, tab, keep, canManage, err }: { mode: "view" 
     </aside>
   );
 }
+
+export const metadata = { title: "Quality Check" };

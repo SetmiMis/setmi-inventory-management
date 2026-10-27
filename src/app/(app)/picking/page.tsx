@@ -444,3 +444,5 @@ async function OrderPanel({ selId, panel, canManage, keep, user }: {
     </div>
   );
 }
+
+export const metadata = { title: "Picking & Packing" };

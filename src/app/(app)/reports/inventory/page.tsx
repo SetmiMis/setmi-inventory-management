@@ -363,3 +363,5 @@ function MovementTrend({ points }: { points: { day: string; in: number; out: num
     </div>
   );
 }
+
+export const metadata = { title: "Inventory Reports" };

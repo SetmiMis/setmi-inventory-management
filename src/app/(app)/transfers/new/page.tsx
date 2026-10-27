@@ -23,3 +23,5 @@ export default async function NewTransferPage() {
     </main>
   );
 }
+
+export const metadata = { title: "New Transfer" };

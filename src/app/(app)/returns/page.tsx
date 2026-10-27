@@ -470,3 +470,5 @@ async function ReturnPanel({ selId, panel, canManage, canApprove, keep, user }: 
     </div>
   );
 }
+
+export const metadata = { title: "Returns" };

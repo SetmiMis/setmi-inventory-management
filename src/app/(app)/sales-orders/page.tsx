@@ -477,3 +477,5 @@ async function DetailsPanel({ selId, keep, user, canConfirm, canCreate }: { selI
     </div>
   );
 }
+
+export const metadata = { title: "Sales Orders" };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { lookupBarcode, saveScanCount, type StockState } from "../actions";
 import { parseQuantity } from "@/lib/validation/stock";
 import { MIN_SCAN_GAP_MS, beep } from "@/lib/client/beep";
@@ -20,6 +20,8 @@ export function ScanCount({ placeName }: { placeName: string }) {
   const [saving, startSave] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
   const lastScan = useRef(0);
+  // Focus the scan box when the page opens, without scrolling the page down to it.
+  useEffect(() => { inputRef.current?.focus({ preventScroll: true }); }, []);
 
   async function onScan(raw: string) {
     const code = raw.trim();
@@ -95,7 +97,6 @@ export function ScanCount({ placeName }: { placeName: string }) {
         <input
           id="scan"
           ref={inputRef}
-          autoFocus
           autoComplete="off"
           inputMode="none"
           placeholder="Scan an item barcode"

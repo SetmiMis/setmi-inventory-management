@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowDownToLine, ArrowUpFromLine, CheckCircle2, ScanLine, X } from "lucide-react";
 import { lookupEntryItem, saveStockEntry, searchEntryItems, type EntryItem, type Problem } from "./actions";
@@ -29,6 +29,8 @@ export function EntryForm({ placeName, reasonLabels, t }: { placeName: string; r
   const [busy, start] = useTransition();
   const scanRef = useRef<HTMLInputElement>(null);
   const lastScan = useRef(0);
+  // Focus the scan box when the page opens, without scrolling the page down to it.
+  useEffect(() => { scanRef.current?.focus({ preventScroll: true }); }, []);
 
   const reasons = direction === "OUT" ? OUT_REASONS : IN_REASONS;
 
@@ -123,7 +125,7 @@ export function EntryForm({ placeName, reasonLabels, t }: { placeName: string; r
       <div className={`${cardClass} space-y-3`}>
         <div>
           <label htmlFor="scan" className="flex items-center gap-2 text-sm font-medium"><ScanLine size={16} aria-hidden /> {t.scan}</label>
-          <input id="scan" ref={scanRef} autoFocus autoComplete="off" inputMode="none" placeholder="Scan here" className={`${inputClass} font-mono`}
+          <input id="scan" ref={scanRef} autoComplete="off" inputMode="none" placeholder="Scan here" className={`${inputClass} font-mono`}
             onKeyDown={(e) => {
               if (e.key === "Enter") { e.preventDefault(); const el = e.currentTarget; const v = el.value; el.value = ""; void onScan(v); }
             }} />

@@ -23,3 +23,5 @@ export default async function NewItemPage() {
     />
   );
 }
+
+export const metadata = { title: "Add Product" };

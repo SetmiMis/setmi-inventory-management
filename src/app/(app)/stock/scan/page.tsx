@@ -22,3 +22,5 @@ export default async function ScanCountPage() {
     </main>
   );
 }
+
+export const metadata = { title: "Scan Count" };

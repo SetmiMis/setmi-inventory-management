@@ -143,3 +143,5 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
     </main>
   );
 }
+
+export const metadata = { title: "Reports" };

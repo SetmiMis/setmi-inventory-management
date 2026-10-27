@@ -286,3 +286,5 @@ function NotBuilt({ icon: Icon, title, text }: { icon: LucideIcon; title: string
     </section>
   );
 }
+
+export const metadata = { title: "Settings" };

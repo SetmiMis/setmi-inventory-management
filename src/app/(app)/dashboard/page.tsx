@@ -359,3 +359,5 @@ function Kpi({ icon: Icon, tint, label, value, sub, href, spark, sparkColor }: {
     </RevealItem>
   );
 }
+
+export const metadata = { title: "Dashboard" };

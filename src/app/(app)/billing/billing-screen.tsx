@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createBill, lookupBillItem, searchBillItems, type BillItem, type Problem } from "./actions";
 import { MIN_SCAN_GAP_MS, beep } from "@/lib/client/beep";
@@ -26,6 +26,8 @@ export function BillingScreen({ placeName, canOverridePrice, customers = [] }: {
   const [busy, start] = useTransition();
   const scanRef = useRef<HTMLInputElement>(null);
   const lastScan = useRef(0);
+  // Focus the scan box when the page opens, without scrolling the page down to it.
+  useEffect(() => { scanRef.current?.focus({ preventScroll: true }); }, []);
 
   function addItem(it: BillItem) {
     setLines((prev) => {
@@ -97,7 +99,7 @@ export function BillingScreen({ placeName, canOverridePrice, customers = [] }: {
       <div className="space-y-3 rounded border border-neutral-300 p-4">
         <div>
           <label htmlFor="scan" className="block text-sm font-medium">Scan an item (keep this box selected)</label>
-          <input id="scan" ref={scanRef} autoFocus autoComplete="off" inputMode="none" placeholder="Scan here" className={`${inputClass} font-mono`}
+          <input id="scan" ref={scanRef} autoComplete="off" inputMode="none" placeholder="Scan here" className={`${inputClass} font-mono`}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); const el = e.currentTarget; const v = el.value; el.value = ""; void onScan(v); } }} />
           <p role="status" className={`mt-1 min-h-5 text-sm ${feedback ? (feedback.ok ? "text-green-700" : "text-red-600") : "text-neutral-500"}`}>{feedback ? feedback.text : "Each scan adds one piece."}</p>
         </div>

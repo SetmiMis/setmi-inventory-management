@@ -387,3 +387,5 @@ async function Panel({ selId, tab, keep, canCost }: { selId: string; tab: string
     </aside>
   );
 }
+
+export const metadata = { title: "Goods Inward (GRN)" };
