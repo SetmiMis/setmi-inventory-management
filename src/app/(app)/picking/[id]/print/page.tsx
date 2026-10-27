@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { companyLine, getCompany } from "@/lib/company";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { requireAnyPermission } from "@/lib/auth";
@@ -12,6 +13,7 @@ export default async function PickListPrintPage({ params }: { params: Promise<{ 
   await requireAnyPermission("picking.view", "picking.manage");
   const id = z.uuid().safeParse((await params).id);
   if (!id.success) notFound();
+  const company = await getCompany();
   const supabase = await createClient();
   const { data: o } = await supabase.from("sales_orders").select("id, order_no, order_date, expected_dispatch, location_id, customers(name), locations(name, code)").eq("id", id.data).maybeSingle();
   if (!o) notFound();
@@ -32,7 +34,7 @@ export default async function PickListPrintPage({ params }: { params: Promise<{ 
         <PrintButton />
       </div>
       <header className="border-b border-black pb-2">
-        <p className="text-lg font-bold">SETMI INDIA</p>
+        <p className="text-lg font-bold">{company.name}</p>{companyLine(company) && <p className="text-xs">{companyLine(company)}</p>}
         <p className="text-base font-semibold">Pick List for order {o.order_no}</p>
       </header>
       <dl className="grid grid-cols-2 gap-2 text-sm">

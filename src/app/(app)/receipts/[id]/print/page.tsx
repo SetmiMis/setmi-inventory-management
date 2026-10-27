@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { companyLine, getCompany } from "@/lib/company";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { can, requireAnyPermission } from "@/lib/auth";
@@ -12,6 +13,7 @@ export default async function ReceiptPrintPage({ params }: { params: Promise<{ i
   const user = await requireAnyPermission("receipts.view", "receipts.create", "receipts.post");
   const id = z.uuid().safeParse((await params).id);
   if (!id.success) notFound();
+  const company = await getCompany();
   const supabase = await createClient();
   const { data: r } = await supabase
     .from("goods_receipts")
@@ -35,7 +37,7 @@ export default async function ReceiptPrintPage({ params }: { params: Promise<{ i
         <PrintButton />
       </div>
       <header className="border-b border-black pb-2">
-        <p className="text-lg font-bold">SETMI INDIA</p>
+        <p className="text-lg font-bold">{company.name}</p>{companyLine(company) && <p className="text-xs">{companyLine(company)}</p>}
         <p className="text-base font-semibold">Goods Receipt {r.receipt_no}{r.status !== "POSTED" ? ` (${r.status === "DRAFT" ? "DRAFT, not posted" : "CANCELLED"})` : ""}</p>
       </header>
       <dl className="grid grid-cols-2 gap-2 text-sm">

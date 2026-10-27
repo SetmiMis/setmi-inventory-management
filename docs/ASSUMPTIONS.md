@@ -227,3 +227,12 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - Departments are a simple list (name, on/off). A department or role cannot be deleted, only switched off.
 - Access Logs = changes made to users, roles, permissions, places and invites (from the audit log), with who did them. It is NOT a record of every sign-in; the "Last Login" of each person comes from the login system.
 - Not built: 2-factor login, e-mail notification switches, phone number, creating the login from this page, deleting users.
+
+## Settings page (2026-10-27, owner chose: photo-like page, real parts work, the rest "Not built yet")
+- ADMINISTRATORS ONLY (the page and the database functions both check).
+- Only these settings are real: company information, the billing ON/OFF switch, and the audit log viewer. Everything else on the page is either a fixed fact about how the system works (labelled "Fixed") or something that is not built (labelled "Not built yet", switched off). No setting is stored that has no effect. (Owner's answer.)
+- Company information is printed at the top of the pick list, shipping label, goods receipt, purchase order, transfer note and bill. The GST number and PAN are only checked for the right SHAPE (15 and 10 characters), not with the government. A person who is signed in can read the company information (a printed paper needs it); only an administrator can change it.
+- The printed papers are NOT tax invoices or e-way bills, whatever is filled in here. Tax / GST waits for the accountant.
+- Document number formats (SO-2026-0001, PO-000001, GRN-000001, RT-2026-0001) are fixed in the database; changing prefixes is not built.
+- Session timeout, password expiry, login attempt limit and 2-factor login belong to Supabase (Authentication settings) and are not controlled from this page.
+- Not built: logo change, e-mail and SMS notifications, integrations, backup / restore, IP restriction, batch / serial / expiry, negative stock, FIFO, "Reset All Settings".

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { companyLine, getCompany } from "@/lib/company";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { requireAnyPermission } from "@/lib/auth";
@@ -13,6 +14,7 @@ export default async function TransferPrintPage({ params }: { params: Promise<{ 
   await requireAnyPermission("transfers.view", "transfers.create", "transfers.send", "transfers.receive");
   const id = z.uuid().safeParse((await params).id);
   if (!id.success) notFound();
+  const company = await getCompany();
   const supabase = await createClient();
   const { data: t } = await supabase.from("stock_transfers").select("*").eq("id", id.data).maybeSingle();
   if (!t) notFound();
@@ -28,7 +30,7 @@ export default async function TransferPrintPage({ params }: { params: Promise<{ 
         <PrintButton />
       </div>
       <header className="border-b border-black pb-2">
-        <p className="text-lg font-bold">SETMI INDIA</p>
+        <p className="text-lg font-bold">{company.name}</p>{companyLine(company) && <p className="text-xs">{companyLine(company)}</p>}
         <p className="text-base font-semibold">Stock Transfer / Dispatch Note {t.transfer_no}{t.status === "DRAFT" ? " (DRAFT, not sent)" : t.status === "CANCELLED" ? " (CANCELLED)" : ""}</p>
       </header>
       <dl className="grid grid-cols-2 gap-2 text-sm">

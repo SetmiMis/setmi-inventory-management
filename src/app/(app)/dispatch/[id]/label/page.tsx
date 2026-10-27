@@ -1,4 +1,5 @@
-import Link from "next/link";
+import Link from "next/link";
+import { getCompany } from "@/lib/company";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { requireAnyPermission } from "@/lib/auth";
@@ -13,6 +14,7 @@ export default async function ShippingLabelPage({ params }: { params: Promise<{ 
   await requireAnyPermission("dispatch.view", "dispatch.manage");
   const id = z.uuid().safeParse((await params).id);
   if (!id.success) notFound();
+  const company = await getCompany();
   const supabase = await createClient();
   const { data: d } = await supabase.from("dispatches").select("id, order_id, job_id, dispatch_date, service_type, awb, insurance, pickup_ref, remarks, couriers(name), locations(name, code, address)").eq("id", id.data).maybeSingle();
   if (!d) notFound();
@@ -32,7 +34,7 @@ export default async function ShippingLabelPage({ params }: { params: Promise<{ 
       </div>
       <section className="mx-auto max-w-md space-y-3 border-2 border-black p-4 text-sm">
         <header className="flex items-start justify-between border-b border-black pb-2">
-          <div><p className="text-lg font-bold">SETMI INDIA</p><p className="text-xs">Order {o?.order_no}</p></div>
+          <div><p className="text-lg font-bold">{company.name}</p><p className="text-xs">Order {o?.order_no}</p></div>
           <div className="text-right"><p className="font-semibold">{courier?.name}</p><p className="text-xs">{d.service_type ? SERVICE_LABEL[d.service_type] : ""}{d.insurance ? " · Insured" : ""}</p></div>
         </header>
         <div className="border-b border-black pb-2 text-center">

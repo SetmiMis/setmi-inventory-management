@@ -1,4 +1,5 @@
-import Image from "next/image";
+import Image from "next/image";
+import { getCompany } from "@/lib/company";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -13,6 +14,7 @@ export default async function PurchaseOrderPrintPage({ params }: { params: Promi
   const user = await requireAnyPermission("purchase.view", "purchase.create", "purchase.approve");
   const id = z.uuid().safeParse((await params).id);
   if (!id.success) notFound();
+  const company = await getCompany();
   const supabase = await createClient();
   const { data: o } = await supabase
     .from("purchase_orders")
@@ -40,7 +42,7 @@ export default async function PurchaseOrderPrintPage({ params }: { params: Promi
         <div className="flex items-center gap-3">
           <Image src="/brand/setmi-badge-96.png" alt="" width={48} height={48} className="h-12 w-12 rounded-full" />
           <div>
-            <p className="text-xl font-bold">SETMI INDIA</p>
+            <p className="text-xl font-bold">{company.name}</p>
             <p className="text-sm">Purchase order</p>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { companyLine, getCompany } from "@/lib/company";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { requireAnyPermission } from "@/lib/auth";
@@ -10,6 +11,7 @@ export default async function BillPrintPage({ params }: { params: Promise<{ id: 
   await requireAnyPermission("bills.view", "bills.create", "bills.void");
   const id = z.uuid().safeParse((await params).id);
   if (!id.success) notFound();
+  const company = await getCompany();
   const supabase = await createClient();
   const { data: b } = await supabase.from("bills").select("*").eq("id", id.data).maybeSingle();
   if (!b) notFound();
@@ -24,7 +26,7 @@ export default async function BillPrintPage({ params }: { params: Promise<{ id: 
         <PrintButton />
       </div>
       <header className="text-center">
-        <p className="text-lg font-bold">SETMI INDIA</p>
+        <p className="text-lg font-bold">{company.name}</p>{companyLine(company) && <p className="text-xs">{companyLine(company)}</p>}
         <p>{b.location_name}</p>
         <p className="text-xs">{b.bill_no}{b.status === "VOIDED" ? " (VOIDED)" : ""}</p>
         <p className="text-xs">{when}</p>
