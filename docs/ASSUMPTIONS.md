@@ -195,3 +195,13 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - Comparative: the date range (default this month so far) against the period of the same length just before it, for orders, value, received value, quantity, suppliers and average order value.
 - Payment Status (Paid / Partial / Unpaid) is NOT built: the system has no supplier payments. When you want it, it needs its own small module (paid amounts per order) and the accountant's rules. (Owner's answer: later.)
 - The old `/reports` page is unchanged; the menu item "Purchase Reports" now opens this page.
+
+## Sales Reports page (2026-10-27, owner chose: dispatched orders only, no payments)
+- A SALE = a sales order that is DISPATCHED. Pending, Confirmed, In Packing and Cancelled orders are not sales. Shop bills from Billing are NOT included in this page; say if you want them added (channel "Shop", customer "walk-in"). (Owner's answer.)
+- Order value = quantity x rate of the lines. Net value / Total Sales = order value - discount + shipping charges (the same Grand Total as on Sales Orders). Shipping is therefore inside "sales". No tax (waits for the accountant).
+- The date range and the Monthly tab use the ORDER date, not the dispatch date. Comparison: the range (default this month so far) against the period of the same length just before it.
+- The category filter keeps the orders that contain that category; the Product Wise tab and the category chart then count only that category's lines, while order rows still show the whole order.
+- Return column = number of returns on the order that were not rejected; "Return Orders" = orders with at least one. A person without a returns permission sees 0. Dispatch status = status of the parcel (a person without dispatch permission sees "Dispatched").
+- City comes from the customer (empty city shows as "Not set"). Customer type is the customer type from the Customers page.
+- Payment Status and the Payment Wise tab are NOT built: the system has no customer payments. (Owner's answer: leave it.)
+- The old `/reports` page is unchanged; the menu item "Sales Reports" now opens this page (before, it opened the old sales-per-day report).
