@@ -1,8 +1,8 @@
-# DEPLOYMENT (plan and checklist, nothing is deployed yet)
+# DEPLOYMENT (live on Vercel since 2026-10-27; checklist below)
 
-**Status:** NOT deployed. No hosting app, no DNS change, no production database exists. The owner must say "deploy" first (rule in CLAUDE.md). This file is the DevOps plan so that when the owner says yes, it is a short, safe job.
+**Status (2026-10-27): DEPLOYED to Vercel at https://setmi-inventory-management.vercel.app (same Supabase project as development, custom address not added yet). See docs/HANDOVER.md, newest entry. The text below is the original plan and still applies for what is not done yet.
 
-**Owner's choice (2026-10-27): Hostinger Business Web Hosting, subdomain `inventory.setmiindia.com`, the same Supabase database.** Section 10 has the Hostinger steps. Wherever this file says "Vercel", read "the Hostinger Node.js app" (the Vercel wording stays as a fallback plan).
+**Owner's choice changed on 2026-10-27: Vercel (the Hostinger notes in section 10 are kept only as a fallback).** Wherever this file says "Vercel" it is current.
 
 ## 1. Target
 - App: Hostinger Node.js web app (hPanel > Websites > Add Website > Node.js Apps), imported from the private GitHub repo `SetmiMis/setmi-inventory-management`, branch `main`. Hostinger lists Next.js as supported and Node.js 18, 20, 22, 24 (checked on Hostinger's pages on 2026-10-27; their guides disagree on whether Business or only Cloud plans include Node.js apps, so open hPanel and confirm "Node.js Apps" is offered on the plan BEFORE planning the go-live day).
