@@ -2,7 +2,7 @@
 // tested with plain `node --test` and used on both browser (quick feedback) and server (real check).
 
 export const BUCKET = "item-files";
-export const MAX_IMAGES = 4;
+export const MAX_IMAGES = 6;
 export const LIMITS = { image: 5 * 1024 * 1024, datasheet: 10 * 1024 * 1024 } as const;
 
 export type FileKind = "image" | "datasheet";

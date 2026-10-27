@@ -6,7 +6,7 @@ import { z } from "zod";
 import { can, requirePermission } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { friendlyDbError } from "@/lib/db-errors";
-import { itemFromForm, parseBarcodes } from "@/lib/validation/item";
+import { itemFromForm, parseBarcodes, parseTags, productExtrasFromForm } from "@/lib/validation/item";
 
 export type FormState = { ok: boolean; message: string } | null;
 const fail = (message: string): FormState => ({ ok: false, message });
@@ -61,6 +61,91 @@ export async function createItem(_prev: FormState, fd: FormData): Promise<FormSt
 
   revalidatePath("/items");
   redirect(`/items/${data.id}${warn}`);
+}
+
+// ---------- create from the Add Product page ----------
+// Same rules as createItem plus the optional product fields. "draft" saves the item switched off (inactive).
+// Returns the new id instead of redirecting, because the browser then uploads the chosen images.
+export type ProductResult = { ok: true; id: string; warn: string } | { ok: false; message: string };
+
+export async function createProduct(fd: FormData): Promise<ProductResult> {
+  const user = await requirePermission("items.create");
+  const draft = fd.get("draft") === "true";
+
+  const parsed = itemFromForm(fd);
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0].message };
+  const extra = productExtrasFromForm(fd);
+  if (!extra.success) return { ok: false, message: extra.error.issues[0].message };
+  const tags = parseTags(fd.getAll("tags"));
+  if (tags.error) return { ok: false, message: tags.error };
+  const bc = parseBarcodes(String(fd.get("barcodes") ?? ""));
+  if (bc.error) return { ok: false, message: bc.error };
+  const v = parsed.data;
+  const x = extra.data;
+  if (!draft) {
+    if (!v.categoryId) return { ok: false, message: "Category is required." };
+    if (!x.shortDescription) return { ok: false, message: "Short Description is required." };
+  }
+  if ((x.netWeight && !x.weightUnit) || ((x.dimL || x.dimW || x.dimH) && !x.dimUnit)) {
+    return { ok: false, message: "Choose the unit for the weight / size." };
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("items")
+    .insert({
+      internal_item_code: v.internalItemCode,
+      import_item_code: v.importItemCode,
+      item_name: v.itemName,
+      selling_item_name: v.sellingItemName || v.itemName,
+      category_id: v.categoryId,
+      purchase_source: v.purchaseSource,
+      unit: v.unit,
+      remarks: v.remarks,
+      selling_price: v.sellingPrice && can(user, "items.edit_price") ? Number(v.sellingPrice) : null,
+      lead_time_days: v.leadTimeDays ? Number(v.leadTimeDays) : null,
+      safety_factor: v.safetyFactor ? Number(v.safetyFactor) : null,
+      moq: v.moq ? Number(v.moq) : null,
+      sub_category: x.subCategory,
+      brand: x.brand,
+      hsn_code: x.hsnCode,
+      short_description: x.shortDescription,
+      detailed_description: x.detailedDescription,
+      product_type: x.productType,
+      material: x.material,
+      color: x.color,
+      net_weight: x.netWeight ? Number(x.netWeight) : null,
+      weight_unit: x.netWeight ? x.weightUnit : null,
+      dim_l: x.dimL ? Number(x.dimL) : null,
+      dim_w: x.dimW ? Number(x.dimW) : null,
+      dim_h: x.dimH ? Number(x.dimH) : null,
+      dim_unit: x.dimL || x.dimW || x.dimH ? x.dimUnit : null,
+      country_of_origin: x.countryOfOrigin,
+      model_no: x.modelNo,
+      tags: tags.tags,
+      search_keywords: x.searchKeywords,
+      shelf_life: x.shelfLife,
+      is_active: !draft && fd.get("isActive") === "on",
+      show_in_sales: fd.get("showInSales") === "on",
+      show_in_purchase: fd.get("showInPurchase") === "on",
+      low_stock_alert: fd.get("lowStockAlert") === "on",
+    })
+    .select("id")
+    .single();
+  if (error) return { ok: false, message: friendlyDbError(error) };
+
+  let warn = "";
+  if (bc.barcodes.length > 0) {
+    const { error: bcError } = await supabase.from("item_barcodes").insert(bc.barcodes.map((barcode) => ({ item_id: data.id, barcode })));
+    if (bcError) warn = "The item was saved, but the barcode was not (maybe it is already used). Add it again on the item page.";
+  }
+  if (fd.get("generateBarcode") === "on") {
+    const { error: genError } = await supabase.rpc("generate_item_barcode", { p_item: data.id });
+    if (genError) warn = "The item was saved, but the SETMI barcode was not made. Make it on the item page.";
+  }
+
+  revalidatePath("/items");
+  return { ok: true, id: data.id, warn };
 }
 
 // ---------- update ----------

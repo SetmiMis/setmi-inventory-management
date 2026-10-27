@@ -1,23 +1,25 @@
-import Link from "next/link";
 import { can, requirePermission } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { ItemForm } from "../item-form";
+import { AddProductForm } from "./add-product-form";
 
+// Master Data > Product / SKU > Add Product.
 export default async function NewItemPage() {
   const user = await requirePermission("items.create");
   const supabase = await createClient();
-  const [{ data: categories }, { data: units }] = await Promise.all([
+  const [{ data: categories }, { data: units }, { data: brands }] = await Promise.all([
     supabase.from("categories").select("id, name").eq("is_active", true).order("name"),
     supabase.from("units").select("code, name").eq("is_active", true).order("code"),
+    supabase.from("items").select("brand").not("brand", "is", null).order("brand").limit(500),
   ]);
+  const brandList = [...new Set((brands ?? []).map((b) => b.brand as string))];
 
   return (
-    <main className="space-y-4">
-      <p className="text-sm">
-        <Link href="/items" className="text-blue-700 underline">Items</Link> / New
-      </p>
-      <h1 className="text-xl font-semibold">New item</h1>
-      <ItemForm categories={categories ?? []} units={units ?? []} canEditSellingName canEditPrice={can(user, "items.edit_price")} />
-    </main>
+    <AddProductForm
+      categories={categories ?? []}
+      units={units ?? []}
+      brands={brandList}
+      canEditPrice={can(user, "items.edit_price")}
+      canUploadImages={can(user, "items.edit")}
+    />
   );
 }

@@ -27,9 +27,10 @@ export async function lookupPoItem(input: { code: string }): Promise<{ ok: true;
   const supabase = await createClient();
   const { data: bc } = await supabase.from("item_barcodes").select("item_id").eq("barcode", code.data).maybeSingle();
   if (!bc) return { ok: false, message: `Unknown barcode ${code.data}` };
-  const { data: it } = await supabase.from("items").select("id, internal_item_code, item_name, unit, is_active").eq("id", bc.item_id).maybeSingle();
+  const { data: it } = await supabase.from("items").select("id, internal_item_code, item_name, unit, is_active, show_in_purchase").eq("id", bc.item_id).maybeSingle();
   if (!it) return { ok: false, message: "You cannot see this item." };
   if (!it.is_active) return { ok: false, message: `${it.internal_item_code} is archived` };
+  if (!it.show_in_purchase) return { ok: false, message: `${it.internal_item_code} is switched off for purchase orders` };
   return { ok: true, item: { id: it.id, code: it.internal_item_code, name: it.item_name, unit: it.unit, decimals: await decimalsOf(it.unit) } };
 }
 
@@ -41,7 +42,7 @@ export async function searchPoItems(input: { q: string }): Promise<PoItem[]> {
   const supabase = await createClient();
   const [{ data }, { data: units }] = await Promise.all([
     supabase.from("items").select("id, internal_item_code, item_name, unit")
-      .eq("is_active", true).or(`internal_item_code.ilike.${like},item_name.ilike.${like},selling_item_name.ilike.${like}`)
+      .eq("is_active", true).eq("show_in_purchase", true).or(`internal_item_code.ilike.${like},item_name.ilike.${like},selling_item_name.ilike.${like}`)
       .order("internal_item_code").limit(10),
     supabase.from("units").select("code, decimals"),
   ]);

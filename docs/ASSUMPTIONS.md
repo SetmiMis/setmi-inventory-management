@@ -236,3 +236,11 @@ Status: UNVERIFIED, VERIFIED or REJECTED. (Owner answers of 2026-10-24 are recor
 - Document number formats (SO-2026-0001, PO-000001, GRN-000001, RT-2026-0001) are fixed in the database; changing prefixes is not built.
 - Session timeout, password expiry, login attempt limit and 2-factor login belong to Supabase (Authentication settings) and are not controlled from this page.
 - Not built: logo change, e-mail and SMS notifications, integrations, backup / restore, IP restriction, batch / serial / expiry, negative stock, FIFO, "Reset All Settings".
+
+## Add Product page (2026-10-27, owner chose: all new fields optional, real switches, 6 tabs real)
+- HSN code is only stored; no tax or GST is calculated from it.
+- Save as Draft means the item is saved inactive (archived look). It can be restored on the item page.
+- A switched-off "Show in Sales Order" / "Show in Purchase Order" item is refused when an order is saved, including an old draft order that already contains it. Existing orders are not changed.
+- "Low Stock Alert" off hides the item from the places that use the stock overview low flag and the reorder list. Other reports that compute low stock themselves are not changed (listed in HANDOVER).
+- Product type is free text with a few suggestions; Brand is free text with the brands already used; Sub Category is free text (no sub-category table).
+- The Key Attributes weight and size units are stored only when a value is given.

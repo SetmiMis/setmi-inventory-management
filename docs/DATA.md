@@ -21,7 +21,7 @@ All use `set search_path = ''`; execute is revoked from `anon`.
 | Table | Key points |
 |---|---|
 | `categories` | Managed list, unique name (case-insensitive). Read: `items.view`. Write: `categories.manage` |
-| `items` | `internal_item_code` required + unique (case-insensitive, trimmed). `import_item_code` optional, unique when filled. `item_name` and `selling_item_name` required. `purchase_source` LOCAL or IMPORT. `unit` default PCS. `image_paths` max 4, `datasheet_path`. `is_active` for archive. No delete policy |
+| `items` | `internal_item_code` required + unique (case-insensitive, trimmed). `import_item_code` optional, unique when filled. `item_name` and `selling_item_name` required. `purchase_source` LOCAL or IMPORT. `unit` default PCS. `image_paths` max 6 (was 4 until migration 56), `datasheet_path`. Optional product fields from migration 56 (brand, sub_category, hsn_code, descriptions, product_type, material, color, weight, size, country, model_no, tags, search_keywords, shelf_life) and three switches `show_in_sales`, `show_in_purchase`, `low_stock_alert` (default true). `is_active` for archive. No delete policy |
 | `item_barcodes` | One item, many barcodes. `barcode` globally unique, exact match. |
 
 Storage bucket `item-files`: private, 10 MB cap, JPEG/PNG/WebP/PDF only. Read needs `items.view`; write needs `items.edit`. Per-type limits (5 MB image) are enforced in the app server.

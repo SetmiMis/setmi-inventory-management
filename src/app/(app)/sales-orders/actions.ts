@@ -23,7 +23,7 @@ export async function searchSalesItems(input: { q: string }): Promise<SalesItem[
   const supabase = await createClient();
   const [{ data }, { data: units }] = await Promise.all([
     supabase.from("items").select("id, internal_item_code, item_name, unit, selling_price")
-      .eq("is_active", true).or(`internal_item_code.ilike.${like},item_name.ilike.${like},selling_item_name.ilike.${like}`).order("internal_item_code").limit(10),
+      .eq("is_active", true).eq("show_in_sales", true).or(`internal_item_code.ilike.${like},item_name.ilike.${like},selling_item_name.ilike.${like}`).order("internal_item_code").limit(10),
     supabase.from("units").select("code, decimals"),
   ]);
   const ids = (data ?? []).map((i) => i.id);

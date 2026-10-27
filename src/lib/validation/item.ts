@@ -4,7 +4,7 @@ import { z } from "zod";
 const blankToNull = (v: unknown) => (typeof v === "string" && v.trim() === "" ? null : v);
 
 // Server-side rules for an item (never trust the browser). They mirror database constraints;
-// the database stays the final judge (unique codes, non-blank, max 4 images).
+// the database stays the final judge (unique codes, non-blank, max 6 images).
 export const itemSchema = z.object({
   // 120, not 64: the owner's real codes are "SETMI-" + the full item name and reach about 85 characters.
   internalItemCode: z.string().trim().min(1, "Internal Item Code is required.").max(120, "Internal Item Code is too long (max 120)."),
@@ -60,4 +60,57 @@ export function parseBarcodes(raw: string): { barcodes: string[]; error?: string
 // Search text goes into a PostgREST filter string, where , ( ) " \ % * have special meaning.
 export function sanitizeSearch(raw: string | undefined): string {
   return (raw ?? "").replace(/[,()"\\%*]/g, " ").replace(/\s+/g, " ").trim().slice(0, 64);
+}
+
+// ---------- Add Product page: extra optional fields (migration 56) ----------
+const optText = (max: number, label: string) => z.preprocess(blankToNull, z.string().trim().max(max, `${label} is too long (max ${max}).`).nullable());
+const optNum = (label: string) => z.preprocess(blankToNull, z.string().trim().regex(/^\d{1,8}(\.\d{1,3})?$/, `${label}: a number with up to 3 decimals.`).nullable());
+
+export const WEIGHT_UNITS = ["g", "kg"] as const;
+export const DIM_UNITS = ["mm", "cm", "m", "in"] as const;
+const optEnum = <T extends readonly [string, ...string[]]>(values: T, label: string) =>
+  z.preprocess(blankToNull, z.enum(values, `${label}: choose from the list.`).nullable());
+
+export const productExtrasSchema = z.object({
+  subCategory: optText(100, "Sub Category"),
+  brand: optText(100, "Brand"),
+  hsnCode: z.preprocess(blankToNull, z.string().trim().regex(/^[0-9]{2,20}$/, "HSN Code: digits only (2 to 20).").nullable()),
+  shortDescription: optText(500, "Short Description"),
+  detailedDescription: optText(2000, "Detailed Description"),
+  productType: optText(100, "Product Type"),
+  material: optText(100, "Material"),
+  color: optText(100, "Color"),
+  netWeight: optNum("Net Weight"),
+  weightUnit: optEnum(WEIGHT_UNITS, "Weight unit"),
+  dimL: optNum("Length"),
+  dimW: optNum("Width"),
+  dimH: optNum("Height"),
+  dimUnit: optEnum(DIM_UNITS, "Dimension unit"),
+  countryOfOrigin: optText(100, "Country of Origin"),
+  modelNo: optText(100, "Model / Part No."),
+  searchKeywords: optText(500, "Search Keywords"),
+  shelfLife: optText(100, "Shelf Life / Warranty"),
+});
+
+export function productExtrasFromForm(fd: FormData) {
+  const g = (k: string) => fd.get(k);
+  return productExtrasSchema.safeParse({
+    subCategory: g("subCategory"), brand: g("brand"), hsnCode: g("hsnCode"), shortDescription: g("shortDescription"),
+    detailedDescription: g("detailedDescription"), productType: g("productType"), material: g("material"), color: g("color"),
+    netWeight: g("netWeight"), weightUnit: g("weightUnit"), dimL: g("dimL"), dimW: g("dimW"), dimH: g("dimH"), dimUnit: g("dimUnit"),
+    countryOfOrigin: g("countryOfOrigin"), modelNo: g("modelNo"), searchKeywords: g("searchKeywords"), shelfLife: g("shelfLife"),
+  });
+}
+
+// Tags: up to 20, each up to 30 letters, no duplicates (ignoring capitals).
+export function parseTags(values: FormDataEntryValue[]): { tags: string[]; error?: string } {
+  const out: string[] = [];
+  for (const v of values) {
+    const t = String(v).trim();
+    if (!t) continue;
+    if (t.length > 30) return { tags: [], error: "A tag is longer than 30 letters." };
+    if (!out.some((o) => o.toLowerCase() === t.toLowerCase())) out.push(t);
+  }
+  if (out.length > 20) return { tags: [], error: "At most 20 tags." };
+  return { tags: out };
 }
