@@ -1,14 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { supabaseEnv } from "@/lib/supabase/env";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get("code");
   const token_hash = searchParams.get("token_hash");
-  const type = searchParams.get("type");
+  const type = searchParams.get("type") as EmailOtpType | null;
 
-  let response = NextResponse.redirect(new URL("/reset-password", origin));
+  const response = NextResponse.redirect(new URL("/reset-password", origin));
   const { url, key } = supabaseEnv();
 
   const supabase = createServerClient(url, key, {
@@ -30,15 +31,14 @@ export async function GET(request: NextRequest) {
     if (!error) return response;
   }
 
-  // 2. Agar token_hash mila
+  // 2. Agar token_hash aur valid type mila
   if (token_hash && type) {
     const { error } = await supabase.auth.verifyOtp({
-      type: type as any,
+      type,
       token_hash,
     });
     if (!error) return response;
   }
 
-  // Agar dono fail ho jayein tabhi expire bolo
   return NextResponse.redirect(new URL("/forgot-password?expired=1", origin));
 }
