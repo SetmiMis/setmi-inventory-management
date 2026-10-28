@@ -30,13 +30,21 @@ async function LoginScreen() {
     { icon: ShieldCheck, text: tr(lang, "login_t2") },
     { icon: Users, text: tr(lang, "login_t3") },
   ];
+
   return (
     <>
       {/* Left: what the system is for (desktop only; on a phone the card alone is enough). */}
       <section className="relative hidden overflow-hidden bg-[#eaf7f4] lg:flex lg:flex-col">
         <div className="login-rise px-12 pt-10 [@media(max-height:780px)]:pt-6">
           <div className="flex items-center gap-5">
-            <Image src="/brand/setmi-round-512.png" alt="" width={112} height={112} priority className="h-24 w-24 xl:h-28 xl:w-28 [@media(max-height:780px)]:!h-20 [@media(max-height:780px)]:!w-20" />
+            <Image
+              src="/brand/setmi-round-512.png"
+              alt=""
+              width={112}
+              height={112}
+              priority
+              className="h-24 w-24 xl:h-28 xl:w-28 [@media(max-height:780px)]:!h-20 [@media(max-height:780px)]:!w-20"
+            />
             <div className="leading-tight">
               <p className="text-4xl font-extrabold tracking-tight xl:text-5xl">
                 <span className="bg-gradient-to-r from-[#0b7fb0] to-[#12b5c9] bg-clip-text text-transparent">SETMI</span>{" "}
@@ -45,15 +53,27 @@ async function LoginScreen() {
               <p className="mt-1 text-base font-medium text-[#0b5f7a]">Engineered for the Extraordinary.</p>
             </div>
           </div>
-          <p className="mt-6 inline-block rounded-full bg-[#d6f0ea] px-4 py-1.5 text-sm font-semibold text-[#075f54]">{tr(lang, "login_tag")}</p>
+
+          <p className="mt-6 inline-block rounded-full bg-[#d6f0ea] px-4 py-1.5 text-sm font-semibold text-[#075f54]">
+            {tr(lang, "login_tag")}
+          </p>
+
           <h1 className="mt-4 text-4xl font-extrabold leading-tight tracking-tight xl:text-5xl [@media(max-height:780px)]:xl:text-4xl">
             {tr(lang, "login_h1a")}<br />{tr(lang, "login_h1b")}
           </h1>
+
           <p className="mt-4 max-w-xl text-lg text-[#3d5565]">{tr(lang, "login_lead")}</p>
+
           <ul className="mt-7 [@media(max-height:780px)]:mt-4 grid max-w-2xl grid-cols-4 gap-4">
             {features.map(({ icon: Icon, text }, i) => (
-              <li key={text} className="login-rise flex flex-col items-center gap-2 text-center text-sm font-medium" style={{ animationDelay: `${120 + i * 80}ms` }}>
-                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#d6f0ea] text-[#0b8a7b]"><Icon size={26} aria-hidden /></span>
+              <li
+                key={text}
+                className="login-rise flex flex-col items-center gap-2 text-center text-sm font-medium"
+                style={{ animationDelay: `${120 + i * 80}ms` }}
+              >
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#d6f0ea] text-[#0b8a7b]">
+                  <Icon size={26} aria-hidden />
+                </span>
                 {text}
               </li>
             ))}
@@ -61,7 +81,13 @@ async function LoginScreen() {
         </div>
 
         <div className="relative mt-auto min-h-[240px] flex-1">
-          <Image src="/brand/login-hero.jpg" alt="" fill sizes="55vw" className="-mr-0.5 !w-[calc(100%+2px)] max-w-none object-cover object-[center_30%]" />
+          <Image
+            src="/brand/login-hero.jpg"
+            alt=""
+            fill
+            sizes="55vw"
+            className="-mr-0.5 !w-[calc(100%+2px)] max-w-none object-cover object-[center_30%]"
+          />
           {/* A soft wave where the picture meets the page. */}
           <svg aria-hidden viewBox="0 0 1200 120" preserveAspectRatio="none" className="absolute inset-x-0 top-0 h-20 w-full fill-[#eaf7f4]">
             <path d="M0 0H1200V30C1000 110 800 20 560 70C340 115 160 90 0 40Z" />
@@ -83,7 +109,14 @@ async function LoginScreen() {
             <LanguageDropdown lang={lang} label={tr(lang, "top_language")} />
           </div>
           <div className="mb-6 flex flex-col items-center text-center [@media(max-height:780px)]:mb-3">
-            <Image src="/brand/setmi-round-512.png" alt="" width={152} height={152} priority className="h-28 w-28 sm:h-36 sm:w-36 [@media(max-height:780px)]:sm:!h-20 [@media(max-height:780px)]:sm:!w-20" />
+            <Image
+              src="/brand/setmi-round-512.png"
+              alt=""
+              width={152}
+              height={152}
+              priority
+              className="h-28 w-28 sm:h-36 sm:w-36 [@media(max-height:780px)]:sm:!h-20 [@media(max-height:780px)]:sm:!w-20"
+            />
             <p className="mt-3 text-3xl font-extrabold tracking-tight">SETMI <span className="text-[#0b6e5c]">INDIA</span></p>
             <p className="text-sm text-[#3d5565]">{tr(lang, "login_subtitle")}</p>
           </div>
@@ -91,15 +124,22 @@ async function LoginScreen() {
           <p className="mb-6 [@media(max-height:780px)]:mb-3 mt-1 text-center text-sm text-[#3d5565]">{tr(lang, "login_welcome_sub")}</p>
           <LoginForm
             labels={{
-              email: tr(lang, "login_email_label"), emailPlaceholder: tr(lang, "login_email_ph"),
-              password: tr(lang, "login_password"), passwordPlaceholder: tr(lang, "login_password_ph"),
-              button: tr(lang, "login_button"), busy: tr(lang, "login_busy"),
-              show: tr(lang, "login_show"), hide: tr(lang, "login_hide"),
-              forgot: tr(lang, "login_forgot"), remember: tr(lang, "login_remember"),
+              email: tr(lang, "login_email_label"),
+              emailPlaceholder: tr(lang, "login_email_ph"),
+              password: tr(lang, "login_password"),
+              passwordPlaceholder: tr(lang, "login_password_ph"),
+              button: tr(lang, "login_button"),
+              busy: tr(lang, "login_busy"),
+              show: tr(lang, "login_show"),
+              hide: tr(lang, "login_hide"),
+              forgot: tr(lang, "login_forgot"),
+              remember: tr(lang, "login_remember"),
             }}
           />
           <div className="mt-8 [@media(max-height:780px)]:mt-4 border-t border-[#dbe7e5] pt-4 text-center text-xs text-[#3d5565]">
-            <p className="flex items-center justify-center gap-1.5 font-medium"><ShieldCheck size={14} aria-hidden /> {tr(lang, "login_authorized")}</p>
+            <p className="flex items-center justify-center gap-1.5 font-medium">
+              <ShieldCheck size={14} aria-hidden /> {tr(lang, "login_authorized")}
+            </p>
             <p className="mt-0.5">{tr(lang, "login_monitored")}</p>
           </div>
         </div>

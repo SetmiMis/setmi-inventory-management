@@ -1,11 +1,17 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { Eye, EyeOff, Loader2, Lock, Save, TriangleAlert } from "lucide-react";
 import { setNewPassword, type ResetState } from "../login/reset-actions";
+import { createClient } from "@/lib/supabase/client";
 
 type Labels = {
-  password: string; confirm: string; button: string; busy: string; show: string; hide: string;
+  password: string;
+  confirm: string;
+  button: string;
+  busy: string;
+  show: string;
+  hide: string;
   errors: { short: string; mismatch: string; expired: string; rejected: string };
 };
 
@@ -15,19 +21,80 @@ const fieldClass =
 export function ResetForm({ labels }: { labels: Labels }) {
   const [state, formAction, pending] = useActionState<ResetState, FormData>(setNewPassword, null);
   const [show, setShow] = useState(false);
-  const message = state?.error ? labels.errors[state.error as keyof Labels["errors"]] ?? labels.errors.rejected : null;
+  const [sessionReady, setSessionReady] = useState(false);
+  const [sessionError, setSessionError] = useState(false);
+
+  // Email se aane wale access_token hash ko read karke session establish karna
+  useEffect(() => {
+    async function initSession() {
+      if (typeof window === "undefined") return;
+
+      const hash = window.location.hash;
+      const supabase = createClient();
+
+      if (hash && hash.includes("access_token")) {
+        const params = new URLSearchParams(hash.substring(1));
+        const accessToken = params.get("access_token");
+        const refreshToken = params.get("refresh_token");
+
+        if (accessToken && refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+
+          if (!error) {
+            setSessionReady(true);
+            return;
+          }
+        }
+      }
+
+      // Agar direct session check ho chuka ho (PKCE / callback flow se)
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        setSessionReady(true);
+      } else {
+        setSessionError(true);
+      }
+    }
+
+    initSession();
+  }, []);
+
+  const message = state?.error
+    ? labels.errors[state.error as keyof Labels["errors"]] ?? labels.errors.rejected
+    : null;
 
   return (
     <form action={formAction} className="space-y-5">
       {(["password", "confirm"] as const).map((name) => (
         <div key={name}>
-          <label htmlFor={name} className="mb-1.5 block text-sm font-semibold">{labels[name]}</label>
+          <label htmlFor={name} className="mb-1.5 block text-sm font-semibold">
+            {labels[name]}
+          </label>
           <div className="relative">
-            <Lock size={18} aria-hidden className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4a6572]" />
-            <input id={name} name={name} type={show ? "text" : "password"} autoComplete="new-password" required minLength={8} maxLength={72} className={fieldClass} />
+            <Lock
+              size={18}
+              aria-hidden
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4a6572]"
+            />
+            <input
+              id={name}
+              name={name}
+              type={show ? "text" : "password"}
+              autoComplete="new-password"
+              required
+              minLength={8}
+              maxLength={72}
+              className={fieldClass}
+            />
             {name === "password" && (
               <button
-                type="button" onClick={() => setShow((v) => !v)} aria-label={show ? labels.hide : labels.show} aria-pressed={show}
+                type="button"
+                onClick={() => setShow((v) => !v)}
+                aria-label={show ? labels.hide : labels.show}
+                aria-pressed={show}
                 className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-[#4a6572] hover:bg-[#e6f4f1]"
               >
                 {show ? <EyeOff size={18} aria-hidden /> : <Eye size={18} aria-hidden />}
@@ -36,13 +103,22 @@ export function ResetForm({ labels }: { labels: Labels }) {
           </div>
         </div>
       ))}
+
+      {sessionError && !sessionReady && (
+        <p role="alert" className="flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+          <TriangleAlert size={16} className="mt-0.5 shrink-0" aria-hidden /> {labels.errors.expired}
+        </p>
+      )}
+
       {message && (
         <p role="alert" className="flex items-start gap-2 rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-800">
           <TriangleAlert size={16} className="mt-0.5 shrink-0" aria-hidden /> {message}
         </p>
       )}
+
       <button
-        type="submit" disabled={pending}
+        type="submit"
+        disabled={pending}
         className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0b8a7b] px-4 text-base font-semibold text-white shadow-lg shadow-[#0b8a7b]/25 transition hover:bg-[#076b60] active:scale-[0.99] disabled:opacity-70"
       >
         {pending ? <Loader2 size={18} className="animate-spin" aria-hidden /> : <Save size={18} aria-hidden />}

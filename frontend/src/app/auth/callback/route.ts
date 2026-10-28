@@ -1,14 +1,44 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
+import { supabaseEnv } from "@/lib/supabase/env";
 
-// The page the "reset your password" e-mail link opens. It swaps the one-time code for a session and
-// sends the person to the fixed /reset-password page (never to an address taken from the link).
 export async function GET(request: NextRequest) {
-  const code = request.nextUrl.searchParams.get("code");
-  const supabase = await createClient();
-  if (code && code.length <= 200) {
+  const { searchParams, origin } = request.nextUrl;
+  const code = searchParams.get("code");
+  const token_hash = searchParams.get("token_hash");
+  const type = searchParams.get("type");
+
+  let response = NextResponse.redirect(new URL("/reset-password", origin));
+  const { url, key } = supabaseEnv();
+
+  const supabase = createServerClient(url, key, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
+      },
+    },
+  });
+
+  // 1. Agar PKCE code mila
+  if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(new URL("/reset-password", request.url));
+    if (!error) return response;
   }
-  return NextResponse.redirect(new URL("/forgot-password?expired=1", request.url));
+
+  // 2. Agar token_hash mila
+  if (token_hash && type) {
+    const { error } = await supabase.auth.verifyOtp({
+      type: type as any,
+      token_hash,
+    });
+    if (!error) return response;
+  }
+
+  // Agar dono fail ho jayein tabhi expire bolo
+  return NextResponse.redirect(new URL("/forgot-password?expired=1", origin));
 }

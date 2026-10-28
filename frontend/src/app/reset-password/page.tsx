@@ -18,7 +18,6 @@ export default function ResetPasswordPage() {
 async function Screen() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
-  if (!data.user) redirect("/forgot-password?expired=1");
   const lang = await getLang();
   return (
     <AuthCard lang={lang} languageLabel={tr(lang, "top_language")} title={tr(lang, "reset_title")} subtitle={tr(lang, "reset_sub")}>

@@ -9,11 +9,10 @@ import { SESSION_ONLY_COOKIE } from "@/lib/supabase/session-cookie";
 export type LoginState = { error: string } | null;
 
 const schema = z.object({
-  email: z.email().max(254),
+  email: z.string().trim().toLowerCase().email().max(254),
   password: z.string().min(1).max(200),
 });
 
-// Same message for every failure on purpose: it must not reveal whether an email exists.
 const FAIL: LoginState = { error: "Invalid email or password." };
 
 export async function login(_prev: LoginState, formData: FormData): Promise<LoginState> {
@@ -23,16 +22,32 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   });
   if (!parsed.success) return FAIL;
 
-  // A ticked box keeps the person signed in on this device; unticked means
-  // the sign-in ends when the browser is closed.
   const remember = formData.get("remember") === "on";
-  const supabase = await createClient({ sessionOnly: !remember });
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
-  if (error) return FAIL;
-
   const jar = await cookies();
-  if (remember) jar.delete(SESSION_ONLY_COOKIE);
-  else jar.set(SESSION_ONLY_COOKIE, "1", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
 
-  redirect("/");
+  // Pehle session-only cookie set/delete karein taaki headers ready rahein
+  if (remember) {
+    jar.delete(SESSION_ONLY_COOKIE);
+  } else {
+    jar.set(SESSION_ONLY_COOKIE, "1", {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    });
+  }
+
+  const supabase = await createClient({ sessionOnly: !remember });
+  const { error } = await supabase.auth.signInWithPassword({
+    email: parsed.data.email,
+    password: parsed.data.password,
+  });
+
+  if (error) {
+    // Agar login fail ho jaye toh cleanup
+    jar.delete(SESSION_ONLY_COOKIE);
+    return FAIL;
+  }
+
+  redirect("/dashboard");
 }
