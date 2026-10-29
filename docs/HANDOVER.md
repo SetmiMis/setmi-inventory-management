@@ -2,6 +2,20 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-29: Products / SKU list: streaming, live search, instant filters, price columns (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- `frontend/src/app/(app)/items/page.tsx` split into a static title plus streamed parts (buttons, header numbers, table, side panel) each in its own `<Suspense>`; one cached `items_page` call per request feeds all of them. New `items-table.tsx` (table, empty states, skeletons). `item-controls.tsx` has `ItemFilters`: search after 300 ms of typing (also Enter), the three drop-downs filter on change, the Filter button is gone. The address parameter stays `category` (not `cat`).
+- Table now shows Selling Price (sortable) and, only when the person has `receipts.cost` AND the database sends it, Cost Price. Empty states: "No products yet. Create your first SKU." and "No products matching '<q>'." with Clear Filters.
+- `npm run lint` (no output), `typecheck`, `build` (exit 0, no warning lines) and `npm test` (55/55) pass.
+- `.claude/launch.json`: the dev server now starts with `--prefix frontend` (the app moved into `frontend/`).
+
+### Not done / owner must do
+- **Not seen in a browser after sign-in** (the AI never enters passwords; port 3000 showed the login page). Please open `/items`, type in the search box, change the drop-downs, check light/dark and phone width.
+- **Migrations 58 and 59 were applied to the live project on 2026-10-29 (owner said yes).** Before: only the old 6-argument `items_page` existed (58 had never been applied). After: one `items_page(text,uuid,text,text,int,int,text,text)`, anon cannot execute, authenticated can. 59 (`20261029000059_items_page_cost.sql`) adds the average buying cost, only for `receipts.cost`. Checked with a rolled-back test as the admin: total 15, rows carry `cost` (86.43, 140.00, 305.45 for the first three), sort by price works. NOT checked: a user without `receipts.cost` (should get null), the screen in a browser. No SQL test file was added for 58/59.
+- No "Print Barcode Labels" button at the top: `/items/labels` needs ticked products, so it stays in the bulk bar ("Print labels").
+- Uncommitted.
+
 ## 2026-10-29: HANDOVER sync (Claude Sonnet 5.5)
 
 Docs only. No code, database, Vercel or git change was made in this entry. Nothing was run (no tests, no build) and nothing was committed.

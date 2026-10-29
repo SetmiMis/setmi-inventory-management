@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
+import { Suspense, cache } from "react";
 import {
-  ArrowDownToLine, ArrowUpFromLine, Boxes, ChevronLeft, ChevronRight, ChevronsUpDown, Copy, FileText, Package, PackageX, Printer, Search, SquarePen,
+  ArrowDownToLine, ArrowUpFromLine, Boxes, ChevronLeft, ChevronRight, Copy, FileText, Package, PackageX, Printer, SquarePen,
   TriangleAlert, X, Archive, type LucideIcon,
 } from "lucide-react";
 import { z } from "zod";
 import { Badge } from "@/components/badge";
 import { Ean13Barcode } from "@/components/ean13-barcode";
-import { EmptyState } from "@/components/empty-state";
 import { can, requirePermission } from "@/lib/auth";
 import { isValidEan13 } from "@/lib/barcode/ean13";
 import { friendlyDbError } from "@/lib/db-errors";
@@ -16,8 +17,9 @@ import { cardClass } from "@/lib/ui";
 import { BUCKET } from "@/lib/validation/files";
 import { sanitizeSearch } from "@/lib/validation/item";
 import { MOVEMENT_LABELS } from "@/lib/validation/stock";
-import { AddMenu, RowMenu, RowsPerPage } from "./item-controls";
+import { AddMenu, ItemFilters, RowsPerPage } from "./item-controls";
 import { BulkForm } from "./bulk-bar";
+import { ItemsEmpty, ItemsTable, KpiSkeleton, TableSkeleton, qtyText, type Row } from "./items-table";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
@@ -28,106 +30,67 @@ const STATUS_OPTIONS = [
 const SORTS = ["code", "name", "category", "qty", "price", "status"];
 const TABS = [["details", "Details"], ["stock", "Stock"], ["documents", "Documents"], ["history", "History"]] as const;
 
-type Row = {
-  id: string; code: string; name: string; selling_item_name: string; category: string | null; unit: string; source: string;
-  active: boolean; price: number | null; image: string | null; qty: number; reorder: number; status: "in" | "low" | "out" | "inactive";
-};
 type PageData = { total: number; rows: Row[]; kpi: { total: number; active: number; inactive: number; low: number; out: number } };
+const EMPTY_PAGE: PageData = { total: 0, rows: [], kpi: { total: 0, active: 0, inactive: 0, low: 0, out: 0 } };
 
-const STATUS_LABEL: Record<Row["status"], string> = { in: "In Stock", low: "Low Stock", out: "Out of Stock", inactive: "Inactive" };
-const STATUS_TONE: Record<Row["status"], "green" | "amber" | "red" | "gray"> = { in: "green", low: "amber", out: "red", inactive: "gray" };
-const qtyText = (n: number) => Number(n).toLocaleString("en-IN", { maximumFractionDigits: 3 });
 const daysAgoIso = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
 const day = (iso: string) => new Date(iso).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" });
 
-export default async function ItemsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  const user = await requirePermission("items.view");
-  const sp = await searchParams;
+// Everything from the URL is untrusted: parse it into safe values.
+type P = {
+  q: string; status: string; source: string; categoryId: string; size: number; page: number; tab: string; sort: string; dir: "asc" | "desc";
+  sel: string | undefined;
+};
+function parseParams(sp: SearchParams): P {
+  return {
+    q: sanitizeSearch(first(sp.q)),
+    status: STATUS_OPTIONS.some(([v]) => v === first(sp.status)) ? first(sp.status)! : "all",
+    source: ["LOCAL", "IMPORT"].includes(first(sp.source) ?? "") ? first(sp.source)! : "",
+    categoryId: z.uuid().safeParse(first(sp.category)).data ?? "",
+    size: SIZES.includes(Number(first(sp.size))) ? Number(first(sp.size)) : 10,
+    page: Math.min(Math.max(parseInt(first(sp.page) ?? "1", 10) || 1, 1), 100000),
+    tab: TABS.some(([v]) => v === first(sp.tab)) ? first(sp.tab)! : "details",
+    sort: SORTS.includes(first(sp.sort) ?? "") ? first(sp.sort)! : "code",
+    dir: first(sp.dir) === "desc" ? "desc" : "asc",
+    sel: first(sp.sel),
+  };
+}
 
-  // Everything from the URL is untrusted: parse it into safe values.
-  const q = sanitizeSearch(first(sp.q));
-  const status = STATUS_OPTIONS.some(([v]) => v === first(sp.status)) ? first(sp.status)! : "all";
-  const source = ["LOCAL", "IMPORT"].includes(first(sp.source) ?? "") ? first(sp.source)! : "";
-  const categoryId = z.uuid().safeParse(first(sp.category)).data ?? "";
-  const size = SIZES.includes(Number(first(sp.size))) ? Number(first(sp.size)) : 10;
-  const page = Math.min(Math.max(parseInt(first(sp.page) ?? "1", 10) || 1, 1), 100000);
-  const tab = TABS.some(([v]) => v === first(sp.tab)) ? first(sp.tab)! : "details";
-  const sort = SORTS.includes(first(sp.sort) ?? "") ? first(sp.sort)! : "code";
-  const dir = first(sp.dir) === "desc" ? "desc" : "asc";
-
+// One database call per request: the header numbers, the table and the side panel all read this same result.
+const getItemsPage = cache(async (q: string, categoryId: string, source: string, status: string, size: number, page: number, sort: string, dir: string) => {
   const supabase = await createClient();
+  const { data, error } = await supabase.rpc("items_page", {
+    p_q: q || null, p_category: categoryId || null, p_source: source || null, p_status: status === "all" ? null : status,
+    p_limit: size, p_offset: (page - 1) * size,
+    // Only sent when a column is chosen, so the plain list keeps working on a database without the sort migration (58).
+    ...(sort !== "code" || dir !== "asc" ? { p_sort: sort, p_dir: dir } : {}),
+  });
+  return { result: (data ?? EMPTY_PAGE) as PageData, error };
+});
+const loadPage = (p: P) => getItemsPage(p.q, p.categoryId, p.source, p.status, p.size, p.page, p.sort, p.dir);
 
-  // Scanner support: a USB scanner types the digits and presses Enter. If the text is exactly
-  // one item's barcode, go straight to that item.
-  if (q) {
-    const { data: exact } = await supabase.from("item_barcodes").select("item_id").eq("barcode", q).maybeSingle();
-    if (exact) redirect(`/items/${exact.item_id}`);
-  }
+// The product open in the side panel: the one in the address, else the first row. sel=none closes it.
+const selectedId = (p: P, rows: Row[]) => (p.sel === "none" ? null : (z.uuid().safeParse(p.sel).data ?? rows[0]?.id ?? null));
 
-  const [{ data, error }, { data: categories }, { count: newThisMonth }] = await Promise.all([
-    supabase.rpc("items_page", {
-      p_q: q || null, p_category: categoryId || null, p_source: source || null, p_status: status === "all" ? null : status,
-      p_limit: size, p_offset: (page - 1) * size,
-      // Only sent when a column is chosen, so the plain list keeps working on a database without the sort migration (58).
-      ...(sort !== "code" || dir !== "asc" ? { p_sort: sort, p_dir: dir } : {}),
-    }),
-    supabase.from("categories").select("id, name").order("name"),
-    supabase.from("items").select("id", { count: "exact", head: true }).gte("created_at", daysAgoIso(30)),
-  ]);
-  const result = (data ?? { total: 0, rows: [], kpi: { total: 0, active: 0, inactive: 0, low: 0, out: 0 } }) as PageData;
-  const rows = result.rows;
-  const kpi = result.kpi;
-  const total = Number(result.total);
-  const lastPage = Math.max(1, Math.ceil(total / size));
-
-  // Pictures: the bucket is private, so each thumbnail uses a link that expires after one hour.
-  const thumbPaths = rows.map((r) => r.image).filter((p): p is string => !!p);
-  const thumbs = new Map<string, string>();
-  if (thumbPaths.length > 0) {
-    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrls(thumbPaths, 3600);
-    for (const s of signed ?? []) if (s.path && s.signedUrl) thumbs.set(s.path, s.signedUrl);
-  }
-
-  // Which product is open in the side panel: the one in the address, else the first row. sel=none closes it.
-  const selParam = first(sp.sel);
-  const selId = selParam === "none" ? null : (z.uuid().safeParse(selParam).data ?? rows[0]?.id ?? null);
-
-  const keep = (extra: Record<string, string | number | undefined>) => {
+// Builds addresses that keep the current filters and change only what is asked for.
+function makeKeep(p: P) {
+  return (extra: Record<string, string | number | undefined>) => {
     const params = new URLSearchParams();
     const base: Record<string, string | number | undefined> = {
-      q: q || undefined, status: status !== "all" ? status : undefined, source: source || undefined, category: categoryId || undefined,
-      size: size !== 10 ? size : undefined, page: page > 1 ? page : undefined, sel: selParam, tab: tab !== "details" ? tab : undefined,
-      sort: sort !== "code" ? sort : undefined, dir: dir !== "asc" ? dir : undefined,
+      q: p.q || undefined, status: p.status !== "all" ? p.status : undefined, source: p.source || undefined, category: p.categoryId || undefined,
+      size: p.size !== 10 ? p.size : undefined, page: p.page > 1 ? p.page : undefined, sel: p.sel, tab: p.tab !== "details" ? p.tab : undefined,
+      sort: p.sort !== "code" ? p.sort : undefined, dir: p.dir !== "asc" ? p.dir : undefined,
     };
     for (const [k, v] of Object.entries({ ...base, ...extra })) if (v !== undefined && v !== "") params.set(k, String(v));
     const s = params.toString();
     return s ? `/items?${s}` : "/items";
   };
-  const filterOnly = new URLSearchParams(
-    Object.entries({ q, status: status !== "all" ? status : "", source, category: categoryId }).filter(([, v]) => v) as [string, string][],
-  ).toString();
+}
 
-  // Page numbers: 1 2 3 4 5 ... last
-  const pages: (number | "gap")[] = [];
-  const windowEnd = Math.min(lastPage, Math.max(5, page + 2));
-  for (let p = Math.max(1, windowEnd - 4); p <= windowEnd; p++) pages.push(p);
-  if (windowEnd < lastPage) pages.push("gap", lastPage);
-
-  const canEdit = can(user, "items.edit");
-  const canCreate = can(user, "items.create");
-  const canArchive = can(user, "items.archive");
-  const sortLink = (col: string) => keep({ sort: col === "code" ? undefined : col, dir: sort === col && dir === "asc" ? "desc" : undefined, page: undefined, sel: undefined });
-  const sortHead = (col: string, label: string, right?: boolean) => (
-    <th key={col} className={right ? "text-right" : undefined} aria-sort={sort === col ? (dir === "asc" ? "ascending" : "descending") : "none"}>
-      <Link href={sortLink(col)} className="inline-flex items-center gap-1 hover:underline">{label}<ChevronsUpDown size={12} aria-hidden className={sort === col ? "text-[var(--brand-text)]" : "opacity-50"} />{sort === col ? (dir === "asc" ? "↑" : "↓") : ""}</Link>
-    </th>
-  );
-  const pct = (n: number) => (kpi.total > 0 ? `${((n / kpi.total) * 100).toFixed(1)}%` : "0.0%");
-  const filtersOn = !!(q || source || categoryId || status !== "all");
-
+// The title is static, so it shows at once; the buttons and the list stream in behind it.
+export default function ItemsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   return (
     <main className="space-y-5">
-      {/* Breadcrumb, title and the three buttons */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <nav aria-label="Breadcrumb" className="mb-1 flex items-center gap-2 text-sm text-muted">
@@ -137,144 +100,170 @@ export default async function ItemsPage({ searchParams }: { searchParams: Promis
           <h1 className="!text-3xl !font-bold">Product / SKU Master</h1>
           <p className="mt-1 text-sm text-muted">Manage all your products, SKUs and specifications. Add, edit, view stock, pricing and related details.</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          {can(user, "items.import") && (
-            <Link href="/items/import" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-line bg-surface px-5 text-sm font-semibold shadow-sm hover:bg-surface-muted">
-              <ArrowUpFromLine size={18} aria-hidden /> Import
-            </Link>
-          )}
-          <a href={`/items/export${filterOnly ? `?${filterOnly}` : ""}`} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-line bg-surface px-5 text-sm font-semibold shadow-sm hover:bg-surface-muted">
-            <ArrowDownToLine size={18} aria-hidden /> Export
-          </a>
-          <AddMenu canCreate={can(user, "items.create")} canImport={can(user, "items.import")} canCategories={can(user, "categories.manage")} />
-        </div>
+        <Suspense fallback={null}>
+          <HeaderActions searchParams={searchParams} />
+        </Suspense>
       </div>
+      <Suspense fallback={<><KpiSkeleton /><TableSkeleton /></>}>
+        <ItemsContent searchParams={searchParams} />
+      </Suspense>
+    </main>
+  );
+}
 
-      {error && <p role="alert" className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700">{friendlyDbError(error)}</p>}
+async function HeaderActions({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const user = await requirePermission("items.view");
+  const p = parseParams(await searchParams);
+  const filterOnly = new URLSearchParams(
+    Object.entries({ q: p.q, status: p.status !== "all" ? p.status : "", source: p.source, category: p.categoryId }).filter(([, v]) => v) as [string, string][],
+  ).toString();
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      {can(user, "items.import") && (
+        <Link href="/items/import" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-line bg-surface px-5 text-sm font-semibold shadow-sm hover:bg-surface-muted">
+          <ArrowUpFromLine size={18} aria-hidden /> Import Products
+        </Link>
+      )}
+      <a href={`/items/export${filterOnly ? `?${filterOnly}` : ""}`} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-line bg-surface px-5 text-sm font-semibold shadow-sm hover:bg-surface-muted">
+        <ArrowDownToLine size={18} aria-hidden /> Export CSV
+      </a>
+      <AddMenu canCreate={can(user, "items.create")} canImport={can(user, "items.import")} canCategories={can(user, "categories.manage")} />
+    </div>
+  );
+}
 
-      {/* The five numbers */}
-      <section aria-label="Summary" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
-        <Kpi icon={Package} tint="teal" label="Total Products" value={kpi.total} href="/items" sub={<span className="font-medium text-green-700 dark:text-green-400">+{newThisMonth ?? 0} in 30 days</span>} />
-        <Kpi icon={Boxes} tint="green" label="Active Products" value={kpi.active} href={keepStatus("all")} sub={<span className="font-medium text-green-700 dark:text-green-400">{pct(kpi.active)}</span>} />
-        <Kpi icon={TriangleAlert} tint="orange" label="Low Stock Items" value={kpi.low} href={keepStatus("low")} sub={<span className="font-medium text-amber-700 dark:text-amber-400">{pct(kpi.low)}</span>} />
-        <Kpi icon={PackageX} tint="red" label="Out of Stock" value={kpi.out} href={keepStatus("out")} sub={<span className="font-medium text-red-600">{pct(kpi.out)}</span>} />
-        <Kpi icon={Archive} tint="gray" label="Inactive Products" value={kpi.inactive} href={keepStatus("inactive")} sub={<span className="text-muted">{pct(kpi.inactive)}</span>} />
-      </section>
+async function ItemsContent({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const user = await requirePermission("items.view");
+  const p = parseParams(await searchParams);
+  const supabase = await createClient();
+
+  // Scanner support: a USB scanner types the digits and presses Enter. If the text is exactly
+  // one item's barcode, go straight to that item.
+  if (p.q) {
+    const { data: exact } = await supabase.from("item_barcodes").select("item_id").eq("barcode", p.q).maybeSingle();
+    if (exact) redirect(`/items/${exact.item_id}`);
+  }
+
+  const { data: categories } = await supabase.from("categories").select("id, name").order("name");
+  const cats = categories ?? [];
+  const keep = makeKeep(p);
+  const keepStatus = (s: string) => keep({ status: s === "all" ? undefined : s, page: undefined, sel: undefined });
+  const canEdit = can(user, "items.edit");
+  const canCreate = can(user, "items.create");
+  const canArchive = can(user, "items.archive");
+  const canCost = can(user, "receipts.cost");
+
+  return (
+    <>
+      <Suspense fallback={<KpiSkeleton />}>
+        <Kpis p={p} hrefFor={keepStatus} />
+      </Suspense>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_21rem]">
         <section className={`${cardClass} min-w-0 !p-4`}>
-          {/* Filters */}
-          <form method="get" className="mb-4 grid gap-3 md:grid-cols-[minmax(12rem,2.2fr)_repeat(3,minmax(0,1fr))_auto_auto] md:items-end">
-            <label className="relative block">
-              <span className="sr-only">Search</span>
-              <Search size={18} aria-hidden className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
-              <input name="q" defaultValue={q} placeholder="Search SKU, name, barcode" autoComplete="off"
-                className="min-h-12 w-full rounded-xl border border-[var(--line-strong)] bg-surface pl-11 pr-3 text-base md:text-sm" />
-            </label>
-            <FilterSelect label="Category" name="category" value={categoryId}>
-              <option value="">All Categories</option>
-              {(categories ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </FilterSelect>
-            <FilterSelect label="Source" name="source" value={source}>
-              <option value="">All Sources</option><option value="LOCAL">LOCAL</option><option value="IMPORT">IMPORT</option>
-            </FilterSelect>
-            <FilterSelect label="Status" name="status" value={status}>
-              {STATUS_OPTIONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-            </FilterSelect>
-            <Link href="/items" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-line bg-surface px-5 text-sm font-semibold hover:bg-surface-muted">Clear</Link>
-            <button type="submit" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--brand)] px-5 text-sm font-semibold text-white hover:bg-brand-strong">
-              <Search size={16} aria-hidden /> Filter
-            </button>
-          </form>
-
-          {rows.length === 0 ? (
-            <EmptyState icon={Package} title="No products found" text={filtersOn ? "Try a different word, or press Clear. You can also scan the barcode." : "Products are what you buy and sell. Add the first one, or bring many at once from Excel."} actionHref={can(user, "items.create") ? "/items/new" : undefined} actionLabel="Add Product" />
-          ) : (
-            <BulkForm categories={categories ?? []} canArchive={canArchive} canEdit={canEdit}>
-            <div className="overflow-x-auto">
-              <table className="dash-table w-full text-left text-sm">
-                <thead>
-                  <tr>
-                    <th aria-label="Select"></th><th>Image</th>{sortHead("code", "SKU Code")}{sortHead("name", "Product Name")}{sortHead("category", "Category")}
-                    <th>Unit</th>{sortHead("qty", "Current Stock", true)}<th className="text-right">Reorder Level</th>{sortHead("status", "Status")}<th>Source</th><th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((r) => {
-                    const selected = r.id === selId;
-                    const thumb = r.image ? thumbs.get(r.image) : undefined;
-                    return (
-                      <tr key={r.id} aria-selected={selected} className={selected ? "!bg-brand-soft" : ""}>
-                        <td><input type="checkbox" name="ids" value={r.id} aria-label={`Select ${r.code}`} /></td>
-                        <td>
-                          <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-lg border border-line bg-white">
-                            {thumb ? (
-                              // eslint-disable-next-line @next/next/no-img-element -- private signed link, size is fixed
-                              <img src={thumb} alt="" width={44} height={44} className="h-full w-full object-contain" loading="lazy" />
-                            ) : (
-                              <Package size={20} aria-hidden className="text-muted" />
-                            )}
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap"><Link href={keepSel(r.id)} className="font-semibold">{r.code}</Link></td>
-                        <td className="min-w-40 max-w-56">
-                          <span className="line-clamp-2">{r.name}</span>
-                        </td>
-                        <td>{r.category ?? ""}</td>
-                        <td>{r.unit}</td>
-                        <td className={`text-right font-mono font-semibold ${r.status === "out" ? "text-red-600" : ""}`}>{qtyText(r.qty)}</td>
-                        <td className="text-right font-mono">{qtyText(r.reorder)}</td>
-                        <td title={r.status === "low" ? "Below its reorder level in at least one place" : undefined}><Badge tone={STATUS_TONE[r.status]}>{STATUS_LABEL[r.status]}</Badge></td>
-                        <td>{r.source}</td>
-                        <td>
-                          <span className="flex items-center gap-1.5">
-                            {canEdit && <Link href={`/items/${r.id}`} aria-label={`Edit ${r.code}`} title="Edit" className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-surface hover:bg-surface-muted"><SquarePen size={18} aria-hidden /></Link>}
-                            <RowMenu id={r.id} canEdit={canEdit} canCreate={canCreate} />
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            </BulkForm>
-          )}
-
-          {/* Pagination */}
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
-            <span className="text-muted">Showing {total === 0 ? 0 : (page - 1) * size + 1} to {Math.min(page * size, total)} of {total.toLocaleString("en-IN")} products</span>
-            <nav aria-label="Pagination" className="flex items-center gap-1.5">
-              {page > 1 ? <PageLink href={keep({ page: page - 1, sel: undefined })} label="Previous page"><ChevronLeft size={16} aria-hidden /></PageLink> : <PageLink disabled label="Previous page"><ChevronLeft size={16} aria-hidden /></PageLink>}
-              {pages.map((p, i) => p === "gap" ? <span key={`g${i}`} className="px-1 text-muted">...</span> : (
-                <PageLink key={p} href={keep({ page: p, sel: undefined })} active={p === page} label={`Page ${p}`}>{p}</PageLink>
-              ))}
-              {page < lastPage ? <PageLink href={keep({ page: page + 1, sel: undefined })} label="Next page"><ChevronRight size={16} aria-hidden /></PageLink> : <PageLink disabled label="Next page"><ChevronRight size={16} aria-hidden /></PageLink>}
-            </nav>
-            <RowsPerPage size={size} sizes={SIZES} basePath={keep({ size: undefined, page: undefined, sel: undefined })} />
-          </div>
+          <ItemFilters
+            q={p.q} category={p.categoryId} source={p.source} status={p.status}
+            categories={[{ value: "", label: "All Categories" }, ...cats.map((c) => ({ value: c.id, label: c.name }))]}
+            sources={[{ value: "", label: "All Sources" }, { value: "LOCAL", label: "LOCAL" }, { value: "IMPORT", label: "IMPORT" }]}
+            statuses={STATUS_OPTIONS.map(([value, label]) => ({ value, label }))}
+          />
+          <Suspense fallback={<TableSkeleton />}>
+            <TableSection p={p} keep={keep} categories={cats} canEdit={canEdit} canCreate={canCreate} canArchive={canArchive} canCost={canCost} />
+          </Suspense>
         </section>
 
-        {selId && <Panel itemId={selId} tab={tab} tabHref={(t) => keep({ tab: t === "details" ? undefined : t, sel: selId })} closeHref={keep({ sel: "none", tab: undefined })} canEdit={canEdit} canCreate={canCreate} />}
+        <Suspense fallback={null}>
+          <SelectedPanel p={p} keep={keep} canEdit={canEdit} canCreate={canCreate} />
+        </Suspense>
       </div>
-    </main>
+    </>
   );
-
-  function keepStatus(s: string) {
-    return keep({ status: s === "all" ? undefined : s, page: undefined, sel: undefined });
-  }
-  function keepSel(id: string) {
-    return keep({ sel: id });
-  }
 }
 
-function FilterSelect({ label, name, value, children }: { label: string; name: string; value: string; children: React.ReactNode }) {
+async function Kpis({ p, hrefFor }: { p: P; hrefFor: (s: string) => string }) {
+  await connection(); // the "30 days" date below must not be fixed at build time
+  const supabase = await createClient();
+  const [{ result }, { count: newThisMonth }] = await Promise.all([
+    loadPage(p),
+    supabase.from("items").select("id", { count: "exact", head: true }).gte("created_at", daysAgoIso(30)),
+  ]);
+  const kpi = result.kpi;
+  const pct = (n: number) => (kpi.total > 0 ? `${((n / kpi.total) * 100).toFixed(1)}%` : "0.0%");
   return (
-    <label className="block">
-      <span className="mb-1 block text-xs text-muted">{label}</span>
-      <select name={name} defaultValue={value} className="min-h-12 w-full rounded-xl border border-[var(--line-strong)] bg-surface px-3 text-base md:text-sm">{children}</select>
-    </label>
+    <section aria-label="Summary" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+      <Kpi icon={Package} tint="teal" label="Total Products" value={kpi.total} href="/items" sub={<span className="font-medium text-green-700 dark:text-green-400">+{newThisMonth ?? 0} in 30 days</span>} />
+      <Kpi icon={Boxes} tint="green" label="Active Products" value={kpi.active} href={hrefFor("all")} sub={<span className="font-medium text-green-700 dark:text-green-400">{pct(kpi.active)}</span>} />
+      <Kpi icon={TriangleAlert} tint="orange" label="Low Stock Items" value={kpi.low} href={hrefFor("low")} sub={<span className="font-medium text-amber-700 dark:text-amber-400">{pct(kpi.low)}</span>} />
+      <Kpi icon={PackageX} tint="red" label="Out of Stock" value={kpi.out} href={hrefFor("out")} sub={<span className="font-medium text-red-600">{pct(kpi.out)}</span>} />
+      <Kpi icon={Archive} tint="gray" label="Inactive Products" value={kpi.inactive} href={hrefFor("inactive")} sub={<span className="text-muted">{pct(kpi.inactive)}</span>} />
+    </section>
   );
+}
+
+async function TableSection({ p, keep, categories, canEdit, canCreate, canArchive, canCost }: {
+  p: P; keep: ReturnType<typeof makeKeep>; categories: { id: string; name: string }[];
+  canEdit: boolean; canCreate: boolean; canArchive: boolean; canCost: boolean;
+}) {
+  const { result, error } = await loadPage(p);
+  const rows = result.rows;
+  const total = Number(result.total);
+  const lastPage = Math.max(1, Math.ceil(total / p.size));
+  const filtersOn = !!(p.q || p.source || p.categoryId || p.status !== "all");
+
+  // Pictures: the bucket is private, so each thumbnail uses a link that expires after one hour.
+  const thumbPaths = rows.map((r) => r.image).filter((x): x is string => !!x);
+  const thumbs = new Map<string, string>();
+  if (thumbPaths.length > 0) {
+    const supabase = await createClient();
+    const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrls(thumbPaths, 3600);
+    for (const s of signed ?? []) if (s.path && s.signedUrl) thumbs.set(s.path, s.signedUrl);
+  }
+
+  // Page numbers: 1 2 3 4 5 ... last
+  const pages: (number | "gap")[] = [];
+  const windowEnd = Math.min(lastPage, Math.max(5, p.page + 2));
+  for (let n = Math.max(1, windowEnd - 4); n <= windowEnd; n++) pages.push(n);
+  if (windowEnd < lastPage) pages.push("gap", lastPage);
+
+  const sortHref = (col: string) => keep({ sort: col === "code" ? undefined : col, dir: p.sort === col && p.dir === "asc" ? "desc" : undefined, page: undefined, sel: undefined });
+  const showCost = canCost && rows.some((r) => "cost" in r);
+
+  return (
+    <>
+      {error && <p role="alert" className="mb-3 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700">{friendlyDbError(error)}</p>}
+
+      {rows.length === 0 ? (
+        <ItemsEmpty hasProducts={result.kpi.total > 0} q={p.q} filtersOn={filtersOn} canCreate={canCreate} />
+      ) : (
+        <BulkForm categories={categories} canArchive={canArchive} canEdit={canEdit}>
+          <ItemsTable
+            rows={rows} thumbs={thumbs} selId={selectedId(p, rows)} sort={p.sort} dir={p.dir} sortHref={sortHref}
+            rowHref={(id) => keep({ sel: id })} canEdit={canEdit} canCreate={canCreate} showCost={showCost}
+          />
+        </BulkForm>
+      )}
+
+      {/* Pagination */}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
+        <span className="text-muted">Showing {total === 0 ? 0 : (p.page - 1) * p.size + 1} to {Math.min(p.page * p.size, total)} of {total.toLocaleString("en-IN")} products</span>
+        <nav aria-label="Pagination" className="flex items-center gap-1.5">
+          {p.page > 1 ? <PageLink href={keep({ page: p.page - 1, sel: undefined })} label="Previous page"><ChevronLeft size={16} aria-hidden /></PageLink> : <PageLink disabled label="Previous page"><ChevronLeft size={16} aria-hidden /></PageLink>}
+          {pages.map((n, i) => n === "gap" ? <span key={`g${i}`} className="px-1 text-muted">...</span> : (
+            <PageLink key={n} href={keep({ page: n, sel: undefined })} active={n === p.page} label={`Page ${n}`}>{n}</PageLink>
+          ))}
+          {p.page < lastPage ? <PageLink href={keep({ page: p.page + 1, sel: undefined })} label="Next page"><ChevronRight size={16} aria-hidden /></PageLink> : <PageLink disabled label="Next page"><ChevronRight size={16} aria-hidden /></PageLink>}
+        </nav>
+        <RowsPerPage size={p.size} sizes={SIZES} basePath={keep({ size: undefined, page: undefined, sel: undefined })} />
+      </div>
+    </>
+  );
+}
+
+async function SelectedPanel({ p, keep, canEdit, canCreate }: { p: P; keep: ReturnType<typeof makeKeep>; canEdit: boolean; canCreate: boolean }) {
+  const { result } = await loadPage(p);
+  const selId = selectedId(p, result.rows);
+  if (!selId) return null;
+  return <Panel itemId={selId} tab={p.tab} tabHref={(t) => keep({ tab: t === "details" ? undefined : t, sel: selId })} closeHref={keep({ sel: "none", tab: undefined })} canEdit={canEdit} canCreate={canCreate} />;
 }
 
 function PageLink({ href, label, active, disabled, children }: { href?: string; label: string; active?: boolean; disabled?: boolean; children: React.ReactNode }) {
