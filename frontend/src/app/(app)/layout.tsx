@@ -14,6 +14,8 @@ import { CollapseButton, NotificationBell, SidebarColumn, ThemeToggle, UserMenu 
 import { LanguageSwitch } from "@/components/language-switch";
 import { MapPin } from "lucide-react";
 
+
+
 // Every page in this group needs a signed-in user. Reading the session is a request-time
 // read, so with Cache Components it must sit inside <Suspense>.
 export default function AppLayout({ children }: { children: React.ReactNode }) {

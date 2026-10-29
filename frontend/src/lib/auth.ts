@@ -16,22 +16,30 @@ export type CurrentUser = {
 // so a revoked or forged session is rejected. Cached per request.
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) return null;
+  const { data: auth, error: authError } = await supabase.auth.getUser();
+  if (authError || !auth?.user) return null;
 
   // The two reads do not depend on each other: ask together (one network wait instead of two).
-  const [{ data: profile }, { data: perms }] = await Promise.all([
-    supabase.from("profiles").select("email, full_name, is_active, is_admin").eq("id", auth.user.id).maybeSingle(),
-    supabase.from("user_permissions").select("permission_key").eq("user_id", auth.user.id),
+  const [{ data: profile, error: profileError }, { data: perms }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("email, full_name, is_active, is_admin")
+      .eq("id", auth.user.id)
+      .maybeSingle(),
+    supabase
+      .from("user_permissions")
+      .select("permission_key")
+      .eq("user_id", auth.user.id),
   ]);
-  if (!profile) return null;
+
+  if (profileError || !profile) return null;
 
   return {
     id: auth.user.id,
-    email: profile.email,
-    fullName: profile.full_name,
-    isActive: profile.is_active,
-    isAdmin: profile.is_admin,
+    email: profile.email || auth.user.email || "",
+    fullName: profile.full_name ?? null,
+    isActive: Boolean(profile.is_active),
+    isAdmin: Boolean(profile.is_admin),
     permissions: (perms ?? []).map((p) => p.permission_key),
   };
 });
@@ -69,10 +77,26 @@ export function can(user: CurrentUser, key: string): boolean {
   return user.isActive && (user.isAdmin || user.permissions.includes(key));
 }
 
-// The dashboard is worth showing when the person may see at least one of its parts
-// (the database decides the numbers; this only decides whether to show the link).
+// The dashboard is worth showing when the person may see at least one of its parts.
+// Admin users bypass the loop instantly.
 export function showDashboard(user: CurrentUser): boolean {
-  return ["bills.view", "stock.view", "purchase.view", "purchase.create", "purchase.approve",
-    "receipts.view", "receipts.create", "receipts.post", "transfers.view", "transfers.create",
-    "transfers.send", "transfers.receive"].some((k) => can(user, k));
+  if (!user.isActive) return false;
+  if (user.isAdmin) return true;
+
+  const dashboardKeys = [
+    "bills.view",
+    "stock.view",
+    "purchase.view",
+    "purchase.create",
+    "purchase.approve",
+    "receipts.view",
+    "receipts.create",
+    "receipts.post",
+    "transfers.view",
+    "transfers.create",
+    "transfers.send",
+    "transfers.receive",
+  ];
+
+  return dashboardKeys.some((k) => user.permissions.includes(k));
 }

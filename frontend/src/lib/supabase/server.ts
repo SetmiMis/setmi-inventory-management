@@ -1,27 +1,36 @@
-import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { connection } from "next/server"; // 👈 Next.js request-time indicator
 import { supabaseEnv } from "./env";
 import { asSessionCookie, SESSION_ONLY_COOKIE } from "./session-cookie";
 
-// Server-side Supabase client bound to the signed-in user's cookies.
-// Requests run as that user, so database Row Level Security applies to every query.
-// `sessionOnly` is passed by the login action (the cookie is not readable yet in that same request).
-export async function createClient(opts?: { sessionOnly?: boolean }) {
+export async function createClient(options?: { sessionOnly?: boolean }) {
+  // Prerender ke waqt Supabase Date.now() crash na kare, request aane ka wait karein
+  await connection();
+
   const cookieStore = await cookies();
   const { url, key } = supabaseEnv();
-  const sessionOnly = opts?.sessionOnly ?? cookieStore.get(SESSION_ONLY_COOKIE)?.value === "1";
+
   return createServerClient(url, key, {
     cookies: {
-      getAll: () => cookieStore.getAll(),
-      setAll(list) {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
         try {
-          for (const { name, value, options } of list) {
-            cookieStore.set(name, value, sessionOnly && value ? asSessionCookie(options) : options);
-          }
+          const sessionOnly =
+            options?.sessionOnly ??
+            cookieStore.get(SESSION_ONLY_COOKIE)?.value === "1";
+
+          cookiesToSet.forEach(({ name, value, options: cookieOptions }) => {
+            cookieStore.set(
+              name,
+              value,
+              sessionOnly && value ? asSessionCookie(cookieOptions) : cookieOptions
+            );
+          });
         } catch {
-          // Called from a Server Component, where cookies are read-only.
-          // Safe to ignore: proxy.ts refreshes the session cookie on every request.
+          // Server component render context me cookies write nahi ho sakti, ignore safely
         }
       },
     },
