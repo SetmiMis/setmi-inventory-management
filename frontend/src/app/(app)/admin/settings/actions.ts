@@ -19,6 +19,18 @@ export async function setBillingEnabled(_prev: SettingState, fd: FormData): Prom
   return { ok: true, message: enabled ? "Billing is now ON." : "Billing is now OFF." };
 }
 
+// How much of the menu everybody sees (1 to 4). Admin only here and inside the database function. It only changes what is shown.
+export async function setMenuStep(_prev: SettingState, fd: FormData): Promise<SettingState> {
+  await requireAdmin();
+  const step = z.coerce.number().int().min(1).max(4).safeParse(fd.get("step"));
+  if (!step.success) return { ok: false, message: "Choose step 1, 2, 3 or 4." };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("admin_set_menu_step", { p_step: step.data });
+  if (error) return { ok: false, message: friendlyDbError(error) };
+  revalidatePath("/", "layout");
+  return { ok: true, message: `Menu step ${step.data} is saved. Everybody sees it from their next click.` };
+}
+
 const company = z.object({
   name: z.string().trim().min(2, "The company name must be 2 to 100 letters.").max(100, "The company name must be 2 to 100 letters."),
   tagline: z.string().trim().max(100, "The tagline is too long (max 100)."),

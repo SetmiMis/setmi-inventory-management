@@ -2,6 +2,20 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-30: "Start simple, step by step": menu steps 1 to 4 (Claude Sonnet 5.5)
+
+Owner felt the system had become too big and asked to start simple and open more step by step. Decision: Step 1 = Products, Categories, Current Stock, Warehouses (warehouse and shop stock), Stock In/Out, Reorder; Step 2 adds Suppliers, Goods Inward, Racks; Step 3 adds Transfers, Ledger, Physical Count, Quality Check; Step 4 = everything. The owner chose a switch in Settings.
+
+### Done (verified by command output)
+- `frontend/src/lib/menu-steps.ts` (which page belongs to which step; an unlisted page counts as step 4), `getMenuStep` in `lib/settings.ts` (answers 4 if the database function does not exist yet), `(app)/layout.tsx` filters the sidebar, phone menu, search box and quick actions, Settings > Modules has a "Menu steps" card (`menu-step-form.tsx`, `setMenuStep` in `settings/actions.ts`, admin only).
+- Migration `20261030000060_menu_step.sql` and SQL test `backend/supabase/tests/047_menu_step.sql` are WRITTEN BUT NOT APPLIED / NOT RUN (needs the owner's yes). Default value 4 = nothing changes until a lower step is saved.
+- `tsc`, `lint` (no output) pass; `npm test` 60/60 (5 new in `tests/menu-steps.test.ts`). In the owner's Chrome (dev server, before the migration): Settings > Modules shows the card with step 4 selected and the menu still shows everything, as intended. NOT run: `npm run build` (a dev server is running on port 3000).
+
+### Not done / owner must do
+- Say yes to applying migration 60, then run test 047, then save Step 1 in Settings > Modules and check the menu as a normal user.
+- It only hides pages from the menu; a person with the right can still open a page by its address. The dashboard still shows numbers of later steps (purchase orders, transfers, bills).
+- Uncommitted.
+
 ## 2026-10-29: Add Product page rebuilt with 8 tabs like the owner's mock (option A: no database change) (Claude Sonnet 5.5)
 
 ### Done (verified by command output)

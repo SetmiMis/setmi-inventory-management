@@ -8,11 +8,12 @@ import { requireAdmin } from "@/lib/auth";
 import { getCompany } from "@/lib/company";
 import { friendlyDbError } from "@/lib/db-errors";
 import { createClient } from "@/lib/supabase/server";
-import { isBillingEnabled } from "@/lib/settings";
+import { getMenuStep, isBillingEnabled } from "@/lib/settings";
 import { cardClass } from "@/lib/ui";
 import { RowsPerPage } from "../../items/item-controls";
 import { BillingSwitch } from "./billing-switch";
 import { CompanyForm } from "./company-form";
+import { MenuStepForm } from "./menu-step-form";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
@@ -34,7 +35,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   await requireAdmin();
   const sp = await searchParams;
   const tab: TabKey = TABS.some((t) => t.key === first(sp.tab)) ? (first(sp.tab) as TabKey) : "general";
-  const [company, billing] = await Promise.all([getCompany(), isBillingEnabled()]);
+  const [company, billing, menuStep] = await Promise.all([getCompany(), isBillingEnabled(), getMenuStep()]);
 
   return (
     <main className="space-y-5">
@@ -124,6 +125,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
       {tab === "modules" && (
         <section className={`${cardClass} !p-5`}>
+          <div className="mb-5 space-y-3 rounded-xl border border-line bg-surface-muted p-4">
+            <h3 className="font-bold">Menu steps: start simple</h3>
+            <p className="text-sm text-muted">Choose how much of the menu everybody sees. This only hides pages from the menu, the search box and the quick actions. Nothing is deleted, and what a person may open is still decided by their rights. You can open the next step whenever your team is ready.</p>
+            <MenuStepForm current={menuStep} />
+          </div>
           <h2 className="mb-3 text-base font-bold">Modules</h2>
           <div className="overflow-x-auto"><table className="dash-table w-full text-left text-sm">
             <thead><tr><th>Module</th><th>What it does</th><th>Status</th></tr></thead>

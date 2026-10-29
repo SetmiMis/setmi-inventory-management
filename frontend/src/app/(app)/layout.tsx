@@ -4,7 +4,8 @@ import Link from "next/link";
 import { can, requireUser, showDashboard } from "@/lib/auth";
 import { getLang, tr } from "@/lib/i18n";
 import { getCurrentLocation, getMyLocations } from "@/lib/location";
-import { isBillingEnabled } from "@/lib/settings";
+import { getMenuStep, isBillingEnabled } from "@/lib/settings";
+import { showAtStep } from "@/lib/menu-steps";
 import { createClient } from "@/lib/supabase/server";
 import { LocationSwitcher } from "./location-switcher";
 import { CommandPalette, type PaletteEntry } from "./command-palette";
@@ -35,9 +36,9 @@ async function Shell({ children }: { children: React.ReactNode }) {
     const { count } = await supabase.from("stock_overview").select("item_id", { count: "exact", head: true }).eq("is_low", true);
     return count ?? 0;
   };
-  // These five reads are independent: ask together, so the page waits for the slowest one, not for the sum.
-  const [lang, myLocations, current, billingOn, lowCount] = await Promise.all([
-    getLang(), getMyLocations(user), getCurrentLocation(user), isBillingEnabled(), countLow(),
+  // These six reads are independent: ask together, so the page waits for the slowest one, not for the sum.
+  const [lang, myLocations, current, billingOn, lowCount, menuStep] = await Promise.all([
+    getLang(), getMyLocations(user), getCurrentLocation(user), isBillingEnabled(), countLow(), getMenuStep(),
   ]);
 
   // The menu is the one in the owner's dashboard mock, item for item. Items marked `soon` are in the design but
@@ -51,7 +52,8 @@ async function Shell({ children }: { children: React.ReactNode }) {
   const seesPurchase = can(user, "purchase.view") || can(user, "purchase.create") || can(user, "purchase.approve");
   const seesBills = can(user, "bills.view") || can(user, "bills.create") || can(user, "bills.void");
   const nav: NavItem[] = [];
-  const add = (show: boolean, item: NavItem) => { if (show) nav.push(item); };
+  // Settings > Modules decides how much of the menu is shown (step 1 to 4); permissions still decide what each person may open.
+  const add = (show: boolean, item: NavItem) => { if (show && showAtStep(item.href, menuStep)) nav.push(item); };
   if (showDashboard(user)) nav.push({ href: "/dashboard", label: tr(lang, "nav_dashboard"), icon: "dashboard" });
   else nav.push({ href: "/", label: tr(lang, "nav_home"), icon: "home" });
   // Master data
@@ -88,10 +90,11 @@ async function Shell({ children }: { children: React.ReactNode }) {
 
   // Jobs that are in the system but not in the mock's menu: reachable from Quick Action, the search box and the phone bar.
   const extras: NavItem[] = [];
-  if (can(user, "stock.view") && can(user, "items.view")) extras.push({ href: "/reorder", label: tr(lang, "nav_reorder"), icon: "reorder" });
-  if (seesBills) extras.push({ href: "/bills", label: tr(lang, "nav_bills"), icon: "bills" });
-  if (billingOn && can(user, "bills.create")) extras.push({ href: "/billing", label: tr(lang, "nav_billing2"), icon: "billing" });
-  extras.push({ href: "/help", label: tr(lang, "nav_help"), icon: "help" });
+  const addExtra = (show: boolean, item: NavItem) => { if (show && showAtStep(item.href, menuStep)) extras.push(item); };
+  addExtra(can(user, "stock.view") && can(user, "items.view"), { href: "/reorder", label: tr(lang, "nav_reorder"), icon: "reorder" });
+  addExtra(seesBills, { href: "/bills", label: tr(lang, "nav_bills"), icon: "bills" });
+  addExtra(billingOn && can(user, "bills.create"), { href: "/billing", label: tr(lang, "nav_billing2"), icon: "billing" });
+  addExtra(true, { href: "/help", label: tr(lang, "nav_help"), icon: "help" });
   const bottomPool = [...nav, ...extras];
 
   // Search box: every page above, plus quick actions for the jobs done most often.
@@ -102,7 +105,7 @@ async function Shell({ children }: { children: React.ReactNode }) {
     ...(can(user, "purchase.create") ? [{ href: "/purchase-orders/new", label: tr(lang, "act_new_po"), kind: "action" as const }] : []),
     ...(can(user, "transfers.create") ? [{ href: "/transfers/new", label: tr(lang, "act_new_transfer"), kind: "action" as const }] : []),
     ...(can(user, "stock.entry") ? [{ href: "/stock/entry", label: tr(lang, "act_stock_out"), kind: "action" as const }] : []),
-  ];
+  ].filter((e) => e.kind === "page" || showAtStep(e.href, menuStep));
   const paletteLabels = {
     button: tr(lang, "top_search"), title: tr(lang, "search_title"), placeholder: tr(lang, "search_placeholder"),
     items: tr(lang, "search_items"), pages: tr(lang, "search_pages"), actions: tr(lang, "search_actions"), recent: tr(lang, "search_recent"),
