@@ -2,6 +2,20 @@
 
 Newest entry on top. Read this first, update it last.
 
+## 2026-10-29: Add Product page rebuilt with 8 tabs like the owner's mock (option A: no database change) (Claude Sonnet 5.5)
+
+### Done (verified by command output)
+- `frontend/src/app/(app)/items/new/add-product-form.tsx` now has the 8 tabs of the mock (Basic Information, Specifications, Inventory & Stock, Pricing, Supplier & Purchase, Images & Documents, Variants / SKUs, SEO & Other), a Product Preview card on the right, and the header buttons (Back to Products, Save as Draft, Save Product). All boxes of all tabs stay in one form (a hidden tab is only hidden), so Save sends everything through the same `createProduct`; images upload as before; Duplicate (`?from=`) still fills the boxes. Errors about name, code or category switch to the Basic tab.
+- Only fields that already exist in the database have boxes. Everything else is a plain "Not built yet" card: technical-spec table and packaging, batch/serial/expiry, MRP, GST, channel prices, discounts, price history, primary/alternate suppliers, several documents, variants, SEO and marketplace fields. No migration, no new dependency. The mock's rich-text editor is a plain text box.
+- Field placement: Selling Item Name moved to Pricing; MOQ, Lead Time, Purchase Source, Import Item Code to Supplier & Purchase; Safety factor to Inventory & Stock; type, material, colour, weight, size, country, model and shelf life to Specifications.
+- `typecheck`, `lint` (no output), `build` (exit 0, no warning lines) and `npm test` (55/55) pass.
+
+### Not done / owner must do
+- **Not seen in a browser** (the AI never enters passwords; localhost:3000 showed the login page). Please open `/items/new`: click all 8 tabs, save a test product (with and without a category), try Duplicate, check dark mode and phone width, then delete the test product.
+- Checked in the owner's Chrome (dev server, light and dark, signed in): all 8 tabs show one panel each; Save with an empty form switches to the Basic tab and shows the error; the preview card follows name, code and category. Fixed after that check: the old error message now clears as soon as a box is edited, it has dark-mode colours, and the tab bar wraps to two rows on a computer screen so "SEO & Other" is no longer cut off (phones still scroll sideways). NOT tested: a real save, Duplicate, image upload, phone width (saving would create data in the live database). A dev-mode console message says `/items/new` reads data outside `<Suspense>` (old pattern in `items/new/page.tsx`, page works, build passes; not changed).
+- Note: `npm run build` must not be run while `next start` or `next dev` uses the same `frontend/.next` folder (it broke the running server once; the old `next start` on port 3000 was stopped with the owner's yes and a dev server started in its place).
+- Not committed. Which "Not built yet" part to build first (each needs its own migration approval) is the owner's choice.
+
 ## 2026-10-29: Products / SKU list: streaming, live search, instant filters, price columns (Claude Sonnet 5.5)
 
 ### Done (verified by command output)
