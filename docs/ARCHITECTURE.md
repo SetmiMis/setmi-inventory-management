@@ -1,17 +1,22 @@
 # ARCHITECTURE
 
-## Current state (implemented)
-Next.js App Router app with Supabase login, a permission guard and an admin users page. The database (9 tables, RLS) exists; no Item Master screens yet. See `docs/FLOW.md` for the real request flow.
+## Current state (implemented; synced with the files on 2026-10-29)
+Two folders: `frontend/` (Next.js App Router app, most of the system) and `backend/` (Express API with only the products module, plus `backend/supabase/` with the database source). Supabase gives login, Row Level Security and the database; the screens call it from the Next.js server. The database has 58 migrations (`create table` appears 52 times in them). See `docs/FLOW.md` for the request flow and `docs/HANDOVER.md` for what was built and tested.
 
 ```
-src/proxy.ts                     session refresh + redirect to /login (convenience)
-src/lib/supabase/{env,server}.ts Supabase clients (server only, runs as the signed-in user)
-src/lib/auth.ts                  getCurrentUser, requireUser/Admin/Permission, can()
-src/app/login/                   login page, form, server action
-src/app/(app)/layout.tsx         signed-in shell, inactive-account guard, sign out
-src/app/(app)/page.tsx           home (shows the user's access)
-src/app/(app)/admin/users/       admin: users, permission toggles, location access
-backend/supabase/migrations, backend/supabase/tests   database source and tests
+frontend/src/proxy.ts                     session refresh + redirect to /login (convenience)
+frontend/src/lib/supabase/                Supabase clients (env, server, client, session-cookie)
+frontend/src/lib/auth.ts                  getCurrentUser, requireUser/Admin/Permission, can()
+frontend/src/lib/{location,settings,company,reports,csv,db-errors}.ts   shared helpers
+frontend/src/lib/{barcode,i18n,import,validation,client}/               barcode, English/Hindi, Excel import, zod schemas, browser helpers
+frontend/src/app/login, forgot-password, reset-password, auth/          sign-in, password recovery, email-link callback
+frontend/src/app/(app)/layout.tsx         signed-in shell, inactive-account guard
+frontend/src/app/(app)/<module>/          dashboard, items, suppliers, locations, customers, purchase-orders,
+                                          import-shipments, receipts, quality-check, stock, transfers, sales-orders,
+                                          picking, dispatch, returns, billing, bills, reorder, reports, help, admin
+backend/src/{app,server}.ts, config/, middleware/auth.middleware.ts, modules/items/   Express API (items only)
+backend/supabase/migrations, backend/supabase/tests, backend/supabase/seed            database source, tests, demo data
+.github/workflows/ci.yml                  CI (frontend and backend jobs)
 ```
 Cache Components is on (scaffold default), so anything reading the session sits inside `<Suspense>` (done in the `(app)` layout).
 
